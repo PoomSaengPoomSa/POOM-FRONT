@@ -66,11 +66,17 @@ export default function NewsBucket() {
 
       {/* Main Content */}
       <div className="news-main">
-        <h1 className="news-header-title">뉴스 버킷 - 버킷</h1>
         
         <div className="news-content-card">
-          <div className="news-page-title">
-            버킷 <span className="news-page-subtitle">오늘의 메시지 뉴스 저장소</span>
+          <div className="news-page-title" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              버킷 <span className="news-page-subtitle">오늘의 메시지 뉴스 저장소</span>
+            </div>
+            <Link to="/news-archive" style={{ textDecoration: 'none' }}>
+              <button style={{ padding: '8px 16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '13px', color: '#64748b', cursor: 'pointer', fontWeight: '500' }}>
+                뉴스 아카이브로 가기
+              </button>
+            </Link>
           </div>
 
           <div className="news-tabs">
