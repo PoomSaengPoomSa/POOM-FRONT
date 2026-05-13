@@ -7,19 +7,68 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+.pnp
+.pnp.js
+
+# Build
 dist
 dist-ssr
-*.local
+build
+out
+.next
+.nuxt
+.cache
 
-# Editor directories and files
+# Local env
+*.local
+.env
+.env.*
+!.env.example
+
+# Editor
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python
 .venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
+htmlcov/
+
+# Misc
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+*.zip
+*.tar.gz
