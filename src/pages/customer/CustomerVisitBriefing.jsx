@@ -14,6 +14,7 @@ export default function CustomerVisitBriefing() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(1);
 
   return (
     <div className="cust-container">
@@ -75,7 +76,7 @@ export default function CustomerVisitBriefing() {
 
           <div className="cust-list-items">
             {customers.map(c => (
-              <div className="cust-list-item" key={c.id}>
+              <div className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomerId(c.id)} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">
                   <span className="cust-item-name">{c.name}</span>

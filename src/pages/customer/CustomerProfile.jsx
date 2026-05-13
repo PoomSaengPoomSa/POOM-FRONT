@@ -14,6 +14,7 @@ export default function CustomerProfile() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(1);
 
   return (
     <div className="cust-container">
@@ -75,7 +76,7 @@ export default function CustomerProfile() {
 
           <div className="cust-list-items">
             {customers.map(c => (
-              <div className="cust-list-item" key={c.id}>
+              <div className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomerId(c.id)} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">
                   <span className="cust-item-name">{c.name}</span>
@@ -130,10 +131,6 @@ export default function CustomerProfile() {
                   </div>
                 </div>
               </div>
-              
-              <button style={{ background: 'white', border: '1px solid #0284c7', color: '#0284c7', padding: '8px 24px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                연락하기
-              </button>
             </div>
 
             {/* Profile Info Grid */}

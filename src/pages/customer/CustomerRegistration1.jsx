@@ -112,7 +112,7 @@ export default function CustomerRegistration1() {
 
           <div className="cust-list-items">
             {(activeListTab === '전체 고객' ? allCustomers : todayCustomers).map(c => (
-              <div className="cust-list-item" key={c.id} onClick={() => { if (activeListTab === '오늘 방문') setSelectedCustomer(c); }} style={{ cursor: activeListTab === '오늘 방문' ? 'pointer' : 'default' }}>
+              <div className={`cust-list-item ${selectedCustomer?.id === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomer(c)} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">
                   <span className="cust-item-name">{c.name}</span>
@@ -309,7 +309,7 @@ export default function CustomerRegistration1() {
                 <span style={{ fontSize: 12, color: '#94a3b8' }}>월별 상담 현황</span>
               </div>
               
-              <div style={{ display: 'flex', gap: 16, marginBottom: 32 }}>
+              <div style={{ display: 'flex', gap: 16, marginBottom: 64 }}>
                 <div style={{ flex: 1, background: '#e2e8f0', borderRadius: 16, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: 14, color: '#64748b', fontWeight: 600 }}>총 방문</span>
                   <div><span style={{ fontSize: 24, fontWeight: 700, color: '#0f172a' }}>4</span> <span style={{ fontSize: 12, color: '#64748b' }}>회</span></div>

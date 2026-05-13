@@ -39,6 +39,7 @@ export default function CustomerDashboard() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(1);
 
   return (
     <div className="cust-container">
@@ -100,7 +101,7 @@ export default function CustomerDashboard() {
 
           <div className="cust-list-items">
             {customers.map(c => (
-              <div className="cust-list-item" key={c.id}>
+              <div className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomerId(c.id)} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">
                   <span className="cust-item-name">{c.name}</span>
@@ -295,7 +296,7 @@ export default function CustomerDashboard() {
                 <span style={{ fontSize: 12, color: '#94a3b8' }}>월별 상담 현황</span>
               </div>
               
-              <div style={{ display: 'flex', gap: 16, marginBottom: 32 }}>
+              <div style={{ display: 'flex', gap: 16, marginBottom: 64 }}>
                 <div style={{ flex: 1, background: '#e2e8f0', borderRadius: 16, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: 14, color: '#64748b', fontWeight: 600 }}>총 방문</span>
                   <div><span style={{ fontSize: 24, fontWeight: 700, color: '#0f172a' }}>4</span> <span style={{ fontSize: 12, color: '#64748b' }}>회</span></div>

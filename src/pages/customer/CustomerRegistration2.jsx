@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, Camera, X } from "lucide-react";
 import "./Customer.css";
@@ -11,6 +12,7 @@ const customers = [
 export default function CustomerRegistration2() {
   const location = useLocation();
   const path = location.pathname;
+  const [selectedCustomerId, setSelectedCustomerId] = useState(1);
 
   return (
     <div className="cust-container">
@@ -75,7 +77,7 @@ export default function CustomerRegistration2() {
 
           <div className="cust-list-items">
             {customers.map(c => (
-              <div className="cust-list-item" key={c.id}>
+              <div className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomerId(c.id)} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">
                   <span className="cust-item-name">{c.name}</span>
