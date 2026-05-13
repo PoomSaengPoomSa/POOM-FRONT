@@ -209,9 +209,9 @@ export default function WeeklyCalendar() {
                 );
               })}
 
-              {/* Time Slots (08:00 to 18:00) */}
-              {Array.from({ length: 11 }).map((_, i) => {
-                const hour = 8 + i;
+              {/* Time Slots (00:00 to 24:00) */}
+              {Array.from({ length: 24 }).map((_, i) => {
+                const hour = i;
                 const timeStr = `${hour < 10 ? `0${hour}` : hour}:00`;
                 
                 return (
@@ -225,13 +225,13 @@ export default function WeeklyCalendar() {
                         <div className="weekly-grid-cell">
                           {/* Demo Events - only show on May 9, 2026 */}
                           {hour === 8 && weekDays[dayIdx].getFullYear() === 2026 && weekDays[dayIdx].getMonth() === 4 && weekDays[dayIdx].getDate() === 9 && (
-                             <div className="event-block event-green" style={{ top: 30, height: 50, cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[0])}>이OO 고객님 미팅</div>
+                             <div className="event-block event-green" style={{ top: 0, height: 60, cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[0])}>이OO 고객님 미팅</div>
                           )}
                           {hour === 12 && weekDays[dayIdx].getFullYear() === 2026 && weekDays[dayIdx].getMonth() === 4 && weekDays[dayIdx].getDate() === 9 && (
-                             <div className="event-block event-blue" style={{ top: 0, height: 50, cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[1])}>점심 약속</div>
+                             <div className="event-block event-blue" style={{ top: 0, height: 60, cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[1])}>점심 약속</div>
                           )}
                           {hour === 13 && weekDays[dayIdx].getFullYear() === 2026 && weekDays[dayIdx].getMonth() === 4 && weekDays[dayIdx].getDate() === 9 && (
-                             <div className="event-block event-orange" style={{ top: 30, height: 100, cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[2])}>내부 회의</div>
+                             <div className="event-block event-orange" style={{ top: 30, height: 120, cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[2])}>내부 회의</div>
                           )}
                         </div>
                       </div>

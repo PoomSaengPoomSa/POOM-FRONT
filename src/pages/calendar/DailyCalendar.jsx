@@ -190,8 +190,8 @@ export default function DailyCalendar() {
                 
                 {/* Hours column */}
                 <div style={{ borderRight: '1px solid #e5e7eb' }}>
-                  {Array.from({ length: 11 }).map((_, i) => {
-                    const hour = 8 + i;
+                  {Array.from({ length: 24 }).map((_, i) => {
+                    const hour = i;
                     const timeStr = `${hour < 10 ? `0${hour}` : hour}:00`;
                     return (
                       <div key={hour} style={{ height: 80, borderBottom: '1px solid #e5e7eb', padding: '8px', textAlign: 'right', fontSize: 11, color: '#94a3b8', boxSizing: 'border-box' }}>
@@ -203,7 +203,7 @@ export default function DailyCalendar() {
 
                 {/* Events column */}
                 <div style={{ position: 'relative' }}>
-                  {Array.from({ length: 11 }).map((_, i) => (
+                  {Array.from({ length: 24 }).map((_, i) => (
                     <div key={i} style={{ height: 80, borderBottom: '1px solid #e5e7eb', boxSizing: 'border-box' }}></div>
                   ))}
 
@@ -212,35 +212,35 @@ export default function DailyCalendar() {
                       {/* Absolute positioned events */}
                       <div 
                         onClick={() => openDetailModal(DEMO_EVENTS[0])}
-                        style={{ cursor: 'pointer', position: 'absolute', top: 10, left: 24, right: 24, height: 60, background: '#dcfce7', borderRadius: 8, display: 'flex', border: '1px solid #bbf7d0' }}
+                        style={{ cursor: 'pointer', position: 'absolute', top: 650, left: 24, right: 24, height: 60, background: '#dcfce7', borderRadius: 8, display: 'flex', border: '1px solid #bbf7d0' }}
                       >
                         <div style={{ width: '30%', padding: 12, borderRight: '1px solid #bbf7d0', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                           <span style={{ fontSize: 13, fontWeight: 600, color: '#166534' }}>이OO 고객님 미팅</span>
                           <span style={{ fontSize: 11, color: '#15803d' }}>08:00 ~ 09:00</span>
                         </div>
-                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: '#166534' }}>메모 사항</div>
+                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: '#166534', whiteSpace: 'pre-line' }}>{DEMO_EVENTS[0].memo}</div>
                       </div>
 
                       <div 
                         onClick={() => openDetailModal(DEMO_EVENTS[1])}
-                        style={{ cursor: 'pointer', position: 'absolute', top: 410, left: 24, right: 24, height: 60, background: '#e0f2fe', borderRadius: 8, display: 'flex', border: '1px solid #bae6fd' }}
+                        style={{ cursor: 'pointer', position: 'absolute', top: 970, left: 24, right: 24, height: 60, background: '#e0f2fe', borderRadius: 8, display: 'flex', border: '1px solid #bae6fd' }}
                       >
                         <div style={{ width: '30%', padding: 12, borderRight: '1px solid #bae6fd', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                           <span style={{ fontSize: 13, fontWeight: 600, color: '#0369a1' }}>점심 약속</span>
                           <span style={{ fontSize: 11, color: '#075985' }}>12:00 ~ 13:00</span>
                         </div>
-                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: '#0369a1' }}>메모 사항</div>
+                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: '#0369a1', whiteSpace: 'pre-line' }}>{DEMO_EVENTS[1].memo}</div>
                       </div>
 
                       <div 
                         onClick={() => openDetailModal(DEMO_EVENTS[2])}
-                        style={{ cursor: 'pointer', position: 'absolute', top: 510, left: 24, right: 24, height: 120, background: '#ffedd5', borderRadius: 8, display: 'flex', border: '1px solid #fed7aa' }}
+                        style={{ cursor: 'pointer', position: 'absolute', top: 1090, left: 24, right: 24, height: 120, background: '#ffedd5', borderRadius: 8, display: 'flex', border: '1px solid #fed7aa' }}
                       >
                         <div style={{ width: '30%', padding: 12, borderRight: '1px solid #fed7aa', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                           <span style={{ fontSize: 13, fontWeight: 600, color: '#9a3412' }}>내부 회의</span>
                           <span style={{ fontSize: 11, color: '#c2410c' }}>13:30 ~ 15:30</span>
                         </div>
-                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: '#9a3412' }}>메모 사항</div>
+                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: '#9a3412', whiteSpace: 'pre-line' }}>{DEMO_EVENTS[2].memo}</div>
                       </div>
                     </>
                   )}
