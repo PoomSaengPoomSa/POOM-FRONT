@@ -717,3 +717,38 @@
   border: 1px solid var(--cal-primary);
   color: white;
 }
+
+/* Detail Modal Styles */
+.cal-detail-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+.cal-detail-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.cal-detail-value {
+  font-size: 14px;
+  color: #0f172a;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.cal-badge-blue {
+  background-color: #e0f2fe;
+  color: var(--cal-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.bg-green {
+  background-color: #22c55e;
+}
