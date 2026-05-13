@@ -13,6 +13,7 @@ export default function CustomerRegistration2() {
   const location = useLocation();
   const path = location.pathname;
   const [selectedCustomerId, setSelectedCustomerId] = useState(1);
+  const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
 
   return (
     <div className="cust-container">
@@ -89,11 +90,11 @@ export default function CustomerRegistration2() {
           </div>
         </div>
 
-        <div className="cust-detail-panel cust-blurred-content">
+        <div key={selectedCustomerId} className="cust-detail-panel cust-blurred-content">
           <div className="cust-detail-header">
             <div className="cust-detail-profile">
-              <div className="cust-avatar pink">김</div>
-              <h2>김OO</h2>
+              <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
+              <h2>{selectedCustomer.name}</h2>
             </div>
           </div>
         </div>

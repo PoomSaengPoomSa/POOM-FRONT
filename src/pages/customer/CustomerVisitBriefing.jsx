@@ -15,6 +15,7 @@ export default function CustomerVisitBriefing() {
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(1);
+  const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
 
   return (
     <div className="cust-container">
@@ -90,7 +91,7 @@ export default function CustomerVisitBriefing() {
         </div>
 
         {/* Right Detail Panel */}
-        <div className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
+        <div key={selectedCustomerId} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
           <div className="cust-detail-header">
             <div className="cust-detail-tabs" style={{ margin: 0 }}>
               <Link to="/customer-management-profile" style={{ textDecoration: 'none' }}>
@@ -106,8 +107,8 @@ export default function CustomerVisitBriefing() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div className="cust-detail-profile">
-                <div className="cust-avatar pink">김</div>
-                <h2>김OO</h2>
+                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
+                <h2>{selectedCustomer.name}</h2>
               </div>
               <MoreVertical className="cust-more-btn" size={20} />
             </div>

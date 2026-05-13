@@ -67,6 +67,7 @@ export default function CustomerMemoAssistant() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(1);
   const [expandedTimelineId, setExpandedTimelineId] = useState(1);
+  const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
 
   return (
     <div className="cust-container">
@@ -142,7 +143,7 @@ export default function CustomerMemoAssistant() {
         </div>
 
         {/* Right Detail Panel */}
-        <div className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
+        <div key={selectedCustomerId} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
           <div className="cust-detail-header">
             <div className="cust-detail-tabs" style={{ margin: 0 }}>
               <Link to="/customer-management-profile" style={{ textDecoration: 'none' }}>
@@ -158,8 +159,8 @@ export default function CustomerMemoAssistant() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div className="cust-detail-profile">
-                <div className="cust-avatar pink">김</div>
-                <h2>김OO</h2>
+                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
+                <h2>{selectedCustomer.name}</h2>
               </div>
               <MoreVertical className="cust-more-btn" size={20} />
             </div>
@@ -198,7 +199,7 @@ export default function CustomerMemoAssistant() {
               
               <table className="report-table">
                 <tbody>
-                  <tr><th>고객명</th><td>김OO (VIP)</td></tr>
+                  <tr><th>고객명</th><td>{selectedCustomer.name} (VIP)</td></tr>
                   <tr><th>총자산</th><td>32억 1234만</td></tr>
                   <tr><th>주요 니즈</th><td>달러 자산 비중 축소/국내 리츠 편입 검토</td></tr>
                   <tr><th>후속 조치</th><td>리츠 상품 비교안 준비</td></tr>
