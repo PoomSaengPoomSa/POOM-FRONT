@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Calendar, TrendingUp, Users, Bell, LogOut, X } from "lucide-react";
 import "./News.css";
 
-const categories = [
+const initialCategories = [
   {
     title: "경제",
     items: [
@@ -26,6 +27,14 @@ const categories = [
 export default function NewsBucket() {
   const location = useLocation();
   const path = location.pathname;
+
+  const [categoriesData, setCategoriesData] = useState(initialCategories);
+
+  const handleRemoveItem = (categoryIndex, itemIndex) => {
+    const updatedCategories = [...categoriesData];
+    updatedCategories[categoryIndex].items = updatedCategories[categoryIndex].items.filter((_, idx) => idx !== itemIndex);
+    setCategoriesData(updatedCategories);
+  };
 
   return (
     <div className="news-container">
@@ -113,7 +122,7 @@ export default function NewsBucket() {
             <div className="news-editor-label" style={{ marginBottom: 16 }}>버킷 - 카테고리별</div>
             
             <div style={{ flex: 1, overflowY: 'auto' }}>
-              {categories.map((cat, idx) => (
+              {categoriesData.map((cat, idx) => (
                 <div key={idx} style={{ marginBottom: 24 }}>
                   <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>{cat.title}</div>
                   {cat.items.map((item, i) => (
@@ -130,7 +139,7 @@ export default function NewsBucket() {
                       <span style={{ fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{item.text}</span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                         <span style={{ fontSize: 13, color: '#64748b' }}>{item.date}</span>
-                        <X size={16} color="#64748b" style={{ cursor: 'pointer' }} />
+                        <X size={16} color="#64748b" style={{ cursor: 'pointer' }} onClick={() => handleRemoveItem(idx, i)} />
                       </div>
                     </div>
                   ))}
