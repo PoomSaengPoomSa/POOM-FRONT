@@ -15,6 +15,7 @@ export default function CustomerProfile() {
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(1);
+  const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
 
   return (
     <div className="cust-container">
@@ -90,7 +91,7 @@ export default function CustomerProfile() {
         </div>
 
         {/* Right Detail Panel */}
-        <div className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
+        <div key={selectedCustomerId} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
           <div className="cust-detail-header">
             <div className="cust-detail-tabs" style={{ margin: 0 }}>
               <button className="cust-detail-tab active">프로필</button>
@@ -106,8 +107,8 @@ export default function CustomerProfile() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div className="cust-detail-profile">
-                <div className="cust-avatar pink">김</div>
-                <h2>김OO</h2>
+                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
+                <h2>{selectedCustomer.name}</h2>
               </div>
               <MoreVertical className="cust-more-btn" size={20} />
             </div>
@@ -118,11 +119,11 @@ export default function CustomerProfile() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <div style={{ width: 64, height: 64, background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: '#e2e8f0', border: '2px dashed #cbd5e1' }}>
-                  김
+                  {selectedCustomer.initial}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 24, fontWeight: 700, color: '#0f172a' }}>김OO</span>
+                    <span style={{ fontSize: 24, fontWeight: 700, color: '#0f172a' }}>{selectedCustomer.name}</span>
                     <span style={{ background: '#fef3c7', color: '#b45309', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 12 }}>VIP</span>
                     <span style={{ background: '#e2e8f0', color: '#64748b', fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 12 }}>중립형</span>
                   </div>
@@ -157,7 +158,7 @@ export default function CustomerProfile() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>연락처</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>010-0000-0000</div>
+                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>{selectedCustomer.phone}</div>
               </div>
             </div>
 
