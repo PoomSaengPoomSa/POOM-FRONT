@@ -1,0 +1,43 @@
+.component1 {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-10) var(--padding-1_4);
+  background-color: transparent;
+  width: var(--width-182);
+  height: var(--height-39);
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  z-index: 2;
+  flex-shrink: 0;
+}
+.underlayIcon {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  margin: 0 !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: var(--br-7);
+  max-width: 100%;
+  overflow: hidden;
+  max-height: 100%;
+  z-index: 0;
+  flex-shrink: 0;
+}
+.llm {
+  height: var(--height-19);
+  width: var(--width-176_3);
+  position: relative;
+  font-size: var(--fs-14);
+  display: inline-block;
+  font-family: var(--font-nunito);
+  color: var(--color-white);
+  text-align: center;
+  z-index: 1;
+  flex-shrink: 0;
+}

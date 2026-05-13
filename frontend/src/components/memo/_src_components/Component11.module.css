@@ -1,0 +1,111 @@
+.div {
+  align-self: stretch;
+  box-shadow: var(--shadow-drop-2);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 19.3px var(--padding-18) var(--padding-18);
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  gap: 13.3px;
+  max-width: 100%;
+  z-index: 1;
+  text-align: left;
+  font-size: var(--fs-14);
+  color: var(--color-steelblue-200);
+  font-family: var(--font-nunito);
+}
+.ai,
+.div,
+.icon {
+  flex-shrink: 0;
+}
+.icon {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  margin: 0 !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: var(--br-5);
+  max-width: 100%;
+  overflow: hidden;
+  max-height: 100%;
+}
+.ai {
+  width: var(--width-187_5);
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+}
+.div2,
+.parent {
+  align-self: stretch;
+  display: flex;
+  max-width: 100%;
+}
+.parent {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--gap-24);
+  flex-shrink: 0;
+  color: var(--Grays-Black);
+}
+.div2 {
+  border-radius: var(--br-10);
+  background-color: var(--color-white);
+  align-items: flex-start;
+  padding: var(--padding-32) var(--padding-34);
+  box-sizing: border-box;
+  min-height: 447px;
+  z-index: 1;
+}
+.div3,
+.kf21Container {
+  position: relative;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+.div3 {
+  height: 447px;
+  width: 1028px;
+  border-radius: var(--br-10);
+  background-color: var(--color-white);
+  display: none;
+}
+.kf21Container {
+  height: 306px;
+  width: 804px;
+  display: inline-block;
+  z-index: 1;
+}
+.kf21,
+.p {
+  margin: 0;
+}
+.kf21 {
+  font-family: inherit;
+  font-size: inherit;
+  padding-left: var(--padding-19);
+}
+.component1Parent {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  max-width: 100%;
+}
+@media screen and (max-width: 750px) {
+  .component1Parent {
+    flex-wrap: wrap;
+  }
+}
+@media screen and (max-width: 450px) {
+  .div2 {
+    padding-top: 21px;
+    padding-bottom: 21px;
+    box-sizing: border-box;
+  }
+}

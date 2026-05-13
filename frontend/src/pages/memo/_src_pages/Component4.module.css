@@ -1,0 +1,209 @@
+.div,
+.wrapper {
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+.div {
+  width: 100%;
+  height: var(--height-900);
+  position: relative;
+  background-color: var(--color-whitesmoke-200);
+  overflow: hidden;
+  padding: var(--padding-1) 37px var(--padding-29) var(--padding-0);
+  gap: 39px;
+  line-height: normal;
+  letter-spacing: normal;
+}
+.wrapper {
+  flex: 1;
+  flex-direction: column;
+  padding: var(--padding-28) var(--padding-0) var(--padding-0);
+  max-width: calc(100% - 257px);
+  flex-shrink: 0;
+}
+.div2,
+.section {
+  border-radius: var(--br-10);
+  background-color: var(--color-white);
+  max-width: 100%;
+}
+.section {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--padding-13) 31px var(--padding-25) 49px;
+  box-sizing: border-box;
+  gap: 20.7px;
+  text-align: left;
+  font-size: var(--fs-36);
+  color: var(--Text);
+  font-family: var(--font-nunito);
+}
+.div2 {
+  width: 1146px;
+  height: 842px;
+  position: relative;
+  display: none;
+  flex-shrink: 0;
+}
+.frameParent,
+.parent {
+  display: flex;
+  align-items: flex-start;
+}
+.frameParent {
+  width: 292.6px;
+  flex-direction: column;
+  gap: 8.8px;
+  flex-shrink: 0;
+}
+.parent {
+  width: 273.7px;
+  gap: 18.3px;
+}
+.h1 {
+  margin: 0;
+  position: relative;
+  font-size: inherit;
+  font-weight: 700;
+  font-family: inherit;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 18.1px var(--padding-0) var(--padding-0);
+  font-size: var(--fs-14);
+  color: var(--color-steelblue-200);
+}
+.b,
+.boardParent {
+  align-self: stretch;
+}
+.b {
+  position: relative;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.boardParent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.3px;
+}
+.board,
+.boardChild {
+  border-radius: var(--br-5) var(--br-0) var(--br-0) var(--br-5);
+  background-color: var(--color-whitesmoke-300);
+}
+.board {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-11) var(--padding-11) var(--padding-7)
+    var(--padding-12);
+  flex: 0.9462;
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 95px;
+  z-index: 1;
+}
+.board:hover {
+  background-color: var(--color-lightgray-100);
+}
+.boardChild {
+  height: 37.1px;
+  width: 146px;
+  position: relative;
+  display: none;
+  flex-shrink: 0;
+}
+.b2,
+.board2 {
+  flex: 1;
+  z-index: 1;
+}
+.b2 {
+  position: relative;
+  font-size: var(--fs-14);
+  font-family: var(--font-nunito);
+  color: var(--Text);
+  text-align: center;
+  flex-shrink: 0;
+}
+.board2 {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-11) var(--padding-7) var(--padding-10_1)
+    var(--padding-9);
+  background-color: var(--color-steelblue-100);
+  border-radius: var(--br-0) var(--br-5) var(--br-5) var(--br-0);
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 95px;
+}
+.board2:hover {
+  background-color: var(--color-deepskyblue);
+}
+.b3,
+.boardItem {
+  position: relative;
+  flex-shrink: 0;
+}
+.boardItem {
+  height: 37.1px;
+  width: 146px;
+  border-radius: var(--br-0) var(--br-5) var(--br-5) var(--br-0);
+  background-color: var(--color-steelblue-100);
+  display: none;
+}
+.b3 {
+  flex: 1;
+  font-size: var(--fs-14);
+  font-family: var(--font-nunito);
+  color: var(--color-white);
+  text-align: center;
+  z-index: 1;
+}
+@media screen and (max-width: 1150px) {
+  .section {
+    padding-left: var(--padding-24);
+    box-sizing: border-box;
+  }
+}
+@media screen and (max-width: 1050px) {
+  .div {
+    padding-left: var(--padding-20);
+    box-sizing: border-box;
+  }
+  .wrapper {
+    max-width: 100%;
+  }
+  .h1 {
+    font-size: 29px;
+  }
+}
+@media screen and (max-width: 750px) {
+  .div {
+    gap: var(--gap-19);
+  }
+}
+@media screen and (max-width: 450px) {
+  .div {
+    height: auto;
+  }
+  .h1 {
+    font-size: var(--fs-22);
+  }
+  .boardParent {
+    flex-wrap: wrap;
+  }
+  .board {
+    flex: 1;
+  }
+}

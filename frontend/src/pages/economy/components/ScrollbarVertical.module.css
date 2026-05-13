@@ -1,0 +1,27 @@
+.scrollbarVertical {
+  height: 455px;
+  width: var(--width-12);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-3);
+  box-sizing: border-box;
+}
+.frame,
+.thumb {
+  width: var(--width-6);
+}
+.frame {
+  height: 449px;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-0) var(--padding-0) 224.5px;
+  box-sizing: border-box;
+}
+.thumb {
+  height: 224.5px;
+  position: relative;
+  border-radius: 1000px;
+  background-color: var(--color-gray-400);
+}

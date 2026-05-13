@@ -1,0 +1,390 @@
+.frameParent,
+.interestDetails {
+  align-self: stretch;
+  display: flex;
+  max-width: 100%;
+}
+.interestDetails {
+  align-items: flex-start;
+  gap: var(--gap-16);
+  flex-shrink: 0;
+  text-align: left;
+  font-size: var(--fs-16);
+  color: var(--color-black);
+  font-family: var(--font-nunito);
+}
+.frameParent {
+  flex: 0.9362;
+  filter: drop-shadow(0 4px 15px #eee);
+  flex-direction: column;
+  align-items: flex-end;
+  padding: var(--padding-14) var(--padding-11) 54px;
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  gap: var(--gap-31);
+  z-index: 1;
+}
+.frameChild {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  margin: 0 !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  max-width: 100%;
+  overflow: hidden;
+  max-height: 100%;
+  flex-shrink: 0;
+}
+.diversificationScore {
+  align-self: stretch;
+  height: var(--height-22);
+  display: flex;
+  align-items: flex-start;
+  gap: 147px;
+  flex-shrink: 0;
+}
+.div,
+.div2 {
+  position: relative;
+  font-weight: 600;
+  z-index: 1;
+}
+.div2 {
+  align-self: stretch;
+  flex: 1;
+  color: var(--color-silver);
+}
+.interestBoxes {
+  width: 311px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: var(--padding-0) var(--padding-28);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  font-size: var(--fs-20);
+  color: var(--color-steelblue-400);
+}
+.firstTag,
+.secondTag {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.firstTag {
+  flex: 1;
+  gap: var(--gap-17);
+}
+.secondTag {
+  align-self: stretch;
+  gap: var(--gap-10);
+}
+.thirdTag {
+  align-self: stretch;
+  padding: var(--padding-0) var(--padding-0) var(--padding-0) var(--padding-34);
+}
+.fifthTag,
+.fourthTag,
+.thirdTag {
+  display: flex;
+  align-items: flex-start;
+}
+.fourthTag {
+  flex: 1;
+  justify-content: space-between;
+  gap: var(--gap-20);
+}
+.fifthTag {
+  width: 66px;
+  flex-direction: column;
+  padding: var(--padding-7) var(--padding-0) var(--padding-0);
+  box-sizing: border-box;
+}
+.div3,
+.div4 {
+  position: relative;
+  font-weight: 500;
+  z-index: 1;
+}
+.div3 {
+  align-self: stretch;
+}
+.div4 {
+  width: 108px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.seventhTag,
+.sixthTag {
+  display: flex;
+  align-items: flex-start;
+}
+.sixthTag {
+  width: 213px;
+  justify-content: space-between;
+  gap: var(--gap-20);
+  font-size: var(--fs-15);
+}
+.seventhTag {
+  flex-direction: column;
+  padding: var(--padding-12) var(--padding-0) var(--padding-0);
+}
+.div5,
+.sa {
+  position: relative;
+  font-weight: 500;
+  z-index: 1;
+}
+.sa {
+  display: inline-block;
+  min-height: var(--min-h-40);
+}
+.eighthTag {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-0) var(--padding-18);
+  font-size: var(--fs-13);
+}
+.parent {
+  height: 244px;
+  flex: 1;
+  position: relative;
+  box-shadow: var(--shadow-drop-1);
+  max-width: 100%;
+  z-index: 3;
+  text-align: right;
+  font-size: var(--fs-12);
+  color: var(--color-gray-300);
+}
+.div7 {
+  top: 216px;
+  left: 79px;
+  font-weight: 500;
+  z-index: 1;
+}
+.div7,
+.div8,
+.frameItem {
+  position: absolute;
+  flex-shrink: 0;
+}
+.div8 {
+  top: 169px;
+  left: -11px;
+  font-weight: 500;
+  display: inline-block;
+  width: var(--width-49);
+  height: var(--height-14);
+  z-index: 2;
+}
+.frameItem {
+  top: 0;
+  left: 0;
+  border-radius: var(--br-5);
+  width: 100%;
+  height: 100%;
+}
+.axisAnalysis,
+.riskRadar {
+  display: flex;
+  align-items: flex-start;
+}
+.riskRadar {
+  position: absolute;
+  top: 14px;
+  left: 12px;
+  width: 323px;
+  flex-direction: column;
+  gap: var(--gap-7);
+  flex-shrink: 0;
+  text-align: left;
+  font-size: var(--fs-16);
+  color: var(--color-black);
+}
+.axisAnalysis {
+  align-self: stretch;
+  justify-content: space-between;
+  gap: var(--gap-20);
+}
+.div10 {
+  height: var(--height-22);
+  width: var(--width-97);
+  position: relative;
+  font-weight: 600;
+  color: var(--color-silver);
+  text-align: right;
+  display: inline-block;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.profitabilityRadar {
+  width: 191px;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-0) 75px;
+  box-sizing: border-box;
+  text-align: right;
+  font-size: var(--fs-12);
+  color: var(--color-gray-300);
+}
+.div11 {
+  flex: 1;
+  position: relative;
+  font-weight: 500;
+  z-index: 1;
+}
+.growthDetails,
+.image3Icon {
+  position: absolute;
+  flex-shrink: 0;
+}
+.image3Icon {
+  top: 56px;
+  left: 30px;
+  width: 153px;
+  height: 160px;
+  object-fit: cover;
+  z-index: 1;
+}
+.growthDetails {
+  top: 58px;
+  left: -11px;
+  width: 346px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gap-20);
+}
+.growthRadar,
+.radarComponents {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.growthRadar {
+  width: var(--width-49);
+  padding: var(--padding-27) var(--padding-0) var(--padding-0);
+  box-sizing: border-box;
+}
+.radarComponents {
+  align-self: stretch;
+  gap: 49px;
+}
+.div12,
+.div13 {
+  align-self: stretch;
+  position: relative;
+  font-weight: 500;
+  z-index: 1;
+}
+.div13 {
+  height: var(--height-14);
+  display: inline-block;
+  flex-shrink: 0;
+}
+.stabilityRadar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--gap-17);
+}
+.radarAnalysis {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: var(--padding-0) var(--padding-0) var(--padding-9);
+}
+.assessmentPoints,
+.safetyIndicators {
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+}
+.safetyIndicators {
+  flex-direction: column;
+  gap: 53px;
+}
+.assessmentPoints {
+  padding: var(--padding-0) var(--padding-0) var(--padding-0) var(--padding-1);
+}
+.div15,
+.image4Icon {
+  position: relative;
+  z-index: 1;
+}
+.div15 {
+  width: var(--width-41);
+  font-weight: 500;
+  display: inline-block;
+}
+.image4Icon {
+  width: 109px;
+  max-height: 100%;
+  object-fit: cover;
+}
+@media screen and (max-width: 900px) {
+  .interestDetails {
+    flex-wrap: wrap;
+  }
+  .frameParent,
+  .parent {
+    flex: 1;
+  }
+  .growthDetails {
+    justify-content: center;
+  }
+}
+@media screen and (max-width: 750px) {
+  .interestDetails {
+    flex-wrap: wrap;
+  }
+  .frameParent,
+  .parent {
+    flex: 1;
+  }
+  .growthDetails {
+    justify-content: center;
+  }
+}
+@media screen and (max-width: 675px) {
+  .interestDetails {
+    flex-wrap: wrap;
+  }
+  .frameParent,
+  .parent {
+    flex: 1;
+  }
+  .growthDetails {
+    justify-content: center;
+  }
+}
+@media screen and (max-width: 450px) {
+  .interestDetails {
+    height: auto;
+  }
+  .frameParent {
+    gap: var(--gap-15);
+  }
+  .diversificationScore {
+    gap: 73px;
+    flex-wrap: wrap;
+  }
+  .fourthTag {
+    flex-wrap: wrap;
+  }
+  .div3,
+  .div4 {
+    font-size: var(--fs-16);
+  }
+  .parent {
+    height: auto;
+    min-height: 244px;
+  }
+  .axisAnalysis {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,196 @@
+.apiContainer,
+.apiContainerChild {
+  box-shadow: var(--shadow-drop);
+  border-radius: var(--br-10);
+  background-color: var(--Backgrounds-Tertiary-Elevated);
+  max-width: 100%;
+}
+.apiContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--padding-23) 27px 34px;
+  box-sizing: border-box;
+  gap: 17px;
+  text-align: left;
+  font-size: var(--fs-12);
+  color: var(--color-gray-300);
+  font-family: var(--font-nunito);
+}
+.apiContainerChild {
+  width: var(--width-1332);
+  height: 404px;
+  position: relative;
+  display: none;
+  flex-shrink: 0;
+}
+.apiContainerInner,
+.dbParent {
+  display: flex;
+  align-items: flex-start;
+  max-width: 100%;
+}
+.apiContainerInner {
+  align-self: stretch;
+  padding: var(--padding-0) var(--padding-9) var(--padding-4) var(--padding-15);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  font-size: var(--fs-20);
+  color: var(--color-black);
+}
+.dbParent {
+  flex: 1;
+  justify-content: space-between;
+  gap: var(--gap-20);
+}
+.db {
+  margin: 0;
+  width: 204px;
+  position: relative;
+  font-size: inherit;
+  font-weight: 400;
+  font-family: inherit;
+  display: inline-block;
+  white-space: nowrap;
+  z-index: 1;
+}
+.logErrorFilterWrapper {
+  flex-direction: column;
+  padding: var(--padding-1) var(--padding-0) var(--padding-0);
+  text-align: center;
+  font-size: var(--fs-12);
+}
+.logErrorFilter,
+.logErrorFilterWrapper,
+.rectangleParent {
+  display: flex;
+  align-items: flex-start;
+}
+.logErrorFilter {
+  gap: var(--gap-12);
+}
+.rectangleParent {
+  border-radius: var(--br-30);
+  background-color: var(--color-whitesmoke-300);
+  padding: 5.8px var(--padding-10) 5.9px var(--padding-11);
+  z-index: 1;
+}
+.div,
+.frameChild {
+  position: relative;
+  flex-shrink: 0;
+}
+.frameChild {
+  height: 25px;
+  width: var(--width-44);
+  border-radius: var(--br-30);
+  background-color: var(--color-whitesmoke-300);
+  display: none;
+}
+.div {
+  line-height: 13.3px;
+  z-index: 1;
+}
+.frameItem,
+.rectangleGroup {
+  border-radius: var(--br-30);
+  background-color: var(--color-pink);
+}
+.rectangleGroup {
+  display: flex;
+  align-items: flex-start;
+  padding: 5.8px var(--padding-5) 5.9px;
+  z-index: 1;
+  color: var(--color-crimson-100);
+}
+.frameItem {
+  height: 25px;
+  width: var(--width-44);
+  position: relative;
+  display: none;
+  flex-shrink: 0;
+}
+.apiRows {
+  width: var(--width-1262);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: var(--padding-0) var(--padding-0) var(--padding-1);
+  box-sizing: border-box;
+  gap: var(--gap-5);
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.apiEntry,
+.apiGrid {
+  display: flex;
+  align-items: flex-start;
+  max-width: 100%;
+}
+.apiGrid {
+  align-self: stretch;
+  justify-content: flex-end;
+  padding: var(--padding-0) var(--padding-4) var(--padding-0) var(--padding-8);
+  box-sizing: border-box;
+}
+.apiEntry {
+  gap: var(--gap-187);
+}
+.apiEntryPlaceholders,
+.apiaichatcompletions {
+  position: relative;
+  z-index: 1;
+}
+.apiaichatcompletions {
+  color: var(--color-black);
+}
+.apiValueRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-16);
+}
+.apiValuePlaceholders {
+  font-weight: 500;
+  color: var(--color-mediumseagreen);
+}
+.apiRowsChild,
+.apiValuePlaceholders,
+.div8 {
+  position: relative;
+  z-index: 1;
+}
+.apiRowsChild {
+  align-self: stretch;
+  height: var(--height-1);
+  border-top: var(--border-1);
+  box-sizing: border-box;
+}
+.div8 {
+  font-weight: 500;
+  color: var(--color-crimson-100);
+}
+@media screen and (max-width: 1050px) {
+  .apiContainer {
+    padding-top: var(--padding-20);
+    padding-bottom: var(--padding-22);
+    box-sizing: border-box;
+  }
+  .db {
+    font-size: var(--fs-16);
+  }
+  .apiEntry {
+    gap: var(--gap-93);
+  }
+}
+@media screen and (max-width: 750px) {
+  .dbParent {
+    flex-wrap: wrap;
+  }
+  .apiRows {
+    height: auto;
+  }
+  .apiEntry {
+    flex-wrap: wrap;
+  }
+}

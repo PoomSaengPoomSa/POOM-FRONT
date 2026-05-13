@@ -1,0 +1,396 @@
+.rectangleParent {
+  align-self: stretch;
+  box-shadow: var(--shadow-drop);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: var(--padding-11) var(--padding-16) var(--padding-20)
+    var(--padding-10);
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  gap: var(--gap-19);
+  max-width: 100%;
+  z-index: 1;
+  flex-shrink: 0;
+  text-align: left;
+  font-size: var(--fs-32);
+  color: var(--color-whitesmoke-400);
+  font-family: var(--font-nunito);
+}
+.frameChild {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  margin: 0 !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: var(--br-5);
+  max-width: 100%;
+  overflow: hidden;
+  max-height: 100%;
+  flex-shrink: 0;
+}
+.clientDetails,
+.clientSegment {
+  display: flex;
+  align-items: flex-start;
+}
+.clientDetails {
+  align-self: stretch;
+  justify-content: space-between;
+  gap: var(--gap-20);
+  flex-shrink: 0;
+}
+.clientSegment {
+  width: 315px;
+  flex-direction: column;
+  padding: var(--padding-4) var(--padding-0) var(--padding-0);
+  box-sizing: border-box;
+}
+.frameParent {
+  align-self: stretch;
+  height: 70px;
+  position: relative;
+}
+.rectangleGroup {
+  position: absolute;
+  height: calc(100% - 5px);
+  top: 4px;
+  bottom: 1px;
+  left: 0;
+  width: 71px;
+}
+.frameItem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: var(--br-15);
+  width: 62px;
+  height: 59px;
+  z-index: 4;
+}
+.photoImage {
+  position: absolute;
+  top: 9px;
+  left: 15px;
+  width: 56px;
+  display: flex;
+  align-items: flex-start;
+  isolation: isolate;
+}
+.div {
+  height: 56px;
+  flex: 1;
+  position: relative;
+  font-weight: 600;
+  display: inline-block;
+  z-index: 5;
+}
+.photoDevice1Icon {
+  width: 21px;
+  position: absolute;
+  margin: 0 !important;
+  right: 7px;
+  bottom: 0;
+  max-height: 100%;
+  object-fit: cover;
+  z-index: 6;
+}
+.clientInfo,
+.ooWrapper {
+  display: flex;
+  align-items: flex-start;
+}
+.clientInfo {
+  position: absolute;
+  top: 0;
+  left: 76px;
+  width: 185px;
+  flex-direction: column;
+  gap: var(--gap-1);
+  color: var(--Text);
+}
+.ooWrapper {
+  width: 126px;
+  padding: var(--padding-0) var(--padding-2);
+  box-sizing: border-box;
+}
+.ceo,
+.oo {
+  position: relative;
+  font-weight: 600;
+  z-index: 1;
+}
+.oo {
+  margin: 0;
+  flex: 1;
+  font-size: inherit;
+  font-family: inherit;
+}
+.ceo {
+  align-self: stretch;
+  font-size: var(--fs-16);
+  color: var(--color-gray-300);
+}
+.rectangleContainer {
+  position: absolute;
+  top: 12px;
+  left: 178px;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-7) var(--padding-11) var(--padding-0) var(--padding-16);
+  isolation: isolate;
+  font-size: var(--fs-14);
+  color: var(--color-firebrick);
+}
+.frameInner {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  margin: 0 !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: var(--br-20);
+  background-color: var(--color-palegoldenrod);
+  z-index: 4;
+  flex-shrink: 0;
+}
+.vip {
+  position: relative;
+  font-weight: 900;
+  display: inline-block;
+  min-width: 31px;
+  z-index: 5;
+  flex-shrink: 0;
+}
+.frameDiv,
+.rectangleDiv {
+  position: absolute;
+  height: var(--height-28);
+}
+.frameDiv {
+  top: 13px;
+  left: 250px;
+  width: 65px;
+  font-size: var(--fs-14);
+  color: var(--color-gray-300);
+}
+.rectangleDiv {
+  top: 0;
+  left: 0;
+  border-radius: var(--br-20);
+  background-color: var(--color-gainsboro-400);
+  width: 58px;
+  z-index: 4;
+}
+.div2 {
+  position: absolute;
+  top: 4px;
+  left: 9px;
+  font-weight: 600;
+  z-index: 5;
+}
+.inputBg {
+  cursor: pointer;
+  border: 1px solid var(--color-steelblue-100);
+  padding: var(--padding-8) var(--padding-0) var(--padding-4) var(--padding-21);
+  background-color: var(--color-white);
+  height: var(--height-37);
+  width: 96px;
+  border-radius: var(--br-10);
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  z-index: 1;
+}
+.inputBg:hover {
+  background-color: var(--color-gainsboro-100);
+  border: 1px solid var(--color-steelblue-200);
+  box-sizing: border-box;
+}
+.div3,
+.inputBgChild {
+  position: relative;
+  flex-shrink: 0;
+}
+.inputBgChild {
+  height: var(--height-37);
+  width: 96px;
+  border-radius: var(--br-10);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-steelblue-100);
+  box-sizing: border-box;
+  display: none;
+}
+.div3 {
+  width: var(--width-97);
+  font-size: var(--fs-14);
+  font-weight: 500;
+  font-family: var(--font-nunito);
+  color: var(--color-gray-300);
+  text-align: left;
+  display: inline-block;
+  z-index: 4;
+}
+.frameGroup,
+.infoContainer,
+.infoContainerWrapper {
+  display: flex;
+  align-items: flex-start;
+  max-width: 100%;
+}
+.infoContainerWrapper {
+  align-self: stretch;
+  justify-content: flex-end;
+  padding: var(--padding-0) var(--padding-10) var(--padding-0) var(--padding-16);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  font-size: var(--fs-16);
+  color: var(--color-dimgray-100);
+}
+.frameGroup,
+.infoContainer {
+  flex: 1;
+}
+.frameGroup {
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: var(--gap-27);
+}
+.frameContainer,
+.frameWrapper,
+.parent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.frameWrapper {
+  flex: 1;
+  padding: var(--padding-1) var(--padding-0) var(--padding-0);
+  box-sizing: border-box;
+  min-width: var(--min-w-150);
+}
+.frameContainer,
+.parent {
+  align-self: stretch;
+  gap: var(--gap-19);
+}
+.parent {
+  gap: var(--gap-15);
+}
+.div4,
+.inputBg2 {
+  font-weight: 600;
+  z-index: 1;
+}
+.div4 {
+  width: var(--width-82_8);
+  position: relative;
+  display: inline-block;
+}
+.inputBg2 {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background-color: var(--color-white);
+  height: var(--height-50);
+  border-radius: var(--br-10);
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-17) var(--padding-23) var(--padding-18);
+  box-sizing: border-box;
+  font-family: var(--font-nunito);
+  font-size: var(--fs-14);
+  color: var(--color-gray-500);
+}
+.div5 {
+  height: var(--height-15);
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  min-width: var(--min-w-72);
+}
+.div5,
+.div6,
+.inputBg3 {
+  font-weight: 600;
+  z-index: 1;
+}
+.inputBg3 {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background-color: var(--color-white);
+  height: var(--height-50);
+  border-radius: var(--br-10);
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-17) var(--padding-20) var(--padding-18);
+  box-sizing: border-box;
+  font-family: var(--font-nunito);
+  font-size: var(--fs-14);
+  color: var(--color-gray-500);
+}
+.div6 {
+  width: var(--width-72);
+  position: relative;
+  display: inline-block;
+}
+.inputBg4,
+.otherDetails,
+.parent3 {
+  display: flex;
+  align-items: flex-start;
+}
+.inputBg4 {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background-color: var(--color-white);
+  border-radius: var(--br-10);
+  padding: var(--padding-17) var(--padding-20) var(--padding-18);
+  box-sizing: border-box;
+  font-size: var(--fs-14);
+  color: var(--color-gray-500);
+  z-index: 1;
+}
+.otherDetails,
+.parent3 {
+  flex-direction: column;
+}
+.otherDetails {
+  flex: 1;
+  gap: var(--gap-15);
+  min-width: var(--min-w-150);
+}
+.parent3 {
+  align-self: stretch;
+  gap: var(--gap-10);
+}
+.div8 {
+  position: relative;
+  font-weight: 600;
+  z-index: 1;
+}
+@media screen and (max-width: 1050px) {
+  .div,
+  .oo {
+    font-size: var(--fs-26);
+  }
+}
+@media screen and (max-width: 750px) {
+  .clientDetails {
+    flex-wrap: wrap;
+  }
+}
+@media screen and (max-width: 450px) {
+  .div,
+  .oo {
+    font-size: var(--fs-19);
+  }
+}

@@ -1,0 +1,243 @@
+.div,
+.parent {
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+.parent {
+  margin: 0;
+  align-self: stretch;
+  padding: var(--padding-0) var(--padding-0) 6.6px;
+  gap: 27.8px;
+  max-width: 100%;
+  flex-shrink: 0;
+  text-align: left;
+  font-size: var(--fs-14);
+  color: var(--color-steelblue-200);
+  font-family: var(--font-nunito);
+}
+.div {
+  width: var(--width-245_4);
+  flex-direction: column;
+  padding: var(--padding-7) var(--padding-10) var(--padding-6);
+  position: relative;
+  isolation: isolate;
+  z-index: 1;
+}
+.b,
+.icon {
+  flex-shrink: 0;
+}
+.icon {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  margin: 0 !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-shadow: var(--shadow-drop-1);
+  border-radius: var(--br-5);
+  max-width: 100%;
+  overflow: hidden;
+  max-height: 100%;
+}
+.b {
+  width: var(--width-187_5);
+  display: inline-block;
+  z-index: 1;
+}
+.b,
+.h2,
+.wrapper {
+  position: relative;
+}
+.wrapper {
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-0) var(--padding-92) var(--padding-4_1)
+    var(--padding-98);
+  margin-top: -4.1px;
+  flex-shrink: 0;
+  font-size: var(--fs-32);
+  color: var(--Grays-Black);
+}
+.h2 {
+  margin: 0;
+  flex: 1;
+  font-size: inherit;
+  font-weight: 700;
+  font-family: inherit;
+  z-index: 1;
+}
+.container,
+.div2 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.container {
+  width: var(--width-245_4);
+  padding: var(--padding-1) var(--padding-0) var(--padding-0);
+  box-sizing: border-box;
+}
+.div2 {
+  align-self: stretch;
+  padding: var(--padding-7) var(--padding-10) var(--padding-6);
+  position: relative;
+  isolation: isolate;
+  z-index: 1;
+}
+.b4,
+.frame,
+.h22 {
+  position: relative;
+  flex-shrink: 0;
+}
+.frame {
+  align-self: stretch;
+  height: 40.1px;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-0) var(--padding-92) var(--padding-0) var(--padding-98);
+  box-sizing: border-box;
+  margin-top: -2px;
+  font-size: var(--fs-32);
+  color: var(--Grays-Black);
+}
+.b4,
+.h22 {
+  z-index: 1;
+}
+.h22 {
+  margin: 0;
+  flex: 1;
+  font-size: inherit;
+  font-weight: 700;
+  font-family: inherit;
+}
+.b4 {
+  width: 98.4px;
+  font-size: var(--fs-10);
+  display: inline-block;
+  color: var(--color-gray-300);
+  margin-top: -2px;
+}
+.frameParent {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 27.6px;
+  min-width: 337px;
+  max-width: 100%;
+}
+.div3,
+.frameDiv {
+  flex-direction: column;
+  box-sizing: border-box;
+}
+.frameDiv {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-2) var(--padding-0) var(--padding-0);
+  min-width: var(--min-w-159);
+}
+.div3 {
+  align-self: stretch;
+  height: 85.3px;
+  padding: var(--padding-7) var(--padding-10) var(--padding-10_1);
+  position: relative;
+  isolation: isolate;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.div3,
+.div4,
+.wrapper2 {
+  display: flex;
+  align-items: flex-start;
+}
+.wrapper2 {
+  align-self: stretch;
+  padding: var(--padding-0) 84px var(--padding-4_1) 83px;
+  margin-top: -4.1px;
+  position: relative;
+  flex-shrink: 0;
+  font-size: var(--fs-32);
+  color: var(--Grays-Black);
+}
+.div4 {
+  flex: 0.9185;
+  flex-direction: column;
+  padding: var(--padding-7) var(--padding-10) var(--padding-6);
+  box-sizing: border-box;
+  isolation: isolate;
+  min-width: var(--min-w-159);
+  z-index: 1;
+}
+.div4,
+.h24,
+.llm,
+.wrapper3 {
+  position: relative;
+  flex-shrink: 0;
+}
+.wrapper3 {
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: var(--padding-0) 42px var(--padding-4_1);
+  margin-top: -4.1px;
+  font-size: var(--fs-32);
+  color: var(--Grays-Black);
+}
+.h24,
+.llm {
+  display: inline-block;
+  z-index: 1;
+}
+.h24 {
+  margin: 0;
+  width: 89px;
+  font-size: inherit;
+  font-weight: 700;
+  font-family: inherit;
+}
+.llm {
+  width: var(--width-187_5);
+  font-size: var(--fs-10);
+  color: var(--color-gray-300);
+  margin-top: -4.1px;
+}
+@media screen and (max-width: 1050px) {
+  .parent {
+    flex-wrap: wrap;
+  }
+  .h2,
+  .h22,
+  .h24 {
+    font-size: var(--fs-26);
+  }
+}
+@media screen and (max-width: 750px) {
+  .frameParent {
+    flex-wrap: wrap;
+    min-width: 100%;
+  }
+}
+@media screen and (max-width: 450px) {
+  .h2,
+  .h22 {
+    font-size: var(--fs-19);
+  }
+  .div4 {
+    flex: 1;
+  }
+  .h24 {
+    font-size: var(--fs-19);
+  }
+}

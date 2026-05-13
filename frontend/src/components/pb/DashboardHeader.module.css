@@ -1,0 +1,323 @@
+.bg,
+.dashboardHeader {
+  width: var(--width-218);
+  position: relative;
+  background-color: var(--color-white);
+  flex-shrink: 0;
+}
+.dashboardHeader {
+  margin-top: -28px;
+  display: flex;
+  align-items: flex-end;
+  padding: 327px var(--padding-16) var(--padding-40) var(--padding-0);
+  box-sizing: border-box;
+  isolation: isolate;
+  gap: var(--gap-3);
+  text-align: left;
+  font-size: var(--fs-16);
+  color: var(--color-gray-1200);
+  font-family: var(--font-nunito);
+}
+.bg {
+  height: 900px;
+  display: none;
+  z-index: 0;
+}
+.image11Icon {
+  width: var(--width-49);
+  position: absolute;
+  margin: 0 !important;
+  top: 28px;
+  left: 82px;
+  max-height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  flex-shrink: 0;
+}
+.dashboardMenu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 310px;
+  flex-shrink: 0;
+}
+.menuArea,
+.menuContainer {
+  display: flex;
+  align-items: flex-start;
+}
+.menuArea {
+  align-self: stretch;
+  flex-direction: column;
+  gap: var(--gap-26);
+}
+.menuContainer {
+  padding: var(--padding-0) var(--padding-29);
+}
+.calendarButtonParent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-17);
+}
+.calendarButton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--padding-1) var(--padding-0) var(--padding-0);
+}
+.calendarIcon,
+.div {
+  position: relative;
+  z-index: 1;
+}
+.calendarIcon {
+  width: var(--width-18);
+  height: var(--height-20);
+  object-fit: cover;
+}
+.div {
+  font-weight: 600;
+}
+.trendsContainerParent {
+  align-self: stretch;
+  flex-direction: column;
+  gap: var(--gap-18);
+}
+.trendsButton,
+.trendsContainer,
+.trendsContainerParent {
+  display: flex;
+  align-items: flex-start;
+}
+.trendsContainer {
+  padding: var(--padding-0) var(--padding-0) var(--padding-0) var(--padding-27);
+}
+.trendsButton {
+  gap: var(--gap-16);
+}
+.chartIcon,
+.div2 {
+  position: relative;
+  z-index: 1;
+}
+.chartIcon {
+  height: var(--height-20);
+  width: var(--width-20);
+  object-fit: cover;
+}
+.div2 {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.activityContainerParent {
+  width: 128px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--gap-11);
+  color: var(--color-steelblue-100);
+}
+.activityContainer {
+  width: 122px;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-10);
+}
+.activityButton {
+  height: var(--height-48);
+  flex: 1;
+  position: relative;
+}
+.activityIcon {
+  position: absolute;
+  top: 14px;
+  left: 27px;
+  width: var(--width-20);
+  height: var(--height-20);
+  object-fit: cover;
+  z-index: 1;
+}
+.activityButtonChild {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: var(--br-0) var(--br-5) var(--br-5) var(--br-0);
+  background: var(--gradient-1);
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+.notifications,
+.wrapper {
+  display: flex;
+  align-items: flex-start;
+}
+.wrapper {
+  flex-direction: column;
+  padding: var(--padding-15) var(--padding-0) var(--padding-0);
+}
+.notifications {
+  align-self: stretch;
+  justify-content: flex-end;
+  position: relative;
+  isolation: isolate;
+  color: var(--color-gray-1200);
+}
+.iconlyboldnotification {
+  height: var(--height-24);
+  width: var(--width-24);
+  position: absolute;
+  margin: 0 !important;
+  top: calc(50% - 12px);
+  left: 26px;
+  object-fit: cover;
+  z-index: 1;
+}
+.profileContainerWrapper {
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: var(--padding-0) var(--padding-22) var(--padding-0) var(--padding-25);
+  font-size: var(--fs-12);
+  color: var(--color-black);
+}
+.profileContainer {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--gap-10);
+}
+.profileImage {
+  height: 54px;
+  width: var(--width-48);
+  position: relative;
+}
+.profileImageChild {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: var(--br-50);
+  background-color: var(--color-aliceblue-100);
+  width: var(--width-48);
+  height: var(--height-48);
+  z-index: 1;
+}
+.image9Icon {
+  position: absolute;
+  top: 9px;
+  left: 1px;
+  width: var(--width-45);
+  height: var(--height-45);
+  object-fit: cover;
+  z-index: 2;
+}
+.parent,
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.profileInfo {
+  justify-content: flex-end;
+  padding: var(--padding-0) var(--padding-0) var(--padding-9);
+}
+.parent {
+  gap: var(--gap-1);
+}
+.privateBanker {
+  position: relative;
+  font-size: var(--fs-10);
+  color: var(--color-gray-1100);
+  z-index: 1;
+}
+.logoutContainer,
+.logoutContainerWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.logoutContainerWrapper {
+  width: var(--width-28);
+  padding: var(--padding-0) var(--padding-0) 16.6px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  font-size: var(--fs-10);
+  color: var(--Red);
+}
+.logoutContainer {
+  align-self: stretch;
+  padding: 395.7px var(--padding-3) var(--padding-0);
+  position: relative;
+  isolation: isolate;
+}
+.logoutButton,
+.logoutButtonChild {
+  width: 100%;
+  position: absolute;
+  margin: 0 !important;
+  top: 0;
+  right: 0;
+  left: 0;
+  flex-shrink: 0;
+}
+.logoutButton {
+  display: flex;
+  align-items: flex-start;
+  padding: 3.2px var(--padding-8) var(--padding-1);
+  box-sizing: border-box;
+  isolation: isolate;
+}
+.logoutButtonChild {
+  height: 100%;
+  bottom: 0;
+  border-radius: 9px;
+  background-color: var(--color-crimson-200);
+  z-index: 1;
+}
+.logoutBlank,
+.logoutIcon {
+  position: relative;
+  flex-shrink: 0;
+}
+.logoutBlank {
+  font-weight: 600;
+  z-index: 2;
+}
+.logoutIcon {
+  width: var(--width-17_3);
+  height: var(--height-16_7);
+  object-fit: cover;
+  z-index: 1;
+}
+@media screen and (max-width: 1200px) {
+  .dashboardHeader {
+    padding-top: 213px;
+    padding-bottom: var(--padding-26);
+    box-sizing: border-box;
+  }
+}
+@media screen and (max-width: 1050px) {
+  .dashboardHeader {
+    padding-top: 138px;
+    padding-bottom: var(--padding-20);
+    box-sizing: border-box;
+  }
+  .logoutContainer {
+    padding-top: 257px;
+    box-sizing: border-box;
+  }
+}
+@media screen and (max-width: 450px) {
+  .dashboardHeader {
+    padding-top: 138px;
+    padding-bottom: var(--padding-20);
+    box-sizing: border-box;
+  }
+  .logoutContainer {
+    padding-top: 257px;
+    box-sizing: border-box;
+  }
+}

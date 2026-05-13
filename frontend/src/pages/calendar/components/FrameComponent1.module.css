@@ -1,0 +1,87 @@
+.parent {
+  top: 63px;
+  width: 100%;
+  height: 71px;
+  text-align: center;
+  font-size: var(--fs-14);
+  color: var(--color-gray-100);
+  font-family: var(--font-nunito);
+}
+.div,
+.lineParent,
+.parent {
+  position: absolute;
+  left: 0;
+}
+.div {
+  top: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  z-index: 3;
+}
+.lineParent {
+  top: 18px;
+  width: 100%;
+  height: 53px;
+  font-size: var(--fs-10);
+  color: var(--color-white);
+}
+.frameChild {
+  position: absolute;
+  top: 52px;
+  left: 0;
+  border-top: var(--border-11);
+  box-sizing: border-box;
+  width: var(--width-869);
+  height: var(--height-1);
+  z-index: 2;
+}
+.frameItem,
+.rectangleParent {
+  width: var(--width-103);
+  border-radius: var(--br-3);
+  background-color: var(--color-limegreen);
+}
+.rectangleParent {
+  position: absolute;
+  top: 0;
+  left: 384px;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-17) var(--padding-8) var(--padding-16) var(--padding-9);
+  box-sizing: border-box;
+  white-space: nowrap;
+  z-index: 3;
+}
+.frameItem {
+  height: 52px;
+  position: relative;
+  display: none;
+  flex-shrink: 0;
+}
+.div2,
+.oo {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.oo {
+  height: var(--height-19);
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+.div2 {
+  position: absolute;
+  top: 33px;
+  left: 0;
+  font-size: var(--fs-14);
+  color: var(--color-gray-100);
+  white-space: nowrap;
+  z-index: 3;
+}

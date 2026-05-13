@@ -1,0 +1,180 @@
+.articleColumn,
+.frameParent {
+  display: flex;
+  align-items: flex-start;
+  max-width: 100%;
+}
+.articleColumn {
+  align-self: stretch;
+  padding: var(--padding-0) var(--padding-3) var(--padding-0) var(--padding-1);
+  box-sizing: border-box;
+  text-align: left;
+  font-size: var(--fs-14);
+  color: var(--Grays-White);
+  font-family: var(--font-nunito);
+}
+.frameParent {
+  flex: 1;
+  flex-direction: column;
+  gap: var(--gap-18);
+}
+.frameChild,
+.rectangleParent {
+  box-shadow: var(--shadow-drop-2);
+  border-radius: var(--br-10);
+  background-color: var(--Grays-White);
+  border: var(--border-3);
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.rectangleParent {
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--padding-9) var(--padding-27) var(--padding-11)
+    var(--padding-18);
+  gap: var(--gap-20);
+  min-height: var(--min-h-70);
+  z-index: 1;
+}
+.frameChild {
+  height: var(--height-70);
+  width: var(--width-1162);
+  position: relative;
+  display: none;
+  flex-shrink: 0;
+}
+.categoryColumn,
+.rectangleGroup {
+  display: flex;
+  align-items: flex-start;
+}
+.categoryColumn {
+  width: var(--width-546);
+  gap: var(--gap-20);
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.rectangleGroup {
+  background-color: var(--color-mediumspringgreen);
+  padding: var(--padding-13) var(--padding-25) var(--padding-14)
+    var(--padding-26);
+  z-index: 2;
+}
+.div,
+.frameItem {
+  position: relative;
+  flex-shrink: 0;
+}
+.frameItem {
+  height: var(--height-46);
+  width: var(--width-77);
+  background-color: var(--color-mediumspringgreen);
+  display: none;
+}
+.div {
+  font-weight: 600;
+  z-index: 1;
+}
+.metadataRow,
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  box-sizing: border-box;
+  color: var(--color-black);
+}
+.wrapper {
+  flex: 1;
+  padding: var(--padding-14) var(--padding-0) var(--padding-0);
+  min-width: var(--min-w-292);
+  max-width: 100%;
+}
+.metadataRow {
+  width: var(--width-209);
+  padding: var(--padding-13) var(--padding-0) var(--padding-0);
+  flex-shrink: 0;
+}
+.metadataColumn {
+  align-self: stretch;
+  justify-content: space-between;
+  gap: var(--gap-20);
+}
+.calendarRow,
+.calendarWrapper,
+.metadataColumn {
+  display: flex;
+  align-items: flex-start;
+}
+.calendarRow {
+  gap: var(--gap-7_4);
+}
+.calendarWrapper {
+  flex-direction: column;
+  padding: var(--padding-3) var(--padding-0) var(--padding-0);
+}
+.calendarIcon,
+.dec2020 {
+  position: relative;
+  z-index: 2;
+}
+.calendarIcon {
+  width: var(--width-12_6);
+  height: var(--height-14);
+  object-fit: cover;
+}
+.dec2020 {
+  font-weight: 600;
+}
+.starRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--padding-1) var(--padding-0) var(--padding-0);
+}
+.starIcon {
+  width: var(--width-16_8);
+  height: var(--height-16);
+  position: relative;
+  z-index: 2;
+}
+.bookmarkColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--padding-8) var(--padding-0) var(--padding-0);
+}
+.bookmarkColumnChild {
+  width: var(--width-14);
+  height: var(--height-3_5);
+}
+.bookmarkColumnChild,
+.hmm,
+.starIcon2 {
+  position: relative;
+  z-index: 2;
+}
+.hmm {
+  align-self: stretch;
+  font-weight: 600;
+}
+.starIcon2 {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-01);
+  background-color: transparent;
+  max-width: 100%;
+  overflow: hidden;
+  max-height: 100%;
+}
+@media screen and (max-width: 825px) {
+  .rectangleParent {
+    flex-wrap: wrap;
+  }
+}
+@media screen and (max-width: 675px) {
+  .categoryColumn {
+    flex-wrap: wrap;
+  }
+}

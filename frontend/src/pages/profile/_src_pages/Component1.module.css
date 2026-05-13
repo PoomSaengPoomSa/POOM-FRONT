@@ -1,0 +1,317 @@
+.div,
+.div2,
+.profileView {
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+.div {
+  width: 100%;
+  height: var(--height-900);
+  position: relative;
+  background-color: var(--color-whitesmoke-200);
+  overflow: hidden;
+  padding: var(--padding-30) var(--padding-30) var(--padding-1) var(--padding-0);
+  gap: var(--gap-30);
+  line-height: var(--lh-normal);
+  letter-spacing: var(--ls-normal);
+}
+.div2,
+.profileView {
+  flex-direction: column;
+}
+.profileView {
+  flex: 1;
+  padding: var(--padding-4) var(--padding-0) var(--padding-0);
+  max-width: calc(100% - 646px);
+  flex-shrink: 0;
+  text-align: left;
+  font-size: var(--fs-16);
+  color: var(--color-black);
+  font-family: var(--font-nunito);
+}
+.div2 {
+  align-self: stretch;
+  border-radius: var(--br-10);
+  background-color: var(--color-white);
+  padding: var(--padding-11) var(--padding-23) 265px var(--padding-29);
+  gap: 27.5px;
+  max-width: 100%;
+}
+.child,
+.inner {
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.child {
+  width: var(--width-764);
+  height: var(--height-839);
+  position: relative;
+  border-radius: var(--br-10);
+  background-color: var(--color-white);
+  display: none;
+}
+.inner {
+  align-self: stretch;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-0) var(--padding-0) var(--padding-0) var(--padding-8);
+  box-sizing: border-box;
+}
+.frameParent {
+  flex: 1;
+  flex-direction: column;
+  gap: var(--gap-20);
+  max-width: 100%;
+}
+.ellipseWrapper,
+.frameGroup,
+.frameParent {
+  display: flex;
+  align-items: flex-start;
+}
+.frameGroup {
+  align-self: stretch;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: var(--gap-10);
+  max-width: 100%;
+}
+.ellipseWrapper {
+  flex-direction: column;
+  padding: var(--padding-1) var(--padding-0) var(--padding-0);
+}
+.frameChild {
+  width: var(--width-36);
+  height: var(--height-36);
+  position: relative;
+  border-radius: var(--br-50);
+  background-color: var(--color-deeppink);
+  z-index: 1;
+}
+.ooWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--padding-9) 572px var(--padding-0) var(--padding-0);
+  box-sizing: border-box;
+  min-width: 300px;
+  max-width: 100%;
+}
+.frameItem,
+.oo {
+  position: relative;
+  z-index: 1;
+}
+.oo {
+  width: var(--width-40);
+  height: var(--height-22);
+  display: inline-block;
+}
+.frameItem {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-01);
+  background-color: transparent;
+  height: var(--height-36);
+  width: var(--width-36);
+}
+.frameWrapper {
+  width: 516px;
+  padding: var(--padding-0) var(--padding-8);
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.frameWrapper,
+.list,
+.listParent {
+  display: flex;
+  align-items: flex-start;
+}
+.listParent {
+  margin: 0;
+  flex: 1;
+  max-width: 100%;
+  row-gap: var(--gap-20);
+}
+.list {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-10_4) var(--padding-29) 9.5px var(--padding-34);
+  background-color: var(--color-steelblue-300);
+  flex: 0.5586;
+  border-radius: var(--br-5) var(--br-0) var(--br-0) var(--br-5);
+  box-sizing: border-box;
+  min-width: 111px;
+  max-width: 125px;
+  z-index: 1;
+}
+.list:hover {
+  background-color: var(--color-deepskyblue);
+}
+.div3,
+.listChild {
+  position: relative;
+  flex-shrink: 0;
+}
+.listChild {
+  height: var(--height-35);
+  width: var(--width-125);
+  border-radius: var(--br-5) var(--br-0) var(--br-0) var(--br-5);
+  background-color: var(--color-steelblue-300);
+  display: none;
+}
+.div3 {
+  flex: 1;
+  font-size: var(--fs-14);
+  line-height: 15.1px;
+  font-weight: 600;
+  font-family: var(--font-nunito);
+  color: var(--color-white);
+  text-align: center;
+  z-index: 1;
+}
+.board,
+.boardChild {
+  background-color: var(--color-whitesmoke-300);
+}
+.board {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-10_4) var(--padding-10) 6.6px var(--padding-11);
+  flex: 0.9369;
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 111px;
+  max-width: 125px;
+  z-index: 1;
+}
+.board:hover {
+  background-color: var(--color-lightgray);
+}
+.boardChild {
+  height: var(--height-35);
+  width: var(--width-125);
+  position: relative;
+  display: none;
+  flex-shrink: 0;
+}
+.board2,
+.div4 {
+  flex: 1;
+  z-index: 1;
+}
+.div4 {
+  position: relative;
+  font-size: var(--fs-14);
+  line-height: var(--lh-18);
+  font-family: var(--font-nunito);
+  color: var(--Text);
+  text-align: center;
+  flex-shrink: 0;
+}
+.board2 {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-10_4) var(--padding-6) 9.5px var(--padding-8);
+  background-color: var(--color-whitesmoke-100);
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 111px;
+  max-width: 125px;
+}
+.board2:hover {
+  background-color: var(--color-gainsboro-200);
+}
+.boardItem,
+.div5 {
+  position: relative;
+  flex-shrink: 0;
+}
+.boardItem {
+  height: var(--height-35);
+  width: var(--width-125);
+  background-color: var(--color-whitesmoke-100);
+  display: none;
+}
+.div5 {
+  flex: 1;
+  font-size: var(--fs-14);
+  line-height: 15.1px;
+  font-family: var(--font-nunito);
+  color: var(--Text);
+  text-align: center;
+  z-index: 1;
+}
+.board3,
+.boardInner {
+  border-radius: var(--br-0) var(--br-5) var(--br-5) var(--br-0);
+  background-color: var(--color-whitesmoke-300);
+}
+.board3 {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-10) var(--padding-10) var(--padding-7)
+    var(--padding-11);
+  flex: 0.9369;
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 111px;
+  max-width: 125px;
+  z-index: 1;
+}
+.board3:hover {
+  background-color: var(--color-lightgray);
+}
+.boardInner {
+  height: var(--height-35);
+  width: var(--width-125);
+  position: relative;
+  display: none;
+  flex-shrink: 0;
+}
+@media screen and (max-width: 1200px) {
+  .div {
+    padding-left: var(--padding-30);
+    box-sizing: border-box;
+  }
+  .profileView {
+    display: none;
+  }
+}
+@media screen and (max-width: 1050px) {
+  .profileView {
+    max-width: 100%;
+  }
+  .div2 {
+    padding-top: var(--padding-20);
+    padding-bottom: 172px;
+    box-sizing: border-box;
+  }
+}
+@media screen and (max-width: 750px) {
+  .div {
+    gap: var(--gap-15);
+  }
+  .listParent {
+    flex-wrap: wrap;
+  }
+}
+@media screen and (max-width: 450px) {
+  .div {
+    height: auto;
+  }
+  .div2 {
+    padding-bottom: 112px;
+    box-sizing: border-box;
+  }
+  .board,
+  .board3,
+  .list {
+    flex: 1;
+  }
+}

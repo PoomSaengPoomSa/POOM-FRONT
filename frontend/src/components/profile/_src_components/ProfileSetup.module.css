@@ -1,0 +1,86 @@
+.profileSetup,
+.rectangleParent {
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.profileSetup {
+  align-self: stretch;
+  justify-content: flex-end;
+  padding: var(--padding-0) var(--padding-17) var(--padding-0) var(--padding-9);
+  text-align: left;
+  font-size: var(--fs-14);
+  color: var(--Text);
+  font-family: var(--font-nunito);
+}
+.rectangleParent {
+  flex: 1;
+  border-radius: var(--br-10);
+  background-color: var(--color-whitesmoke-200);
+  padding: var(--padding-10) var(--padding-11) var(--padding-8);
+  gap: var(--gap-12);
+  z-index: 1;
+}
+.frameChild,
+.imageIcon {
+  position: relative;
+  flex-shrink: 0;
+}
+.frameChild {
+  height: 78px;
+  width: 394px;
+  border-radius: var(--br-10);
+  background-color: var(--color-whitesmoke-200);
+  display: none;
+  max-width: 100%;
+}
+.imageIcon {
+  height: var(--height-60);
+  width: var(--width-60);
+  object-fit: cover;
+  z-index: 2;
+}
+.imageControls {
+  width: 228px;
+  flex-direction: column;
+  padding: var(--padding-6) var(--padding-0) var(--padding-0);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.imageControls,
+.pictureUpload,
+.uploadElements {
+  display: flex;
+  align-items: flex-start;
+}
+.pictureUpload {
+  align-self: stretch;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+.uploadElements {
+  width: var(--width-132);
+  padding: var(--padding-0) var(--padding-1);
+  box-sizing: border-box;
+}
+.div,
+.div2 {
+  position: relative;
+  z-index: 2;
+}
+.div {
+  flex: 1;
+  line-height: var(--lh-20);
+  font-weight: 600;
+}
+.div2 {
+  align-self: stretch;
+  font-size: var(--fs-12);
+  color: var(--color-gray-400);
+}
+@media screen and (max-width: 450px) {
+  .rectangleParent {
+    flex-wrap: wrap;
+  }
+}

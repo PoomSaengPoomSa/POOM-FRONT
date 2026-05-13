@@ -1,0 +1,241 @@
+.bg,
+.menu,
+.menuParent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+}
+.menuParent {
+  width: var(--width-218);
+  margin: 0 !important;
+  bottom: 0;
+  flex-shrink: 0;
+  text-align: left;
+  font-size: var(--fs-16);
+  color: var(--color-gray-600);
+  font-family: var(--font-nunito);
+}
+.bg,
+.menu {
+  background-color: var(--color-white);
+  width: 100%;
+}
+.bg {
+  display: none;
+}
+.div,
+.iconlyboldchart {
+  position: absolute;
+  z-index: 1;
+}
+.div {
+  top: 430px;
+  left: 63px;
+  font-weight: 600;
+  display: inline-block;
+  min-width: 59px;
+}
+.iconlyboldchart {
+  top: 373px;
+  left: 25px;
+  width: var(--width-24);
+  height: var(--height-24);
+  object-fit: cover;
+}
+.div2 {
+  position: absolute;
+  bottom: 404px;
+  left: 64px;
+  display: inline-block;
+  min-width: 59px;
+  z-index: 4;
+}
+.div2,
+.div3,
+.div4 {
+  font-weight: 600;
+}
+.div3 {
+  position: absolute;
+  top: 375px;
+  right: 47px;
+  color: var(--color-steelblue);
+  display: inline-block;
+  min-width: 108px;
+  z-index: 4;
+}
+.div4 {
+  top: 327px;
+  left: 64px;
+  min-width: 45px;
+}
+.div4,
+.div5,
+.privateBanker {
+  position: absolute;
+  display: inline-block;
+  z-index: 4;
+}
+.div5 {
+  bottom: 65px;
+  left: 83px;
+  font-size: var(--fs-12);
+  font-weight: 600;
+  color: var(--color-black);
+  min-width: 34px;
+}
+.privateBanker {
+  right: 69px;
+  bottom: 50px;
+  font-size: var(--fs-10);
+  color: var(--color-gray-500);
+  min-width: 66px;
+}
+.iconlyboldactivity,
+.iconlyboldnotification,
+.iconlyboldsetting {
+  position: absolute;
+  left: 26px;
+  width: var(--width-24);
+  height: var(--height-24);
+  object-fit: cover;
+  z-index: 1;
+}
+.iconlyboldsetting {
+  cursor: pointer;
+  border: 0;
+  padding: var(--padding-01);
+  background-color: transparent;
+  top: 518px;
+}
+.iconlyboldactivity,
+.iconlyboldnotification {
+  top: 473px;
+}
+.iconlyboldactivity {
+  top: 427px;
+  left: 25px;
+}
+.icons {
+  position: absolute;
+  top: 361px;
+  left: 0;
+  border-radius: var(--br-0) var(--br-5) var(--br-5) var(--br-0);
+  background: var(--gradient-1);
+  width: var(--width-53);
+  height: var(--height-48);
+  z-index: 2;
+}
+.calendarIcon {
+  position: absolute;
+  top: 328px;
+  left: 29px;
+  width: var(--width-18);
+  height: var(--height-20);
+  object-fit: cover;
+  z-index: 1;
+}
+.logoutIcon {
+  top: 825.7px;
+  left: 177.7px;
+  width: var(--width-17_3);
+  height: var(--height-16_7);
+  z-index: 1;
+}
+.image11Icon,
+.image9Icon,
+.logoutIcon {
+  position: absolute;
+  object-fit: cover;
+}
+.image9Icon {
+  top: 814px;
+  left: 26px;
+  width: var(--width-45);
+  height: var(--height-45);
+  z-index: 2;
+}
+.image11Icon {
+  top: 49px;
+  left: 82px;
+  width: var(--width-49);
+  height: 49px;
+  z-index: 1;
+}
+.iconlyboldactivity2,
+.iconlyboldchart2,
+.iconlyboldnotification2 {
+  position: absolute;
+  top: 473px;
+  left: 26px;
+  width: var(--width-24);
+  height: var(--height-24);
+  object-fit: cover;
+  z-index: 4;
+}
+.iconlyboldactivity2,
+.iconlyboldchart2 {
+  top: 373px;
+  left: 25px;
+}
+.iconlyboldactivity2 {
+  top: 427px;
+}
+.icons2 {
+  position: absolute;
+  top: 361px;
+  left: 0;
+  border-radius: var(--br-0) var(--br-5) var(--br-5) var(--br-0);
+  background: var(--gradient-1);
+  width: var(--width-53);
+  height: var(--height-48);
+  z-index: 5;
+}
+.calendarIcon2 {
+  top: 328px;
+  left: 29px;
+  width: var(--width-18);
+  height: var(--height-20);
+  object-fit: cover;
+}
+.calendarIcon2,
+.logoutIcon2,
+.userAvatar {
+  position: absolute;
+  z-index: 4;
+}
+.logoutIcon2 {
+  top: 825.7px;
+  left: 177.7px;
+  width: var(--width-17_3);
+  height: var(--height-16_7);
+  object-fit: cover;
+}
+.userAvatar {
+  top: 805px;
+  left: 25px;
+  border-radius: var(--br-50);
+  background-color: var(--color-aliceblue-100);
+  width: var(--width-48);
+  height: var(--height-48);
+}
+.image11Icon2,
+.image9Icon2 {
+  position: absolute;
+  object-fit: cover;
+}
+.image9Icon2 {
+  top: 814px;
+  left: 26px;
+  width: var(--width-45);
+  height: var(--height-45);
+  z-index: 5;
+}
+.image11Icon2 {
+  top: 49px;
+  left: 82px;
+  width: var(--width-49);
+  height: 49px;
+  z-index: 4;
+}

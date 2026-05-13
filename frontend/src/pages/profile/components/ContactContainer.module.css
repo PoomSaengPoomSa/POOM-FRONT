@@ -1,0 +1,129 @@
+.contactContainer {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--gap-10);
+  max-width: 100%;
+  text-align: left;
+  font-size: var(--fs-16);
+  color: var(--color-dimgray-100);
+  font-family: var(--font-nunito);
+}
+.contactDetailsWrapper {
+  width: var(--width-555);
+  height: var(--height-20);
+  justify-content: center;
+  padding: var(--padding-0) var(--padding-20);
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.actionLabels,
+.contactDetails,
+.contactDetailsWrapper {
+  display: flex;
+  align-items: flex-start;
+}
+.contactDetails {
+  width: 299px;
+  justify-content: space-between;
+  gap: var(--gap-20);
+}
+.actionLabels {
+  flex-direction: column;
+  padding: var(--padding-5) var(--padding-0) var(--padding-0);
+}
+.div,
+.div2 {
+  position: relative;
+  font-weight: 600;
+  display: inline-block;
+  z-index: 1;
+}
+.div {
+  min-width: var(--min-w-72);
+}
+.div2 {
+  width: var(--width-72);
+  flex-shrink: 0;
+}
+.inputBgParent {
+  align-self: stretch;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--gap-27);
+  font-size: var(--fs-14);
+  color: var(--color-gray-500);
+}
+.inputBg,
+.inputBgChild {
+  height: var(--height-50);
+  border-radius: var(--br-10);
+  background-color: var(--color-white);
+}
+.inputBg {
+  flex: 0.8;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--padding-17) var(--padding-20) var(--padding-18);
+  box-sizing: border-box;
+  z-index: 1;
+}
+.inputBgChild {
+  width: var(--width-200);
+  position: relative;
+  display: none;
+  flex-shrink: 0;
+}
+.div3,
+.separator {
+  position: relative;
+  font-weight: 600;
+  display: inline-block;
+  flex-shrink: 0;
+  z-index: 2;
+}
+.separator {
+  width: 103px;
+}
+.div3 {
+  width: var(--width-100);
+}
+.inputBg3,
+.phoneInputContainer {
+  display: flex;
+  align-items: flex-start;
+}
+.phoneInputContainer {
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--padding-0) var(--padding-0) var(--padding-5);
+}
+.inputBg3 {
+  align-self: stretch;
+  height: var(--height-50);
+  border-radius: var(--br-10);
+  background-color: var(--color-white);
+  padding: var(--padding-17) var(--padding-20) var(--padding-18);
+  box-sizing: border-box;
+  z-index: 1;
+}
+.emptyNumber {
+  width: 142px;
+  position: relative;
+  font-weight: 600;
+  display: inline-block;
+  flex-shrink: 0;
+  z-index: 2;
+}
+@media screen and (max-width: 750px) {
+  .inputBgParent {
+    flex-wrap: wrap;
+  }
+}
+@media screen and (max-width: 450px) {
+  .inputBg {
+    flex: 1;
+  }
+}
