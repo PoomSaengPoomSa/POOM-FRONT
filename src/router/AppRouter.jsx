@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, Outlet } from "react-router-dom";
 
 import AppLayout from "../layouts/AppLayout.jsx";
 
@@ -40,6 +40,7 @@ import CustomerDashboard from "../pages/customer/CustomerDashboard.jsx";
 
 // Phase 4: Calendar (Day) and Trend Archives
 import DailyCalendar from "../pages/calendar/DailyCalendar.jsx";
+import { CalendarProvider } from "../pages/calendar/CalendarContext.jsx";
 import TrendArchive from "../pages/trend/TrendArchive.jsx";
 import EconomicIndicatorArchive from "../pages/trend/EconomicIndicatorArchive.jsx";
 import EconomicIndicatorLlmReport from "../pages/trend/EconomicIndicatorLlmReport.jsx";
@@ -75,9 +76,11 @@ export default function AppRouter() {
         <Route path="/news-bucket-message-draft" element={<NewsBucketMessageDraft />} />
         
         {/* Phase 2 Calendar Routes */}
-        <Route path="/daily-calendar" element={<DailyCalendar />} />
-        <Route path="/weekly-calendar" element={<WeeklyCalendar />} />
-        <Route path="/monthly-calendar" element={<MonthlyCalendar />} />
+        <Route element={<CalendarProvider><Outlet /></CalendarProvider>}>
+          <Route path="/daily-calendar" element={<DailyCalendar />} />
+          <Route path="/weekly-calendar" element={<WeeklyCalendar />} />
+          <Route path="/monthly-calendar" element={<MonthlyCalendar />} />
+        </Route>
 
         {/* Phase 3 & 5 Customer Management Routes */}
         <Route path="/news-bucket-bucket" element={<NewsBucket />} />

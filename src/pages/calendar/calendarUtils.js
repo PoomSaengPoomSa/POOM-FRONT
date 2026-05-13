@@ -58,11 +58,12 @@ const isSameDay = (d1, d2) => {
 
 const isSameWeek = (d1, d2) => {
   if (!d1 || !d2) return false;
-  const start = new Date(d2);
-  start.setDate(d2.getDate() - d2.getDay());
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-  return d1 >= start && d1 <= end;
+  const start = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate() - d2.getDay());
+  const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+  
+  const d1Date = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate());
+  
+  return d1Date >= start && d1Date <= end;
 };
 
 const isSelected = (date, selectedDate, viewMode) => {
@@ -97,8 +98,8 @@ export const DEMO_EVENTS = [
   {
     id: 1,
     title: "이OO 고객님 미팅",
-    startTime: "09/05/2026 08:00",
-    endTime: "09/05/2026 09:00",
+    startTime: "2026-05-09 08:00",
+    endTime: "2026-05-09 09:00",
     category: "상담",
     customer: "이OO",
     color: "green",
@@ -107,8 +108,8 @@ export const DEMO_EVENTS = [
   {
     id: 2,
     title: "점심 약속",
-    startTime: "09/05/2026 12:00",
-    endTime: "09/05/2026 13:00",
+    startTime: "2026-05-09 12:00",
+    endTime: "2026-05-09 13:00",
     category: "개인",
     customer: "",
     color: "blue",
@@ -117,8 +118,8 @@ export const DEMO_EVENTS = [
   {
     id: 3,
     title: "내부 회의",
-    startTime: "09/05/2026 13:30",
-    endTime: "09/05/2026 15:30",
+    startTime: "2026-05-09 13:30",
+    endTime: "2026-05-09 15:30",
     category: "공지",
     customer: "",
     color: "orange",

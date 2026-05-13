@@ -1,18 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut, User, FileText, ClipboardList } from "lucide-react";
 import "./CalendarNew.css";
 import ScheduleRegistrationModal from "./ScheduleRegistrationModal";
 import ScheduleDetailModal from "./ScheduleDetailModal";
 import ScheduleEditModal from "./ScheduleEditModal";
-import { generateMiniCalendar, formatMonthYear, DEMO_EVENTS } from './calendarUtils';
+import { generateMiniCalendar, formatMonthYear } from './calendarUtils';
+import { useCalendar } from './CalendarContext';
 
 export default function MonthlyCalendar() {
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { events, selectedDate, setSelectedDate } = useCalendar();
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [currentMonth, setCurrentMonth] = useState({ year: 2026, month: 4 }); // May 2026
+  const [currentMonth, setCurrentMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
+
+  useEffect(() => {
+    setCurrentMonth({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
+  }, [selectedDate]);
+
+  const handleDateClick = (date) => {
+    setSelectedDate(date);
+    setCurrentMonth({ year: date.getFullYear(), month: date.getMonth() });
+  };
 
   const openDetailModal = (event) => {
     setSelectedEvent(event);
@@ -47,7 +58,19 @@ export default function MonthlyCalendar() {
     });
   };
 
-  const calendarDays = generateMiniCalendar(currentMonth.year, currentMonth.month, null, 'month');
+  const calendarDays = generateMiniCalendar(currentMonth.year, currentMonth.month, selectedDate, 'month');
+
+  const getTodayEvents = () => {
+    const yyyy = selectedDate.getFullYear();
+    const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(selectedDate.getDate()).padStart(2, '0');
+    const targetDateStr = `${yyyy}-${mm}-${dd}`;
+    return events.filter(e => e.startTime.startsWith(targetDateStr));
+  };
+
+  const todayEvents = getTodayEvents();
+
+  const badgeColorMap = { yellow: '#eab308', blue: '#3b82f6', pink: '#ec4899', purple: '#a855f7', lightblue: '#06b6d4', orange: '#f97316', green: '#22c55e' };
 
   return (
     <div className="cal-layout">
@@ -112,8 +135,10 @@ export default function MonthlyCalendar() {
                 <span className="cal-mini-day-name">T</span>
                 <span className="cal-mini-day-name">F</span>
                 
-                {calendarDays.map((d, i) => (
-                  <div key={i} className={`cal-mini-day ${d.muted ? 'muted' : ''} ${d.selected ? 'selected' : ''}`}>
+                {generateMiniCalendar(currentMonth.year, currentMonth.month, selectedDate, 'month').map((d, i) => (
+                  <div key={i} 
+                       className={`cal-mini-day ${d.muted ? 'muted' : ''} ${d.selected ? 'selected' : ''}`}
+                       onClick={() => handleDateClick(d.date)}>
                     {d.day}
                   </div>
                 ))}
@@ -123,18 +148,19 @@ export default function MonthlyCalendar() {
             <div>
               <h3 className="cal-schedule-title">오늘의 일정</h3>
               <div className="cal-today-schedule">
-                <div className="cal-schedule-item">
-                  <span className="cal-schedule-time">08:00 ~ 09:00</span>
-                  <span className="cal-schedule-desc">이OO 고객님 미팅</span>
-                </div>
-                <div className="cal-schedule-item">
-                  <span className="cal-schedule-time">12:00 ~ 13:00</span>
-                  <span className="cal-schedule-desc">점심 약속</span>
-                </div>
-                <div className="cal-schedule-item">
-                  <span className="cal-schedule-time">13:30 ~ 14:30</span>
-                  <span className="cal-schedule-desc">내부 회의</span>
-                </div>
+                {todayEvents.length === 0 ? (
+                  <div style={{ fontSize: 13, color: '#94a3b8', padding: '12px 0' }}>등록된 일정이 없습니다.</div>
+                ) : (
+                  todayEvents.map(e => {
+                    const timeStr = `${e.startTime.split(' ')[1]} ~ ${e.endTime.split(' ')[1]}`;
+                    return (
+                      <div className="cal-schedule-item" key={e.id}>
+                        <span className="cal-schedule-time">{timeStr}</span>
+                        <span className="cal-schedule-desc">{e.title}</span>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
 
@@ -191,21 +217,33 @@ export default function MonthlyCalendar() {
 
               {/* Grid Cells */}
               {calendarDays.map((d, i) => {
-                const isDemoDate9 = currentMonth.year === 2026 && currentMonth.month === 4 && d.day === 9 && !d.muted;
+                const cellDate = d.date;
+                const yyyy = cellDate.getFullYear();
+                const mm = String(cellDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(cellDate.getDate()).padStart(2, '0');
+                const cellDateStr = `${yyyy}-${mm}-${dd}`;
+                
+                const cellEvents = events.filter(e => e.startTime.startsWith(cellDateStr));
 
                 return (
                   <div key={i} className={`monthly-day-cell`} style={i >= 35 ? { borderBottom: 'none' } : {}}>
                     <div className={`monthly-day-number ${d.muted ? 'muted' : ''}`}>
                       {String(d.day).padStart(2, '0')}
                     </div>
-                    {/* Demo Events injected for specific dates in May 2026 to match original UI */}
-                    {isDemoDate9 && (
-                      <>
-                        <div className="monthly-event" style={{ backgroundColor: '#22c55e', cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[0])}>08:00 이OO 고객님 미팅</div>
-                        <div className="monthly-event" style={{ backgroundColor: '#3b82f6', cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[1])}>12:00 점심 약속</div>
-                        <div className="monthly-event" style={{ backgroundColor: '#fb923c', cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[2])}>13:30 내부 회의</div>
-                      </>
-                    )}
+                    {cellEvents.map(event => {
+                      const timeStr = event.startTime.split(' ')[1] || '';
+                      const bgColor = badgeColorMap[event.color] || '#3b82f6';
+                      return (
+                        <div 
+                          key={event.id} 
+                          className="monthly-event" 
+                          style={{ backgroundColor: bgColor, cursor: 'pointer' }} 
+                          onClick={() => openDetailModal(event)}
+                        >
+                          {timeStr} {event.title}
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })}
