@@ -1,19 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import "./CalendarNew.css";
 import ScheduleRegistrationModal from "./ScheduleRegistrationModal";
 import ScheduleDetailModal from "./ScheduleDetailModal";
 import ScheduleEditModal from "./ScheduleEditModal";
-import { generateMiniCalendar, formatMonthYear, formatHeaderDate, getWeekDays, DEMO_EVENTS } from './calendarUtils';
+import { generateMiniCalendar, formatMonthYear, formatHeaderDate, getWeekDays } from './calendarUtils';
+import { useCalendar } from './CalendarContext';
 
 export default function WeeklyCalendar() {
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { events, selectedDate, setSelectedDate } = useCalendar();
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date(2026, 4, 9)); // May 9, 2026
-  const [miniCalMonth, setMiniCalMonth] = useState({ year: 2026, month: 4 }); // May 2026
+  const [miniCalMonth, setMiniCalMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
+
+  useEffect(() => {
+    setMiniCalMonth({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
+  }, [selectedDate]);
 
   const openDetailModal = (event) => {
     setSelectedEvent(event);
@@ -66,6 +71,26 @@ export default function WeeklyCalendar() {
   };
 
   const weekDays = getWeekDays(selectedDate);
+
+  const colorMap = {
+    yellow: { bg: '#fef9c3', border: '#fef08a', text: '#854d0e', timeText: '#a16207' },
+    blue: { bg: '#e0f2fe', border: '#bae6fd', text: '#0369a1', timeText: '#075985' },
+    pink: { bg: '#fce7f3', border: '#fbcfe8', text: '#9d174d', timeText: '#be185d' },
+    purple: { bg: '#f3e8ff', border: '#e9d5ff', text: '#6b21a8', timeText: '#7e22ce' },
+    lightblue: { bg: '#ecfeff', border: '#cffafe', text: '#164e63', timeText: '#155e75' },
+    orange: { bg: '#ffedd5', border: '#fed7aa', text: '#9a3412', timeText: '#c2410c' },
+    green: { bg: '#dcfce7', border: '#bbf7d0', text: '#166534', timeText: '#15803d' }
+  };
+
+  const getTodayEvents = () => {
+    const yyyy = selectedDate.getFullYear();
+    const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(selectedDate.getDate()).padStart(2, '0');
+    const targetDateStr = `${yyyy}-${mm}-${dd}`;
+    return events.filter(e => e.startTime.startsWith(targetDateStr));
+  };
+
+  const todayEvents = getTodayEvents();
 
   return (
     <div className="cal-layout">
@@ -143,18 +168,19 @@ export default function WeeklyCalendar() {
             <div>
               <h3 className="cal-schedule-title">오늘의 일정</h3>
               <div className="cal-today-schedule">
-                <div className="cal-schedule-item">
-                  <span className="cal-schedule-time">08:00 ~ 09:00</span>
-                  <span className="cal-schedule-desc">이OO 고객님 미팅</span>
-                </div>
-                <div className="cal-schedule-item">
-                  <span className="cal-schedule-time">12:00 ~ 13:00</span>
-                  <span className="cal-schedule-desc">점심 약속</span>
-                </div>
-                <div className="cal-schedule-item">
-                  <span className="cal-schedule-time">13:30 ~ 14:30</span>
-                  <span className="cal-schedule-desc">내부 회의</span>
-                </div>
+                {todayEvents.length === 0 ? (
+                  <div style={{ fontSize: 13, color: '#94a3b8', padding: '12px 0' }}>등록된 일정이 없습니다.</div>
+                ) : (
+                  todayEvents.map(e => {
+                    const timeStr = `${e.startTime.split(' ')[1]} ~ ${e.endTime.split(' ')[1]}`;
+                    return (
+                      <div className="cal-schedule-item" key={e.id}>
+                        <span className="cal-schedule-time">{timeStr}</span>
+                        <span className="cal-schedule-desc">{e.title}</span>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
 
@@ -220,22 +246,61 @@ export default function WeeklyCalendar() {
                       <div className="weekly-time-cell">{timeStr}</div>
                     </div>
                     {/* 7 Days Columns per row */}
-                    {Array.from({ length: 7 }).map((_, dayIdx) => (
-                      <div className="weekly-day-col" key={dayIdx}>
-                        <div className="weekly-grid-cell">
-                          {/* Demo Events - only show on May 9, 2026 */}
-                          {hour === 8 && weekDays[dayIdx].getFullYear() === 2026 && weekDays[dayIdx].getMonth() === 4 && weekDays[dayIdx].getDate() === 9 && (
-                             <div className="event-block event-green" style={{ top: 0, height: 60, cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[0])}>이OO 고객님 미팅</div>
-                          )}
-                          {hour === 12 && weekDays[dayIdx].getFullYear() === 2026 && weekDays[dayIdx].getMonth() === 4 && weekDays[dayIdx].getDate() === 9 && (
-                             <div className="event-block event-blue" style={{ top: 0, height: 60, cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[1])}>점심 약속</div>
-                          )}
-                          {hour === 13 && weekDays[dayIdx].getFullYear() === 2026 && weekDays[dayIdx].getMonth() === 4 && weekDays[dayIdx].getDate() === 9 && (
-                             <div className="event-block event-orange" style={{ top: 30, height: 120, cursor: 'pointer' }} onClick={() => openDetailModal(DEMO_EVENTS[2])}>내부 회의</div>
-                          )}
+                    {Array.from({ length: 7 }).map((_, dayIdx) => {
+                      const cellDate = weekDays[dayIdx];
+                      const yyyy = cellDate.getFullYear();
+                      const mm = String(cellDate.getMonth() + 1).padStart(2, '0');
+                      const dd = String(cellDate.getDate()).padStart(2, '0');
+                      const cellDateStr = `${yyyy}-${mm}-${dd}`;
+                      
+                      const cellEvents = events.filter(e => {
+                        if (!e.startTime.startsWith(cellDateStr)) return false;
+                        const startHour = parseInt(e.startTime.split(' ')[1].split(':')[0], 10);
+                        return startHour === hour;
+                      });
+
+                      return (
+                        <div className="weekly-day-col" key={dayIdx}>
+                          <div className="weekly-grid-cell">
+                            {cellEvents.map(event => {
+                              const timePartStart = event.startTime.split(' ')[1] || '09:00';
+                              const timePartEnd = event.endTime.split(' ')[1] || '10:00';
+                              
+                              const [sHour, sMin] = timePartStart.split(':').map(Number);
+                              const [eHour, eMin] = timePartEnd.split(':').map(Number);
+                              
+                              const startTotalMins = sHour * 60 + sMin;
+                              const endTotalMins = eHour * 60 + eMin;
+                              const durationMins = endTotalMins - startTotalMins;
+                              
+                              // 1 hour cell = 60px height
+                              const topPos = (sMin / 60) * 60;
+                              const heightPx = (durationMins / 60) * 60;
+                              
+                              const styleColors = colorMap[event.color] || colorMap.blue;
+                              
+                              return (
+                                <div 
+                                  key={event.id}
+                                  className={`event-block`} 
+                                  style={{ 
+                                    top: topPos, 
+                                    height: heightPx, 
+                                    cursor: 'pointer',
+                                    background: styleColors.bg,
+                                    border: `1px solid ${styleColors.border}`,
+                                    color: styleColors.text
+                                  }} 
+                                  onClick={() => openDetailModal(event)}
+                                >
+                                  {event.title}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 );
               })}

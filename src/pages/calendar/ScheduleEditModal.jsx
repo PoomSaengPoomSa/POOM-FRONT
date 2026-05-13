@@ -1,12 +1,116 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Calendar as CalendarIcon, Search } from "lucide-react";
 import "./CalendarNew.css";
+import MiniCalendarPicker from "./MiniCalendarPicker";
+import { useCalendar } from "./CalendarContext";
 
 export default function ScheduleEditModal({ isOpen, onClose, event }) {
-  const [category, setCategory] = useState(event?.category || "상담");
-  const [color, setColor] = useState(event?.color || "green");
+  const { updateEvent } = useCalendar();
+  const [category, setCategory] = useState("상담");
+  const [color, setColor] = useState("green");
+  
+  const [title, setTitle] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [customer, setCustomer] = useState("");
+  const [memo, setMemo] = useState("");
+  const [errors, setErrors] = useState({ title: false, startDate: false, startTime: false, endDate: false, endTime: false });
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && event) {
+      setCategory(event.category || "상담");
+      setColor(event.color || "green");
+      setTitle(event.title || "");
+      setStartDate(event.startTime ? event.startTime.split(' ')[0] : "");
+      setStartTime(event.startTime ? event.startTime.split(' ')[1] : "");
+      setEndDate(event.endTime ? event.endTime.split(' ')[0] : "");
+      setEndTime(event.endTime ? event.endTime.split(' ')[1] : "");
+      setCustomer(event.customer || "");
+      setMemo(event.memo || "");
+      setErrors({ title: false, startDate: false, startTime: false, endDate: false, endTime: false });
+      setShowStartPicker(false);
+      setShowEndPicker(false);
+    }
+  }, [isOpen, event]);
+
+  const handleDateSelect = (date, setter, isEnd = false) => {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const selectedStr = `${yyyy}-${mm}-${dd}`;
+    
+    if (isEnd && startDate) {
+      if (new Date(selectedStr) < new Date(startDate)) {
+        alert('종료일은 시작일보다 이전일 수 없습니다.');
+        return;
+      }
+    } else if (!isEnd && endDate) {
+      if (new Date(selectedStr) > new Date(endDate)) {
+        alert('시작일은 종료일보다 이후일 수 없습니다.');
+        return;
+      }
+    }
+    
+    setter(selectedStr);
+  };
 
   if (!isOpen || !event) return null;
+
+  const handleSave = () => {
+    const newErrors = {
+      title: title.trim() === "",
+      startDate: startDate.trim() === "",
+      startTime: startTime.trim() === "",
+      endDate: endDate.trim() === "",
+      endTime: endTime.trim() === ""
+    };
+    
+    setErrors(newErrors);
+    
+    if (!newErrors.title && !newErrors.startDate && !newErrors.startTime && !newErrors.endDate && !newErrors.endTime) {
+      if (new Date(startDate) > new Date(endDate)) {
+        alert('종료일은 시작일보다 이전일 수 없습니다.');
+        return;
+      }
+      
+      if (startDate === endDate && startTime >= endTime) {
+        alert('종료 시간은 시작 시간보다 빠르거나 같을 수 없습니다.');
+        return;
+      }
+
+      const startDateTime = new Date(`${startDate} ${startTime}`);
+      const endDateTime = new Date(`${endDate} ${endTime}`);
+
+      const isOverlap = events.some(e => {
+        if (e.id === event.id) return false;
+        const eStart = new Date(e.startTime);
+        const eEnd = new Date(e.endTime);
+        return startDateTime < eEnd && endDateTime > eStart;
+      });
+
+      if (isOverlap) {
+        alert('선택하신 시간에 이미 다른 일정이 존재합니다. 중복 등록할 수 없습니다.');
+        return;
+      }
+
+      updateEvent({
+        ...event,
+        title,
+        startTime: `${startDate} ${startTime}`,
+        endTime: `${endDate} ${endTime}`,
+        category,
+        color,
+        customer,
+        memo
+      });
+
+      onClose();
+    }
+  };
 
   return (
     <div className="cal-modal-overlay">
@@ -37,23 +141,95 @@ export default function ScheduleEditModal({ isOpen, onClose, event }) {
 
           <div className="cal-form-group">
             <label className="cal-form-label">내용 <span className="req">*</span></label>
-            <input type="text" className="cal-form-input" defaultValue={event.title} placeholder="일정 내용을 입력하세요" />
+            <input 
+              type="text" 
+              className="cal-form-input" 
+              value={title} 
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (errors.title) setErrors({ ...errors, title: false });
+              }}
+              placeholder="일정 내용을 입력하세요" 
+              style={errors.title ? { backgroundColor: '#fee2e2' } : {}}
+            />
+          </div>
+
+          <div className="cal-form-grid" style={{ marginBottom: 16 }}>
+            <div className="cal-form-group" style={{ marginBottom: 0 }}>
+              <label className="cal-form-label">시작 일 <span className="req">*</span></label>
+              <div className="cal-input-icon-wrap" style={{ position: 'relative' }}>
+                <input 
+                  type="text" 
+                  className="cal-form-input" 
+                  value={startDate} 
+                  onChange={(e) => {
+                    setStartDate(e.target.value);
+                    if (errors.startDate) setErrors({ ...errors, startDate: false });
+                  }}
+                  placeholder="MM/DD/YYYY" 
+                  style={errors.startDate ? { backgroundColor: '#fee2e2' } : {}}
+                />
+                <CalendarIcon size={16} className="cal-input-icon" style={{ cursor: 'pointer' }} onClick={() => setShowStartPicker(!showStartPicker)} />
+                {showStartPicker && (
+                  <MiniCalendarPicker 
+                    onSelect={(d) => { handleDateSelect(d, setStartDate, false); setShowStartPicker(false); if (errors.startDate) setErrors({ ...errors, startDate: false }); }} 
+                    onClose={() => setShowStartPicker(false)} 
+                  />
+                )}
+              </div>
+            </div>
+            <div className="cal-form-group" style={{ marginBottom: 0 }}>
+              <label className="cal-form-label">종료 일 <span className="req">*</span></label>
+              <div className="cal-input-icon-wrap" style={{ position: 'relative' }}>
+                <input 
+                  type="text" 
+                  className="cal-form-input" 
+                  value={endDate} 
+                  onChange={(e) => {
+                    setEndDate(e.target.value);
+                    if (errors.endDate) setErrors({ ...errors, endDate: false });
+                  }}
+                  placeholder="MM/DD/YYYY" 
+                  style={errors.endDate ? { backgroundColor: '#fee2e2' } : {}}
+                />
+                <CalendarIcon size={16} className="cal-input-icon" style={{ cursor: 'pointer' }} onClick={() => setShowEndPicker(!showEndPicker)} />
+                {showEndPicker && (
+                  <MiniCalendarPicker 
+                    alignRight={true}
+                    onSelect={(d) => { handleDateSelect(d, setEndDate, true); setShowEndPicker(false); if (errors.endDate) setErrors({ ...errors, endDate: false }); }} 
+                    onClose={() => setShowEndPicker(false)} 
+                  />
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="cal-form-grid">
             <div className="cal-form-group">
-              <label className="cal-form-label">시작 일시 <span className="req">*</span></label>
-              <div className="cal-input-icon-wrap">
-                <input type="text" className="cal-form-input" defaultValue={event.startTime} placeholder="MM/DD/YYYY HH:mm" />
-                <CalendarIcon size={16} className="cal-input-icon" />
-              </div>
+              <label className="cal-form-label">시작 시간 <span className="req">*</span></label>
+              <input 
+                type="time" 
+                className="cal-form-input" 
+                value={startTime}
+                onChange={(e) => {
+                  setStartTime(e.target.value);
+                  if (errors.startTime) setErrors({ ...errors, startTime: false });
+                }}
+                style={errors.startTime ? { backgroundColor: '#fee2e2' } : {}}
+              />
             </div>
             <div className="cal-form-group">
-              <label className="cal-form-label">종료 일시 <span className="req">*</span></label>
-              <div className="cal-input-icon-wrap">
-                <input type="text" className="cal-form-input" defaultValue={event.endTime} placeholder="MM/DD/YYYY HH:mm" />
-                <CalendarIcon size={16} className="cal-input-icon" />
-              </div>
+              <label className="cal-form-label">종료 시간 <span className="req">*</span></label>
+              <input 
+                type="time" 
+                className="cal-form-input" 
+                value={endTime}
+                onChange={(e) => {
+                  setEndTime(e.target.value);
+                  if (errors.endTime) setErrors({ ...errors, endTime: false });
+                }}
+                style={errors.endTime ? { backgroundColor: '#fee2e2' } : {}}
+              />
             </div>
           </div>
 
@@ -62,7 +238,7 @@ export default function ScheduleEditModal({ isOpen, onClose, event }) {
           <div className="cal-form-group">
             <label className="cal-form-label">고객 선택</label>
             <div className="cal-input-icon-wrap">
-              <input type="text" className="cal-form-input" defaultValue={event.customer || ""} placeholder="고객명 또는 연락처 검색" />
+              <input type="text" className="cal-form-input" value={customer} onChange={(e) => setCustomer(e.target.value)} placeholder="고객명 또는 연락처 검색" />
               <Search size={16} className="cal-input-icon search" />
             </div>
           </div>
@@ -82,13 +258,13 @@ export default function ScheduleEditModal({ isOpen, onClose, event }) {
 
           <div className="cal-form-group" style={{ marginBottom: 0 }}>
             <label className="cal-form-label">메모</label>
-            <textarea className="cal-form-textarea" defaultValue={event.memo || ""} placeholder="추가 메모를 입력하세요"></textarea>
+            <textarea className="cal-form-textarea" value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="추가 메모를 입력하세요"></textarea>
           </div>
         </div>
 
         <div className="cal-modal-actions">
           <button className="cal-btn cal-btn-outline" onClick={onClose}>취소</button>
-          <button className="cal-btn cal-btn-primary" onClick={onClose}>저장</button>
+          <button className="cal-btn cal-btn-primary" onClick={handleSave}>저장</button>
         </div>
       </div>
     </div>

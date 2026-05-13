@@ -1,19 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import "./CalendarNew.css";
 import ScheduleRegistrationModal from "./ScheduleRegistrationModal";
 import ScheduleDetailModal from "./ScheduleDetailModal";
 import ScheduleEditModal from "./ScheduleEditModal";
-import { generateMiniCalendar, formatMonthYear, formatFullHeaderDate, DEMO_EVENTS } from './calendarUtils';
+import { generateMiniCalendar, formatMonthYear, formatFullHeaderDate } from './calendarUtils';
+import { useCalendar } from './CalendarContext';
 
 export default function DailyCalendar() {
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { events, selectedDate, setSelectedDate } = useCalendar();
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date(2026, 4, 9)); // May 9, 2026
-  const [miniCalMonth, setMiniCalMonth] = useState({ year: 2026, month: 4 }); // May 2026
+  const [miniCalMonth, setMiniCalMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
+
+  useEffect(() => {
+    setMiniCalMonth({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
+  }, [selectedDate]);
 
   const openDetailModal = (event) => {
     setSelectedEvent(event);
@@ -63,6 +68,26 @@ export default function DailyCalendar() {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() + 1);
     handleDateClick(newDate);
+  };
+
+  const getTodayEvents = () => {
+    const yyyy = selectedDate.getFullYear();
+    const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(selectedDate.getDate()).padStart(2, '0');
+    const targetDateStr = `${yyyy}-${mm}-${dd}`;
+    return events.filter(e => e.startTime.startsWith(targetDateStr));
+  };
+
+  const todayEvents = getTodayEvents();
+
+  const colorMap = {
+    yellow: { bg: '#fef9c3', border: '#fef08a', text: '#854d0e', timeText: '#a16207' },
+    blue: { bg: '#e0f2fe', border: '#bae6fd', text: '#0369a1', timeText: '#075985' },
+    pink: { bg: '#fce7f3', border: '#fbcfe8', text: '#9d174d', timeText: '#be185d' },
+    purple: { bg: '#f3e8ff', border: '#e9d5ff', text: '#6b21a8', timeText: '#7e22ce' },
+    lightblue: { bg: '#ecfeff', border: '#cffafe', text: '#164e63', timeText: '#155e75' },
+    orange: { bg: '#ffedd5', border: '#fed7aa', text: '#9a3412', timeText: '#c2410c' },
+    green: { bg: '#dcfce7', border: '#bbf7d0', text: '#166534', timeText: '#15803d' }
   };
 
   return (
@@ -141,18 +166,19 @@ export default function DailyCalendar() {
             <div>
               <h3 className="cal-schedule-title">오늘의 일정</h3>
               <div className="cal-today-schedule">
-                <div className="cal-schedule-item">
-                  <span className="cal-schedule-time">08:00 ~ 09:00</span>
-                  <span className="cal-schedule-desc">이OO 고객님 미팅</span>
-                </div>
-                <div className="cal-schedule-item">
-                  <span className="cal-schedule-time">12:00 ~ 13:00</span>
-                  <span className="cal-schedule-desc">점심 약속</span>
-                </div>
-                <div className="cal-schedule-item">
-                  <span className="cal-schedule-time">13:30 ~ 14:30</span>
-                  <span className="cal-schedule-desc">내부 회의</span>
-                </div>
+                {todayEvents.length === 0 ? (
+                  <div style={{ fontSize: 13, color: '#94a3b8', padding: '12px 0' }}>등록된 일정이 없습니다.</div>
+                ) : (
+                  todayEvents.map(e => {
+                    const timeStr = `${e.startTime.split(' ')[1]} ~ ${e.endTime.split(' ')[1]}`;
+                    return (
+                      <div className="cal-schedule-item" key={e.id}>
+                        <span className="cal-schedule-time">{timeStr}</span>
+                        <span className="cal-schedule-desc">{e.title}</span>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
 
@@ -207,43 +233,50 @@ export default function DailyCalendar() {
                     <div key={i} style={{ height: 80, borderBottom: '1px solid #e5e7eb', boxSizing: 'border-box' }}></div>
                   ))}
 
-                  {selectedDate.getFullYear() === 2026 && selectedDate.getMonth() === 4 && selectedDate.getDate() === 9 && (
-                    <>
-                      {/* Absolute positioned events */}
+                  {todayEvents.map(event => {
+                    const timePartStart = event.startTime.split(' ')[1] || '09:00';
+                    const timePartEnd = event.endTime.split(' ')[1] || '10:00';
+                    
+                    const [startHour, startMin] = timePartStart.split(':').map(Number);
+                    const [endHour, endMin] = timePartEnd.split(':').map(Number);
+                    
+                    const startTotalMins = startHour * 60 + startMin;
+                    const endTotalMins = endHour * 60 + endMin;
+                    const durationMins = endTotalMins - startTotalMins;
+                    
+                    // 1 hour = 80px
+                    const topPos = (startTotalMins / 60) * 80;
+                    const heightPx = (durationMins / 60) * 80;
+                    
+                    const styleColors = colorMap[event.color] || colorMap.blue;
+                    
+                    return (
                       <div 
-                        onClick={() => openDetailModal(DEMO_EVENTS[0])}
-                        style={{ cursor: 'pointer', position: 'absolute', top: 650, left: 24, right: 24, height: 60, background: '#dcfce7', borderRadius: 8, display: 'flex', border: '1px solid #bbf7d0' }}
+                        key={event.id}
+                        onClick={() => openDetailModal(event)}
+                        style={{ 
+                          cursor: 'pointer', 
+                          position: 'absolute', 
+                          top: topPos, 
+                          left: 24, 
+                          right: 24, 
+                          height: heightPx, 
+                          background: styleColors.bg, 
+                          borderRadius: 8, 
+                          display: 'flex', 
+                          border: `1px solid ${styleColors.border}` 
+                        }}
                       >
-                        <div style={{ width: '30%', padding: 12, borderRight: '1px solid #bbf7d0', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#166534' }}>이OO 고객님 미팅</span>
-                          <span style={{ fontSize: 11, color: '#15803d' }}>08:00 ~ 09:00</span>
+                        <div style={{ width: '30%', padding: 12, borderRight: `1px solid ${styleColors.border}`, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: styleColors.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.title}</span>
+                          <span style={{ fontSize: 11, color: styleColors.timeText }}>{timePartStart} ~ {timePartEnd}</span>
                         </div>
-                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: '#166534', whiteSpace: 'pre-line' }}>{DEMO_EVENTS[0].memo}</div>
-                      </div>
-
-                      <div 
-                        onClick={() => openDetailModal(DEMO_EVENTS[1])}
-                        style={{ cursor: 'pointer', position: 'absolute', top: 970, left: 24, right: 24, height: 60, background: '#e0f2fe', borderRadius: 8, display: 'flex', border: '1px solid #bae6fd' }}
-                      >
-                        <div style={{ width: '30%', padding: 12, borderRight: '1px solid #bae6fd', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#0369a1' }}>점심 약속</span>
-                          <span style={{ fontSize: 11, color: '#075985' }}>12:00 ~ 13:00</span>
+                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: styleColors.text, whiteSpace: 'pre-line', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {event.memo || (event.customer ? `고객: ${event.customer}` : "메모 없음")}
                         </div>
-                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: '#0369a1', whiteSpace: 'pre-line' }}>{DEMO_EVENTS[1].memo}</div>
                       </div>
-
-                      <div 
-                        onClick={() => openDetailModal(DEMO_EVENTS[2])}
-                        style={{ cursor: 'pointer', position: 'absolute', top: 1090, left: 24, right: 24, height: 120, background: '#ffedd5', borderRadius: 8, display: 'flex', border: '1px solid #fed7aa' }}
-                      >
-                        <div style={{ width: '30%', padding: 12, borderRight: '1px solid #fed7aa', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#9a3412' }}>내부 회의</span>
-                          <span style={{ fontSize: 11, color: '#c2410c' }}>13:30 ~ 15:30</span>
-                        </div>
-                        <div style={{ flex: 1, padding: 12, display: 'flex', alignItems: 'center', fontSize: 13, color: '#9a3412', whiteSpace: 'pre-line' }}>{DEMO_EVENTS[2].memo}</div>
-                      </div>
-                    </>
-                  )}
+                    );
+                  })}
 
                 </div>
               </div>
