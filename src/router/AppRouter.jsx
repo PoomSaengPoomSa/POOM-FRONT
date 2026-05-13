@@ -7,7 +7,6 @@ import SignUpPage from "../pages/auth/SignUpPage.jsx";
 
 
 import CalendarPage from "../pages/calendar/CalendarPage.jsx";
-import TrendsPage from "../pages/trends/TrendsPage.jsx";
 import ProfilePage from "../pages/profile/ProfilePage.jsx";
 import EconomyPage from "../pages/economy/EconomyPage.jsx";
 import MemoPage from "../pages/memo/MemoPage.jsx";
@@ -63,7 +62,6 @@ export default function AppRouter() {
       <Route element={<AppLayout />}>
 
         <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/trends" element={<TrendsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/economy" element={<EconomyPage />} />
         <Route path="/memo" element={<MemoPage />} />
