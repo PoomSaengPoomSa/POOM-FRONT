@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut, User, FileText, ClipboardList } from "lucide-react";
+import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut, User, FileText, ClipboardList, Settings } from "lucide-react";
 import "./CalendarNew.css";
 import ScheduleRegistrationModal from "./ScheduleRegistrationModal";
 import ScheduleDetailModal from "./ScheduleDetailModal";
@@ -96,6 +96,10 @@ export default function MonthlyCalendar() {
           <Link to="/news-bucket-bucket" className="cal-menu-item">
             <Bell size={20} />
             뉴스 버킷
+          </Link>
+          <Link to="/settings" className="cal-menu-item">
+            <Settings size={20} />
+            설정
           </Link>
         </div>
 

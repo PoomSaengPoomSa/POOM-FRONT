@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, TrendingUp, Users, Bell, Copy, LogOut } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Copy, LogOut, Settings } from "lucide-react";
 import "./News.css";
 
 const draftText = `안녕하세요 고객님.
@@ -60,9 +60,13 @@ export default function NewsBucketMessageDraft() {
             <Users size={20} />
             고객관리
           </Link>
-          <Link to="/news-bucket-message-draft" className={`news-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
+          <Link to="/news-bucket-bucket" className={`news-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
             <Bell size={20} />
             뉴스 버킷
+          </Link>
+          <Link to="/settings" className={`news-menu-item ${path.includes('/settings') ? 'active' : ''}`}>
+            <Settings size={20} />
+            설정
           </Link>
         </div>
 

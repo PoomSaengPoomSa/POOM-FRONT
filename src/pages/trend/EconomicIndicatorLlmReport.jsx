@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, TrendingUp, Users, Bell, LogOut, MoreHorizontal, Activity, Home, DollarSign, X } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, LogOut, MoreHorizontal, Activity, Home, DollarSign, X, Settings } from "lucide-react";
 import "./Trend.css";
 
 export default function EconomicIndicatorLlmReport() {
@@ -30,6 +30,10 @@ export default function EconomicIndicatorLlmReport() {
           <Link to="/news-bucket-bucket" className="trend-menu-item">
             <Bell size={20} />
             뉴스 버킷
+          </Link>
+          <Link to="/settings" className={`trend-menu-item ${path.includes('/settings') ? 'active' : ''}`}>
+            <Settings size={20} />
+            설정
           </Link>
         </div>
 

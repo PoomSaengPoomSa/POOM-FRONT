@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
-import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Search, Plus, LogOut, ChevronDown, MessageSquare, Download, Share2, Printer, Settings } from "lucide-react";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import "./Customer.css";
 
@@ -78,6 +78,10 @@ export default function CustomerDashboard() {
           <Link to="/news-bucket-bucket" className={`cust-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
             <Bell size={20} />
             뉴스 버킷
+          </Link>
+          <Link to="/settings" className={`cust-menu-item ${path.includes('/settings') ? 'active' : ''}`}>
+            <Settings size={20} />
+            설정
           </Link>
         </div>
 
