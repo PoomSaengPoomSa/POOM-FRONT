@@ -12,7 +12,8 @@
 
 .trend-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background-color: var(--trend-bg);
   font-family: 'Inter', sans-serif;
 }
@@ -39,6 +40,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .trend-page-title {
@@ -63,7 +66,7 @@
 }
 
 .trend-section-title {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--trend-text-main);
   margin: 0 0 24px 0;
@@ -87,7 +90,7 @@
 }
 
 .trend-news-col-title {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--trend-text-main);
   padding-bottom: 12px;
@@ -217,7 +220,7 @@
 
 .eco-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
