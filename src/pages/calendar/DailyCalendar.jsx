@@ -144,14 +144,16 @@ export default function DailyCalendar() {
                   <ChevronRight size={16} cursor="pointer" onClick={handleNextMonth} />
                 </div>
               </div>
-              <div className="cal-mini-grid">
-                <span className="cal-mini-day-name">S</span>
+              <div className="cal-mini-day-names" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, textAlign: 'center', fontSize: 12, marginBottom: 8 }}>
                 <span className="cal-mini-day-name">S</span>
                 <span className="cal-mini-day-name">M</span>
                 <span className="cal-mini-day-name">T</span>
                 <span className="cal-mini-day-name">W</span>
                 <span className="cal-mini-day-name">T</span>
                 <span className="cal-mini-day-name">F</span>
+                <span className="cal-mini-day-name">S</span>
+              </div>
+              <div className="cal-mini-grid">
                 
                 {generateMiniCalendar(miniCalMonth.year, miniCalMonth.month, selectedDate, 'day').map((d, i) => (
                   <div key={i} 

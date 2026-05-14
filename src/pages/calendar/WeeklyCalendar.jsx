@@ -138,7 +138,7 @@ export default function WeeklyCalendar() {
               <Plus size={18} /> 일정 등록
             </button>
 
-            <div className="cal-mini-calendar">
+            <div className="cal-mini-calendar mode-week">
               <div className="cal-mini-header">
                 <span>{formatMonthYear(miniCalMonth.year, miniCalMonth.month)}</span>
                 <div style={{ display: 'flex', gap: 8, color: '#94a3b8' }}>
@@ -146,22 +146,29 @@ export default function WeeklyCalendar() {
                   <ChevronRight size={16} cursor="pointer" onClick={handleNextMonth} />
                 </div>
               </div>
-              <div className="cal-mini-grid">
-                <span className="cal-mini-day-name">S</span>
+              <div className="cal-mini-day-names" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, textAlign: 'center', fontSize: 12, marginBottom: 8 }}>
                 <span className="cal-mini-day-name">S</span>
                 <span className="cal-mini-day-name">M</span>
                 <span className="cal-mini-day-name">T</span>
                 <span className="cal-mini-day-name">W</span>
                 <span className="cal-mini-day-name">T</span>
                 <span className="cal-mini-day-name">F</span>
+                <span className="cal-mini-day-name">S</span>
+              </div>
+              <div className="cal-mini-grid">
                 
-                {generateMiniCalendar(miniCalMonth.year, miniCalMonth.month, selectedDate, 'week').map((d, i) => (
-                  <div key={i} 
-                       className={`cal-mini-day ${d.muted ? 'muted' : ''} ${d.selected ? 'selected' : ''}`}
-                       onClick={() => handleDateClick(d.date)}>
-                    {d.day}
-                  </div>
-                ))}
+                {generateMiniCalendar(miniCalMonth.year, miniCalMonth.month, selectedDate, 'week').map((d, i) => {
+                  const isTarget = d.date.getFullYear() === selectedDate.getFullYear() && 
+                                   d.date.getMonth() === selectedDate.getMonth() && 
+                                   d.date.getDate() === selectedDate.getDate();
+                  return (
+                    <div key={i} 
+                         className={`cal-mini-day ${d.muted ? 'muted' : ''} ${d.selected ? 'selected' : ''} ${isTarget ? 'target-date' : ''}`}
+                         onClick={() => handleDateClick(d.date)}>
+                      {d.day}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

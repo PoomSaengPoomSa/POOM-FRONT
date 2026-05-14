@@ -118,7 +118,7 @@ export default function MonthlyCalendar() {
               <Plus size={18} /> 일정 등록
             </button>
 
-            <div className="cal-mini-calendar">
+            <div className="cal-mini-calendar mode-month">
               <div className="cal-mini-header">
                 <span>{formatMonthYear(currentMonth.year, currentMonth.month)}</span>
                 <div style={{ display: 'flex', gap: 8, color: '#94a3b8' }}>
@@ -126,14 +126,16 @@ export default function MonthlyCalendar() {
                   <ChevronRight size={16} cursor="pointer" onClick={handleNextMonth} />
                 </div>
               </div>
-              <div className="cal-mini-grid">
-                <span className="cal-mini-day-name">S</span>
+              <div className="cal-mini-day-names" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, textAlign: 'center', fontSize: 12, marginBottom: 8 }}>
                 <span className="cal-mini-day-name">S</span>
                 <span className="cal-mini-day-name">M</span>
                 <span className="cal-mini-day-name">T</span>
                 <span className="cal-mini-day-name">W</span>
                 <span className="cal-mini-day-name">T</span>
                 <span className="cal-mini-day-name">F</span>
+                <span className="cal-mini-day-name">S</span>
+              </div>
+              <div className="cal-mini-grid">
                 
                 {generateMiniCalendar(currentMonth.year, currentMonth.month, selectedDate, 'month').map((d, i) => (
                   <div key={i} 
