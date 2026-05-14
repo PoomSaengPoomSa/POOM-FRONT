@@ -2,7 +2,7 @@ import { Camera, X, Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-export default function CustomerRegistrationModal({ isOpen, onClose }) {
+export default function CustomerRegistrationModal({ isOpen, onClose, initialData }) {
   const [activeTab, setActiveTab] = useState('기본 정보');
   if (!isOpen) return null;
 
@@ -10,7 +10,7 @@ export default function CustomerRegistrationModal({ isOpen, onClose }) {
     <div className="cust-modal-overlay">
       <div className="cust-modal">
         <button className="cust-modal-close" onClick={onClose}><X size={16} /></button>
-        <h2 className="cust-modal-title">신규 고객 등록</h2>
+        <h2 className="cust-modal-title">{initialData ? '고객 정보 수정' : '신규 고객 등록'}</h2>
 
         <div className="cust-modal-tabs">
           <button className={`cust-modal-tab ${activeTab === '기본 정보' ? 'active' : ''}`} onClick={() => setActiveTab('기본 정보')}>기본 정보</button>
@@ -32,7 +32,7 @@ export default function CustomerRegistrationModal({ isOpen, onClose }) {
               <div className="cust-form-grid">
                 <div className="cust-form-group">
                   <label className="cust-form-label">이름 <span className="req">*</span></label>
-                  <input type="text" className="cust-form-input" placeholder="예: 김OO" />
+                  <input type="text" className="cust-form-input" placeholder="예: 김OO" defaultValue={initialData?.name || ''} />
                 </div>
                 <div className="cust-form-group">
                   <label className="cust-form-label">생년월일 <span className="req">*</span></label>
@@ -53,11 +53,11 @@ export default function CustomerRegistrationModal({ isOpen, onClose }) {
                 </div>
                 <div className="cust-form-group">
                   <label className="cust-form-label">연락처</label>
-                  <input type="text" className="cust-form-input" placeholder="010-0000-0000" />
+                  <input type="text" className="cust-form-input" placeholder="010-0000-0000" defaultValue={initialData?.phone || ''} />
                 </div>
                 <div className="cust-form-group">
                   <label className="cust-form-label">이메일</label>
-                  <input type="text" className="cust-form-input" placeholder="example@email.com" />
+                  <input type="text" className="cust-form-input" placeholder="example@email.com" defaultValue={initialData?.email || ''} />
                 </div>
               </div>
 

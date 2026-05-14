@@ -3,6 +3,17 @@ import { Link, useLocation } from "react-router-dom";
 import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, Camera, X } from "lucide-react";
 import "./Customer.css";
 
+
+const allCustomers = [
+  { id: 101, name: "강OO", email: "dohyun@naver.com", phone: "010-7134-2353", color: "yellow", initial: "강" },
+  { id: 102, name: "강OO", email: "lsjshid@gmail.com", phone: "010-4563-2364", color: "green", initial: "강" },
+  { id: 103, name: "고OO", email: "shiho@gmail.com", phone: "010-9291-1342", color: "red", initial: "고" },
+  { id: 104, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김" },
+  { id: 105, name: "김OO", email: "kim1004@gmail.com", phone: "010-4333-1245", color: "blue", initial: "김" },
+  { id: 106, name: "김OO", email: "kimvils@naver.com", phone: "010-2214-3621", color: "gray", initial: "김" },
+  { id: 107, name: "김OO", email: "ppjisd@naver.com", phone: "010-6335-2365", color: "purple", initial: "김" },
+];
+
 const customers = [
   { id: 1, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김" },
   { id: 2, name: "박OO", email: "erlkgjldfjgkld@gmail.com", phone: "010-1234-5678", color: "purple", initial: "박" },
@@ -35,7 +46,7 @@ export default function CustomerRegistration2() {
           <Link to="/customer-management-registration-1" className={`cust-menu-item ${path.includes('/customer-management') ? 'active' : ''}`}>
             <Users size={20} />
             고객관리
-            <span className="cust-badge">23</span>
+            <span className="cust-badge">{allCustomers.length}</span>
           </Link>
           <Link to="/news-bucket-bucket" className={`cust-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
             <Bell size={20} />
@@ -72,7 +83,7 @@ export default function CustomerRegistration2() {
           </div>
 
           <div className="cust-list-tabs">
-            <div className="cust-list-tab active">전체 고객</div>
+            <Link to="/customer-management-registration-1" style={{ textDecoration: "none", color: "inherit", flex: 1 }}><div className="cust-list-tab active">전체 고객</div></Link>
             <div className="cust-list-tab">오늘 방문</div>
           </div>
 

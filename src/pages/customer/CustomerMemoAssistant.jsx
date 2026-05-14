@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
-import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, PenLine } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, PenLine, Check } from "lucide-react";
 import "./Customer.css";
+
+
+const allCustomers = [
+  { id: 101, name: "강OO", email: "dohyun@naver.com", phone: "010-7134-2353", color: "yellow", initial: "강" },
+  { id: 102, name: "강OO", email: "lsjshid@gmail.com", phone: "010-4563-2364", color: "green", initial: "강" },
+  { id: 103, name: "고OO", email: "shiho@gmail.com", phone: "010-9291-1342", color: "red", initial: "고" },
+  { id: 104, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김" },
+  { id: 105, name: "김OO", email: "kim1004@gmail.com", phone: "010-4333-1245", color: "blue", initial: "김" },
+  { id: 106, name: "김OO", email: "kimvils@naver.com", phone: "010-2214-3621", color: "gray", initial: "김" },
+  { id: 107, name: "김OO", email: "ppjisd@naver.com", phone: "010-6335-2365", color: "purple", initial: "김" },
+];
 
 const customers = [
   { id: 1, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김", time: "10:00 AM" },
@@ -66,7 +77,8 @@ export default function CustomerMemoAssistant() {
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(1);
-  const [expandedTimelineId, setExpandedTimelineId] = useState(1);
+  const [expandedTimelineId, setExpandedTimelineId] = useState(null);
+  const [showSaveToast, setShowSaveToast] = useState(false);
   const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
 
   return (
@@ -89,7 +101,7 @@ export default function CustomerMemoAssistant() {
           <Link to="/customer-management-registration-1" className={`cust-menu-item ${path.includes('/customer-management') ? 'active' : ''}`}>
             <Users size={20} />
             고객관리
-            <span className="cust-badge">23</span>
+            <span className="cust-badge">{allCustomers.length}</span>
           </Link>
           <Link to="/news-bucket-bucket" className={`cust-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
             <Bell size={20} />
@@ -123,7 +135,7 @@ export default function CustomerMemoAssistant() {
           </div>
 
           <div className="cust-list-tabs">
-            <div className="cust-list-tab">전체 고객</div>
+            <Link to="/customer-management-registration-1" style={{ textDecoration: "none", color: "inherit", flex: 1 }}><div className="cust-list-tab">전체 고객</div></Link>
             <div className="cust-list-tab active">오늘 방문</div>
           </div>
 
@@ -144,7 +156,13 @@ export default function CustomerMemoAssistant() {
 
         {/* Right Detail Panel */}
         <div key={selectedCustomerId} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
-          <div className="cust-detail-header">
+          <div className="cust-detail-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '24px' }}>
+            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="cust-detail-profile">
+                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
+                <h2>{selectedCustomer.name}</h2>
+              </div>
+            </div>
             <div className="cust-detail-tabs" style={{ margin: 0 }}>
               <Link to="/customer-management-profile" style={{ textDecoration: 'none' }}>
               <button className="cust-detail-tab">프로필</button>
@@ -152,36 +170,27 @@ export default function CustomerMemoAssistant() {
             <Link to="/customer-management-dashboard-2" style={{ textDecoration: 'none' }}>
               <button className="cust-detail-tab">고객 대시보드</button>
             </Link>
-            <Link to="/customer-management-visit-briefing" style={{ textDecoration: 'none' }}>
-              <button className="cust-detail-tab">방문 브리핑</button>
-            </Link>
+            
             <button className="cust-detail-tab active">메모 어시스턴트</button>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div className="cust-detail-profile">
-                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
-                <h2>{selectedCustomer.name}</h2>
-              </div>
-              <MoreVertical className="cust-more-btn" size={20} />
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', padding: '8px 24px 24px 24px' }}>
             <div className="memo-layout-grid">
             {/* Memo Input */}
-            <div className="memo-box">
+            <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
               <div className="memo-box-title">메모 입력</div>
-              <div className="memo-btn-group">
-                <button className="memo-small-btn">샘플 불러오기</button>
-                <button className="memo-small-btn" style={{ border: '1px solid #0284c7', color: '#0284c7' }}>AI 보고서 생성</button>
-              </div>
               <textarea 
                 className="memo-textarea" 
                 placeholder="달러 자산 줄이고 싶다고. 국내 리츠 관심. 다음달 초 재방문."
                 defaultValue="달러 자산 줄이고 싶다고. 국내 리츠 관심. 다음달 초 재방문."
+                style={{ minHeight: '200px', flex: 1, marginBottom: '16px', resize: 'none' }}
               />
-              <div className="memo-tip">
-                💡 자유롭게 메모하세요. AI가 구조화된 상담 보고서로 변환합니다. OCR 버튼으로 손글씨 사진도 업로드 가능합니다.
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
+                <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  💡 자유롭게 메모하세요. AI가 구조화된 상담 보고서로 변환합니다.
+                </div>
+                <button className="memo-small-btn" style={{ border: '1px solid #0284c7', color: '#0284c7', whiteSpace: 'nowrap' }}>AI 보고서 생성</button>
               </div>
             </div>
 
@@ -207,9 +216,31 @@ export default function CustomerMemoAssistant() {
                 </tbody>
               </table>
 
-              <div className="report-actions" style={{ justifyContent: 'flex-end' }}>
-                <button className="report-btn report-btn-primary">저장</button>
-                <button className="report-btn report-btn-secondary">출력</button>
+              <div className="report-actions" style={{ justifyContent: 'flex-end', position: 'relative' }}>
+                {showSaveToast && (
+                  <div style={{
+                    position: 'absolute', right: '80px', top: '50%', transform: 'translateY(-50%)',
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    background: '#334155', color: 'white',
+                    padding: '8px 16px', borderRadius: 20,
+                    fontSize: 14, fontWeight: 500,
+                    whiteSpace: 'nowrap'
+                  }}>
+                    <div style={{ width: 18, height: 18, background: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Check size={12} color="white" strokeWidth={3} />
+                    </div>
+                    저장완료
+                  </div>
+                )}
+                <button 
+                  className="report-btn report-btn-primary"
+                  onClick={() => {
+                    setShowSaveToast(true);
+                    setTimeout(() => setShowSaveToast(false), 2000);
+                  }}
+                >
+                  저장
+                </button>
               </div>
             </div>
           </div>
