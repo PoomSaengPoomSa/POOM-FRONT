@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
-import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, Trash2 } from "lucide-react";
 import "./Customer.css";
+
+
+const allCustomers = [
+  { id: 101, name: "강OO", email: "dohyun@naver.com", phone: "010-7134-2353", color: "yellow", initial: "강" },
+  { id: 102, name: "강OO", email: "lsjshid@gmail.com", phone: "010-4563-2364", color: "green", initial: "강" },
+  { id: 103, name: "고OO", email: "shiho@gmail.com", phone: "010-9291-1342", color: "red", initial: "고" },
+  { id: 104, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김" },
+  { id: 105, name: "김OO", email: "kim1004@gmail.com", phone: "010-4333-1245", color: "blue", initial: "김" },
+  { id: 106, name: "김OO", email: "kimvils@naver.com", phone: "010-2214-3621", color: "gray", initial: "김" },
+  { id: 107, name: "김OO", email: "ppjisd@naver.com", phone: "010-6335-2365", color: "purple", initial: "김" },
+];
 
 const customers = [
   { id: 1, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김", time: "10:00 AM" },
@@ -14,6 +25,8 @@ export default function CustomerProfile() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [editModalData, setEditModalData] = useState(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState(1);
   const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
 
@@ -37,7 +50,7 @@ export default function CustomerProfile() {
           <Link to="/customer-management-registration-1" className={`cust-menu-item ${path.includes('/customer-management') ? 'active' : ''}`}>
             <Users size={20} />
             고객관리
-            <span className="cust-badge">23</span>
+            <span className="cust-badge">{allCustomers.length}</span>
           </Link>
           <Link to="/news-bucket-bucket" className={`cust-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
             <Bell size={20} />
@@ -71,7 +84,7 @@ export default function CustomerProfile() {
           </div>
 
           <div className="cust-list-tabs">
-            <div className="cust-list-tab">전체 고객</div>
+            <Link to="/customer-management-registration-1" style={{ textDecoration: "none", color: "inherit", flex: 1 }}><div className="cust-list-tab">전체 고객</div></Link>
             <div className="cust-list-tab active">오늘 방문</div>
           </div>
 
@@ -92,25 +105,30 @@ export default function CustomerProfile() {
 
         {/* Right Detail Panel */}
         <div key={selectedCustomerId} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
-          <div className="cust-detail-header">
-            <div className="cust-detail-tabs" style={{ margin: 0 }}>
-              <button className="cust-detail-tab active">프로필</button>
-            <Link to="/customer-management-dashboard-2" style={{ textDecoration: 'none' }}>
-              <button className="cust-detail-tab">고객 대시보드</button>
-            </Link>
-            <Link to="/customer-management-visit-briefing" style={{ textDecoration: 'none' }}>
-              <button className="cust-detail-tab">방문 브리핑</button>
-            </Link>
-            <Link to="/customer-management-memo-assistant" style={{ textDecoration: 'none' }}>
-              <button className="cust-detail-tab">메모 어시스턴트</button>
-            </Link>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className="cust-detail-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '24px' }}>
+            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
               <div className="cust-detail-profile">
                 <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
                 <h2>{selectedCustomer.name}</h2>
               </div>
-              <MoreVertical className="cust-more-btn" size={20} />
+            </div>
+            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="cust-detail-tabs" style={{ margin: 0 }}>
+                <button className="cust-detail-tab active">프로필</button>
+                <Link to="/customer-management-dashboard-2" style={{ textDecoration: 'none' }}>
+                  <button className="cust-detail-tab">고객 대시보드</button>
+                </Link>
+                <Link to="/customer-management-memo-assistant" style={{ textDecoration: 'none' }}>
+                  <button className="cust-detail-tab">메모 어시스턴트</button>
+                </Link>
+              </div>
+              <button 
+                onClick={() => setIsDeleteModalOpen(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 6, border: '1px solid #e2e8f0', background: 'white', color: '#ef4444', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
+              >
+                <Trash2 size={14} />
+                삭제하기
+              </button>
             </div>
           </div>
 
@@ -132,6 +150,12 @@ export default function CustomerProfile() {
                   </div>
                 </div>
               </div>
+              <button 
+                onClick={() => setEditModalData(selectedCustomer)}
+                style={{ background: '#0284c7', color: 'white', border: 'none', borderRadius: 6, padding: '8px 24px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+              >
+                수정하기
+              </button>
             </div>
 
             {/* Profile Info Grid */}
@@ -176,7 +200,40 @@ export default function CustomerProfile() {
             
           </div>
         </div>
-      <CustomerRegistrationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        {/* Delete Confirmation Modal */}
+        {isDeleteModalOpen && (
+          <div className="cust-modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <div className="cust-modal" style={{ width: 400, padding: 32, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <Trash2 size={24} color="#ef4444" />
+              </div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>고객 삭제 확인</h2>
+              <p style={{ fontSize: 15, color: '#64748b', marginBottom: 32 }}>
+                <strong style={{ color: '#0f172a' }}>{selectedCustomer.name}</strong> 고객을 삭제하겠습니까?
+              </p>
+              <div style={{ display: 'flex', gap: 12, width: '100%' }}>
+                <button 
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  style={{ flex: 1, padding: '12px', borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', color: '#64748b', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+                >
+                  취소
+                </button>
+                <button 
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  style={{ flex: 1, padding: '12px', borderRadius: 8, border: 'none', background: '#ef4444', color: 'white', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+      <CustomerRegistrationModal 
+        isOpen={isModalOpen || !!editModalData} 
+        onClose={() => { setIsModalOpen(false); setEditModalData(null); }} 
+        initialData={editModalData}
+      />
       </div>
     </div>
   );

@@ -5,6 +5,17 @@ import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical }
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import "./Customer.css";
 
+
+const allCustomers = [
+  { id: 101, name: "강OO", email: "dohyun@naver.com", phone: "010-7134-2353", color: "yellow", initial: "강" },
+  { id: 102, name: "강OO", email: "lsjshid@gmail.com", phone: "010-4563-2364", color: "green", initial: "강" },
+  { id: 103, name: "고OO", email: "shiho@gmail.com", phone: "010-9291-1342", color: "red", initial: "고" },
+  { id: 104, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김" },
+  { id: 105, name: "김OO", email: "kim1004@gmail.com", phone: "010-4333-1245", color: "blue", initial: "김" },
+  { id: 106, name: "김OO", email: "kimvils@naver.com", phone: "010-2214-3621", color: "gray", initial: "김" },
+  { id: 107, name: "김OO", email: "ppjisd@naver.com", phone: "010-6335-2365", color: "purple", initial: "김" },
+];
+
 const customers = [
   { id: 1, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김", time: "10:00 AM" },
   { id: 2, name: "박OO", email: "erlkgjldfjgkld@gmail.com", phone: "010-1234-5678", color: "purple", initial: "박", time: "13:30 PM" },
@@ -62,7 +73,7 @@ export default function CustomerDashboard() {
           <Link to="/customer-management-registration-1" className={`cust-menu-item ${path.includes('/customer-management') ? 'active' : ''}`}>
             <Users size={20} />
             고객관리
-            <span className="cust-badge">23</span>
+            <span className="cust-badge">{allCustomers.length}</span>
           </Link>
           <Link to="/news-bucket-bucket" className={`cust-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
             <Bell size={20} />
@@ -96,7 +107,7 @@ export default function CustomerDashboard() {
           </div>
 
           <div className="cust-list-tabs">
-            <div className="cust-list-tab">전체 고객</div>
+            <Link to="/customer-management-registration-1" style={{ textDecoration: "none", color: "inherit", flex: 1 }}><div className="cust-list-tab">전체 고객</div></Link>
             <div className="cust-list-tab active">오늘 방문</div>
           </div>
 
@@ -117,25 +128,22 @@ export default function CustomerDashboard() {
 
         {/* Right Detail Panel */}
         <div key={selectedCustomerId} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
-          <div className="cust-detail-header">
+          <div className="cust-detail-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '24px' }}>
+            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="cust-detail-profile">
+                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
+                <h2>{selectedCustomer.name}</h2>
+              </div>
+            </div>
             <div className="cust-detail-tabs" style={{ margin: 0 }}>
               <Link to="/customer-management-profile" style={{ textDecoration: 'none' }}>
               <button className="cust-detail-tab">프로필</button>
             </Link>
             <button className="cust-detail-tab active">고객 대시보드</button>
-            <Link to="/customer-management-visit-briefing" style={{ textDecoration: 'none' }}>
-              <button className="cust-detail-tab">방문 브리핑</button>
-            </Link>
+            
             <Link to="/customer-management-memo-assistant" style={{ textDecoration: 'none' }}>
               <button className="cust-detail-tab">메모 어시스턴트</button>
             </Link>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div className="cust-detail-profile">
-                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
-                <h2>{selectedCustomer.name}</h2>
-              </div>
-              <MoreVertical className="cust-more-btn" size={20} />
             </div>
           </div>
 

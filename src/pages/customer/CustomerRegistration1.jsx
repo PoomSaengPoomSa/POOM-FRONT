@@ -72,7 +72,7 @@ export default function CustomerRegistration1() {
           <Link to="/customer-management-registration-1" className={`cust-menu-item ${path.includes('/customer-management') ? 'active' : ''}`}>
             <Users size={20} />
             고객관리
-            <span className="cust-badge">23</span>
+            <span className="cust-badge">{allCustomers.length}</span>
           </Link>
           <Link to="/news-bucket-bucket" className={`cust-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
             <Bell size={20} />
@@ -129,25 +129,22 @@ export default function CustomerRegistration1() {
         <div key={selectedCustomer?.id || 'empty'} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
           {selectedCustomer ? (
             <>
-          <div className="cust-detail-header">
+          <div className="cust-detail-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '24px' }}>
+            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="cust-detail-profile">
+                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
+                <h2>{selectedCustomer.name}</h2>
+              </div>
+            </div>
             <div className="cust-detail-tabs" style={{ margin: 0 }}>
               <Link to="/customer-management-profile" style={{ textDecoration: 'none' }}>
               <button className="cust-detail-tab">프로필</button>
             </Link>
             <button className="cust-detail-tab active">고객 대시보드</button>
-            <Link to="/customer-management-visit-briefing" style={{ textDecoration: 'none' }}>
-              <button className="cust-detail-tab">방문 브리핑</button>
-            </Link>
+            
             <Link to="/customer-management-memo-assistant" style={{ textDecoration: 'none' }}>
               <button className="cust-detail-tab">메모 어시스턴트</button>
             </Link>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div className="cust-detail-profile">
-                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
-                <h2>{selectedCustomer.name}</h2>
-              </div>
-              <MoreVertical className="cust-more-btn" size={20} />
             </div>
           </div>
 
