@@ -47,6 +47,9 @@ import EconomicIndicatorLlmReport from "../pages/trend/EconomicIndicatorLlmRepor
 import NewsArchive from "../pages/trend/NewsArchive.jsx";
 import NewsArchiveDetails from "../pages/trend/NewsArchiveDetails.jsx";
 
+// Phase 6: Settings
+import SettingsPage from "../pages/settings/SettingsPage.jsx";
+
 export default function AppRouter() {
   return (
     <Routes>
@@ -97,6 +100,9 @@ export default function AppRouter() {
         <Route path="/economic-indicator-archive-llm-report" element={<EconomicIndicatorLlmReport />} />
         <Route path="/news-archive" element={<NewsArchive />} />
         <Route path="/news-archive-details" element={<NewsArchiveDetails />} />
+
+        {/* Phase 6 Settings */}
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
       <Route

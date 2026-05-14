@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, Camera, X } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, Camera, X, Settings } from "lucide-react";
 import "./Customer.css";
 
 
@@ -51,6 +51,10 @@ export default function CustomerRegistration2() {
           <Link to="/news-bucket-bucket" className={`cust-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
             <Bell size={20} />
             뉴스 버킷
+          </Link>
+          <Link to="/settings" className={`cust-menu-item ${path.includes('/settings') ? 'active' : ''}`}>
+            <Settings size={20} />
+            설정
           </Link>
         </div>
 
