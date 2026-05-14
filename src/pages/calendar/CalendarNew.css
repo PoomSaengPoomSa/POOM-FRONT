@@ -283,6 +283,15 @@
   padding: 8px 0;
 }
 
+.cal-today-schedule-container {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
 .cal-today-schedule {
   display: flex;
   flex-direction: column;
@@ -295,6 +304,8 @@
   font-size: 16px;
   font-weight: 600;
   color: #0f172a;
+  margin-top: 0;
+  margin-bottom: 16px;
 }
 
 .cal-schedule-item {
