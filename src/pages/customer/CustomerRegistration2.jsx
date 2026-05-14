@@ -24,7 +24,15 @@ export default function CustomerRegistration2() {
   const location = useLocation();
   const path = location.pathname;
   const [selectedCustomerId, setSelectedCustomerId] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
+
+  const filteredCustomers = customers.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.email.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.phone.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
 
   return (
     <div className="cust-container">
@@ -83,7 +91,13 @@ export default function CustomerRegistration2() {
           
           <div className="cust-search">
             <Search size={16} className="cust-search-icon" />
-            <input type="text" className="cust-search-input" placeholder="Search" />
+            <input 
+              type="text" 
+              className="cust-search-input" 
+              placeholder="Search" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
           <div className="cust-list-tabs">
@@ -92,7 +106,7 @@ export default function CustomerRegistration2() {
           </div>
 
           <div className="cust-list-items">
-            {customers.map(c => (
+            {filteredCustomers.map(c => (
               <div className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomerId(c.id)} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">

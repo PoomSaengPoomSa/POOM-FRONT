@@ -51,6 +51,15 @@ export default function CustomerRegistration1() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeListTab, setActiveListTab] = useState('전체 고객');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const currentList = activeListTab === '전체 고객' ? allCustomers : todayCustomers;
+  const filteredCustomers = currentList.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.email.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.phone.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
 
   return (
     <div className="cust-container">
@@ -106,7 +115,13 @@ export default function CustomerRegistration1() {
           
           <div className="cust-search">
             <Search size={16} className="cust-search-icon" />
-            <input type="text" className="cust-search-input" placeholder="Search" />
+            <input 
+              type="text" 
+              className="cust-search-input" 
+              placeholder="Search" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
           <div className="cust-list-tabs">
@@ -115,7 +130,7 @@ export default function CustomerRegistration1() {
           </div>
 
           <div className="cust-list-items">
-            {(activeListTab === '전체 고객' ? allCustomers : todayCustomers).map(c => (
+            {filteredCustomers.map(c => (
               <div className={`cust-list-item ${selectedCustomer?.id === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomer(c)} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">
