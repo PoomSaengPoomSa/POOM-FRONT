@@ -172,7 +172,7 @@ export default function WeeklyCalendar() {
               </div>
             </div>
 
-            <div>
+            <div className="cal-today-schedule-container">
               <h3 className="cal-schedule-title">오늘의 일정</h3>
               <div className="cal-today-schedule">
                 {todayEvents.length === 0 ? (
