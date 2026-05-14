@@ -24,7 +24,7 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
-    const selectedStr = `${yyyy}-${mm}-${dd}`;
+    const selectedStr = `${yyyy}/${mm}/${dd}`;
     
     if (isEnd && startDate) {
       if (new Date(selectedStr) < new Date(startDate)) {
@@ -155,7 +155,7 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
                 <input 
                   type="text" 
                   className="cal-form-input" 
-                  placeholder="12/05/2026" 
+                  placeholder="2026/05/12" 
                   value={startDate}
                   onChange={(e) => {
                     setStartDate(e.target.value);
@@ -178,7 +178,7 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
                 <input 
                   type="text" 
                   className="cal-form-input" 
-                  placeholder="12/05/2026" 
+                  placeholder="2026/05/12" 
                   value={endDate}
                   onChange={(e) => {
                     setEndDate(e.target.value);
@@ -206,8 +206,15 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
                 className="cal-form-input" 
                 value={startTime}
                 onChange={(e) => {
-                  setStartTime(e.target.value);
+                  const val = e.target.value;
+                  setStartTime(val);
                   if (errors.startTime) setErrors({ ...errors, startTime: false });
+                  if (val) {
+                    const [h, m] = val.split(':');
+                    const nextH = String((parseInt(h, 10) + 1) % 24).padStart(2, '0');
+                    setEndTime(`${nextH}:${m}`);
+                    if (errors.endTime) setErrors({ ...errors, endTime: false });
+                  }
                 }}
                 style={errors.startTime ? { backgroundColor: '#fee2e2' } : {}}
               />
@@ -227,17 +234,7 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <div className="cal-form-section-title" style={{ marginTop: 24 }}>고객 정보</div>
-
-          <div className="cal-form-group">
-            <label className="cal-form-label">고객 선택</label>
-            <div className="cal-input-icon-wrap">
-              <input type="text" className="cal-form-input" placeholder="고객명 또는 연락처 검색" value={customer} onChange={(e) => setCustomer(e.target.value)} />
-              <Search size={16} className="cal-input-icon search" />
-            </div>
-          </div>
-
-          <div className="cal-form-group">
+          <div className="cal-form-group" style={{ marginTop: 16 }}>
             <label className="cal-form-label">색상</label>
             <div className="cal-color-picker">
               {['yellow', 'blue', 'pink', 'purple', 'lightblue', 'orange'].map(c => (
@@ -247,6 +244,16 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
                   onClick={() => setColor(c)}
                 ></div>
               ))}
+            </div>
+          </div>
+
+          <div className="cal-form-section-title" style={{ marginTop: 24 }}>고객 정보</div>
+
+          <div className="cal-form-group">
+            <label className="cal-form-label">고객 선택</label>
+            <div className="cal-input-icon-wrap">
+              <input type="text" className="cal-form-input" placeholder="고객명 또는 연락처 검색" value={customer} onChange={(e) => setCustomer(e.target.value)} />
+              <Search size={16} className="cal-input-icon search" />
             </div>
           </div>
 
