@@ -87,8 +87,6 @@ export default function TrendArchive() {
 
       {/* Main Content */}
       <div className="trend-main">
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 32, marginTop: 0 }}>트렌드 아카이브</h1>
-
         {/* News Archive Section */}
         <div className="trend-section-box">
           <Link to="/news-archive" style={{ textDecoration: 'none' }}>

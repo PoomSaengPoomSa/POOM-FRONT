@@ -58,11 +58,11 @@ export default function EconomicIndicatorLlmReport() {
 
         <div className="eco-grid">
           {/* Chart 1 */}
-          <div className="eco-box" style={{ gridRow: 'span 2' }}>
+          <div className="eco-box">
             <div className="eco-box-title">금값 추이·예측</div>
-            <div style={{ flex: 1, position: 'relative' }}>
-              <div style={{ position: 'absolute', top: 0, right: 0, fontSize: 10, color: '#94a3b8' }}>ECOS - FRED</div>
-              <svg viewBox="0 0 400 300" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+            <div style={{ height: 160, position: 'relative', marginTop: 16 }}>
+              <div style={{ position: 'absolute', top: -16, right: 0, fontSize: 10, color: '#94a3b8' }}>ECOS - FRED</div>
+              <svg viewBox="0 40 400 180" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                 <path d="M 0 200 C 50 150, 100 200, 150 100 S 250 150, 250 150" fill="none" stroke="#0f172a" strokeWidth="2" />
                 <path d="M 250 150 C 300 150, 350 100, 400 50" fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="4 4" />
                 <circle cx="250" cy="150" r="4" fill="#0f172a" />
@@ -115,7 +115,7 @@ export default function EconomicIndicatorLlmReport() {
           </div>
 
           {/* LLM Report Placeholder */}
-          <div className="eco-box" style={{ background: 'white' }}>
+          <div className="eco-box">
             <div className="eco-box-title">LLM 보고서</div>
             <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.8, marginBottom: 24 }}>
               향후 12개월간 금값은 3,890달러 수준으로 완만한 상승이 예상됩니다...
