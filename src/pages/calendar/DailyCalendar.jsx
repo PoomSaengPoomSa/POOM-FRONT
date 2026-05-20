@@ -20,7 +20,7 @@ export default function DailyCalendar() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAiTodoDetailOpen, setIsAiTodoDetailOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos, revertAiTodo, leftPanelWidth, isResizing, startResize } = useCalendar();
+  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos, revertAiTodo, leftPanelWidth, isResizing, startResize, toast } = useCalendar();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [miniCalMonth, setMiniCalMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
 
@@ -157,9 +157,22 @@ export default function DailyCalendar() {
                 ))}
               </div>
               <div className="ai-todo-actions">
-                <button className="todo-action-btn primary" onClick={() => transferCheckedAiTodos(selectedDate)}><ChevronDown size={16}/></button>
-                <button className="todo-action-btn"><ChevronUp size={16}/></button>
+                <button 
+                  className="todo-action-btn primary" 
+                  onClick={() => transferCheckedAiTodos(selectedDate)}
+                  title="선택 항목 My To Do로 등록"
+                  style={{ width: '100%', borderRadius: '20px', gap: '6px', display: 'flex', alignItems: 'center', height: '36px', justifyContent: 'center' }}
+                >
+                  <ChevronDown size={16}/>
+                  <span style={{ fontSize: '13px', fontWeight: '600' }}>My To Do 등록</span>
+                </button>
               </div>
+              {toast && toast.show && (
+                <div className="cal-toast-notification">
+                  <CheckCircle2 size={18} style={{ color: '#0ea5e9', flexShrink: 0 }} />
+                  <span>{toast.message}</span>
+                </div>
+              )}
             </div>
 
             {/* My To Do */}

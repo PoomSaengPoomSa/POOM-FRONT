@@ -4,7 +4,7 @@ import { LogOut, Clock, Gift, Flag, Heart, Sparkles, TrendingUp } from 'lucide-r
 import './CalendarNew.css';
 
 export default function AiTodoDetailModal({ isOpen, onClose }) {
-  const { aiTodos, toggleAiTodo, transferCheckedAiTodos, selectedDate } = useCalendar();
+  const { aiTodos, toggleAiTodo, transferCheckedAiTodos, selectedDate, showToast } = useCalendar();
 
   if (!isOpen) return null;
 
@@ -108,11 +108,10 @@ export default function AiTodoDetailModal({ isOpen, onClose }) {
   const handleTransfer = () => {
     const checkedCount = aiTodos.filter(t => t.checked).length;
     if (checkedCount === 0) {
-      alert('일정으로 추가할 할 일을 선택해주세요.');
+      showToast('일정으로 추가할 할 일을 선택해주세요.');
       return;
     }
     transferCheckedAiTodos(selectedDate);
-    alert('선택한 AI To Do가 My To Do 및 일정에 등록되었습니다!');
     onClose();
   };
 

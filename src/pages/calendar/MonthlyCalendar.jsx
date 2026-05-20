@@ -20,7 +20,7 @@ export default function MonthlyCalendar() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAiTodoDetailOpen, setIsAiTodoDetailOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos, revertAiTodo, leftPanelWidth, isResizing, startResize } = useCalendar();
+  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos, revertAiTodo, leftPanelWidth, isResizing, startResize, toast } = useCalendar();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentMonth, setCurrentMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
 
@@ -80,7 +80,15 @@ export default function MonthlyCalendar() {
 
   const todayEvents = getTodayEvents();
 
-  const badgeColorMap = { yellow: '#eab308', blue: '#3b82f6', pink: '#ec4899', purple: '#a855f7', lightblue: '#06b6d4', orange: '#f97316', green: '#22c55e' };
+  const colorMap = {
+    yellow: { bg: '#fef9c3', border: '#fef08a', text: '#854d0e', timeText: '#a16207' },
+    blue: { bg: '#e0f2fe', border: '#bae6fd', text: '#0369a1', timeText: '#075985' },
+    pink: { bg: '#fce7f3', border: '#fbcfe8', text: '#9d174d', timeText: '#be185d' },
+    purple: { bg: '#f3e8ff', border: '#e9d5ff', text: '#6b21a8', timeText: '#7e22ce' },
+    lightblue: { bg: '#ecfeff', border: '#cffafe', text: '#164e63', timeText: '#155e75' },
+    orange: { bg: '#ffedd5', border: '#fed7aa', text: '#9a3412', timeText: '#c2410c' },
+    green: { bg: '#dcfce7', border: '#bbf7d0', text: '#166534', timeText: '#15803d' }
+  };
 
   return (
     <div className="cal-layout">
@@ -139,9 +147,22 @@ export default function MonthlyCalendar() {
                 ))}
               </div>
               <div className="ai-todo-actions">
-                <button className="todo-action-btn primary" onClick={() => transferCheckedAiTodos(selectedDate)}><ChevronDown size={16}/></button>
-                <button className="todo-action-btn"><ChevronUp size={16}/></button>
+                <button 
+                  className="todo-action-btn primary" 
+                  onClick={() => transferCheckedAiTodos(selectedDate)}
+                  title="선택 항목 My To Do로 등록"
+                  style={{ width: '100%', borderRadius: '20px', gap: '6px', display: 'flex', alignItems: 'center', height: '36px', justifyContent: 'center' }}
+                >
+                  <ChevronDown size={16}/>
+                  <span style={{ fontSize: '13px', fontWeight: '600' }}>My To Do 등록</span>
+                </button>
               </div>
+              {toast && toast.show && (
+                <div className="cal-toast-notification">
+                  <CheckCircle2 size={18} style={{ color: '#0ea5e9', flexShrink: 0 }} />
+                  <span>{toast.message}</span>
+                </div>
+              )}
             </div>
 
             {/* My To Do */}
@@ -327,15 +348,21 @@ export default function MonthlyCalendar() {
                     </div>
                     {cellEvents.map(event => {
                       const timeStr = event.startTime.split(' ')[1] || '';
-                      const bgColor = badgeColorMap[event.color] || '#3b82f6';
+                      const styleColors = colorMap[event.color] || colorMap.blue;
                       return (
                         <div 
                           key={event.id} 
                           className="monthly-event" 
-                          style={{ backgroundColor: bgColor, cursor: 'pointer' }} 
+                          style={{ 
+                            backgroundColor: styleColors.bg, 
+                            color: styleColors.text, 
+                            border: `1px solid ${styleColors.border}`,
+                            cursor: 'pointer' 
+                          }} 
                           onClick={() => openDetailModal(event)}
                         >
-                          {timeStr} {event.title}
+                          <span style={{ fontWeight: 600, marginRight: '4px', flexShrink: 0 }}>{timeStr}</span>
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.title}</span>
                         </div>
                       );
                     })}

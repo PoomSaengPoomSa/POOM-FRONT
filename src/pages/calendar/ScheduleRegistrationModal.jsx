@@ -237,7 +237,7 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
           <div className="cal-form-group" style={{ marginTop: 16 }}>
             <label className="cal-form-label">색상</label>
             <div className="cal-color-picker">
-              {['yellow', 'blue', 'pink', 'purple', 'lightblue', 'orange'].map(c => (
+              {['yellow', 'blue', 'pink', 'green', 'purple', 'lightblue', 'orange'].map(c => (
                 <div 
                   key={c}
                   className={`cal-color-circle bg-${c} ${color === c ? 'active' : ''}`}
