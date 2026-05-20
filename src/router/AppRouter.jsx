@@ -20,7 +20,7 @@ import AdminPermissionSettings from "../pages/admin/AdminPermissionSettings.jsx"
 
 // New News Bucket Page
 // New News Bucket Page
-import NewsBucketMessageDraft from "../pages/news/NewsBucketMessageDraft.jsx";
+import NotificationMessageDraft from "../pages/news/NotificationMessageDraft.jsx";
 
 // Phase 2: Auth and Calendar New Pages
 import SignUpNew from "../pages/auth/SignUpNew.jsx";
@@ -30,7 +30,7 @@ import WeeklyCalendar from "../pages/calendar/WeeklyCalendar.jsx";
 import MonthlyCalendar from "../pages/calendar/MonthlyCalendar.jsx";
 
 // Phase 3: Customer Management and News Bucket Pages
-import NewsBucket from "../pages/news/NewsBucket.jsx";
+import CustomerNotifications from "../pages/news/CustomerNotifications.jsx";
 import CustomerRegistration1 from "../pages/customer/CustomerRegistration1.jsx";
 import CustomerRegistration2 from "../pages/customer/CustomerRegistration2.jsx";
 import CustomerMemoAssistant from "../pages/customer/CustomerMemoAssistant.jsx";
@@ -76,7 +76,7 @@ export default function AppRouter() {
         <Route path="/admin-system-dashboard-2" element={<AdminSystemDashboard2 />} />
         <Route path="/admin-employee-dashboard" element={<AdminEmployeeDashboard />} />
         <Route path="/admin-permission-settings" element={<AdminPermissionSettings />} />
-        <Route path="/news-bucket-message-draft" element={<NewsBucketMessageDraft />} />
+        <Route path="/notification-message-draft" element={<NotificationMessageDraft />} />
         
         {/* Phase 2 Calendar Routes */}
         <Route element={<CalendarProvider><Outlet /></CalendarProvider>}>
@@ -86,7 +86,7 @@ export default function AppRouter() {
         </Route>
 
         {/* Phase 3 & 5 Customer Management Routes */}
-        <Route path="/news-bucket-bucket" element={<NewsBucket />} />
+        <Route path="/notifications" element={<CustomerNotifications />} />
         <Route path="/customer-management-registration-1" element={<CustomerRegistration1 />} />
         <Route path="/customer-management-registration-2" element={<CustomerRegistration2 />} />
         <Route path="/customer-management-memo-assistant" element={<CustomerMemoAssistant />} />

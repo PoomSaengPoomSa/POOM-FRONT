@@ -1,11 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { Calendar, TrendingUp, Contact, BarChart2, Bell, LogOut } from "lucide-react";
+import { notifications } from "../../pages/news/notificationsData";
 
 export default function Sidebar({ type = "cal" }) {
   const location = useLocation();
   const path = location.pathname;
 
   const prefix = type; // e.g., "cal", "cust", "news", "trend"
+  const todayCount = notifications.filter(n => n.today).length;
 
   const isCalendarActive = 
     path.includes('/calendar') || 
@@ -26,7 +28,8 @@ export default function Sidebar({ type = "cal" }) {
     path.includes('/news-archive');
     
   const isNotificationActive = 
-    path.includes('/news-bucket');
+    path.includes('/notifications') || 
+    path.includes('/notification-message-draft');
 
   return (
     <div className={`${prefix}-sidebar`}>
@@ -51,10 +54,14 @@ export default function Sidebar({ type = "cal" }) {
           <BarChart2 size={20} />
           트렌드 아카이브
         </Link>
-        <Link to="/news-bucket-bucket" className={`${prefix}-menu-item ${isNotificationActive ? 'active' : ''}`}>
+        <Link to="/notifications" className={`${prefix}-menu-item ${isNotificationActive ? 'active' : ''}`}>
           <Bell size={20} />
           알림
-          <span className={`${prefix}-badge`} style={{ backgroundColor: '#fee2e2', color: '#ef4444', marginLeft: 'auto' }}>9</span>
+          {todayCount > 0 && (
+            <span className={`${prefix}-badge`} style={{ backgroundColor: '#fee2e2', color: '#ef4444', marginLeft: 'auto' }}>
+              {todayCount}
+            </span>
+          )}
         </Link>
       </div>
 
