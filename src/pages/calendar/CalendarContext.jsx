@@ -170,7 +170,8 @@ export function CalendarProvider({ children }) {
         category,
         customer,
         color: eventColor,
-        memo: `AI To Do 추천에서 My To Do 및 일정으로 등록된 업무입니다.`
+        memo: `AI To Do 추천에서 My To Do 및 일정으로 등록된 업무입니다.`,
+        aiTodoSource: todo
       };
     });
 
@@ -189,6 +190,49 @@ export function CalendarProvider({ children }) {
     setAiTodos(prev => prev.filter(t => !t.checked));
   };
 
+  const revertAiTodo = (eventId) => {
+    const eventToRevert = events.find(e => e.id === eventId);
+    if (!eventToRevert) return;
+
+    // 1. Remove the event from events list
+    setEvents(prev => prev.filter(e => e.id !== eventId));
+
+    // 2. Put the AI Todo back to aiTodos list
+    let originalTodo = eventToRevert.aiTodoSource;
+
+    if (!originalTodo) {
+      // Reconstruct it from DEFAULT_AI_TODOS using content match
+      const matchedDefault = DEFAULT_AI_TODOS.find(t => t.content === eventToRevert.title);
+      if (matchedDefault) {
+        originalTodo = { ...matchedDefault, checked: false };
+      } else {
+        // Fallback for custom or unmatched events
+        originalTodo = {
+          id: Date.now() + Math.random(),
+          time: '09:00 - 10:00',
+          tag: 'AI추천',
+          tagColor: 'tag-blue',
+          content: eventToRevert.title,
+          checked: false,
+          group: '상담 일정 제안',
+          subText: 'AI 추천에서 복원된 항목입니다.',
+          tags: ['복원됨']
+        };
+      }
+    } else {
+      originalTodo = { ...originalTodo, checked: false };
+    }
+
+    // 3. Put it back to aiTodos list, keeping original id sort order
+    setAiTodos(prev => {
+      if (prev.some(t => t.content === originalTodo.content)) {
+        return prev;
+      }
+      const newTodos = [...prev, originalTodo];
+      return newTodos.sort((a, b) => a.id - b.id);
+    });
+  };
+
   return (
     <CalendarContext.Provider value={{ 
       events, 
@@ -199,7 +243,8 @@ export function CalendarProvider({ children }) {
       setSelectedDate,
       aiTodos,
       toggleAiTodo,
-      transferCheckedAiTodos
+      transferCheckedAiTodos,
+      revertAiTodo
     }}>
       {children}
     </CalendarContext.Provider>
