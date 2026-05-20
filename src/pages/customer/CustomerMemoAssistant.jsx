@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
 import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, PenLine, Check, Settings, ArrowUp } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
@@ -77,11 +77,16 @@ export default function CustomerMemoAssistant() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeListTab, setActiveListTab] = useState("오늘 방문");
+  const [allCustomersList, setAllCustomersList] = useState(allCustomers);
+  const [todayCustomersList, setTodayCustomersList] = useState(customers);
   const [selectedCustomerId, setSelectedCustomerId] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedTimelineId, setExpandedTimelineId] = useState(null);
   const [showSaveToast, setShowSaveToast] = useState(false);
-  const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
+  
+  const currentList = activeListTab === '전체 고객' ? allCustomersList : todayCustomersList;
+  const selectedCustomer = allCustomersList.concat(todayCustomersList).find(c => c.id === selectedCustomerId) || currentList[0];
 
   const [activeTab, setActiveTab] = useState("memo"); // "memo" or "simulator"
   const [listWidth, setListWidth] = useState(320);
@@ -213,7 +218,7 @@ export default function CustomerMemoAssistant() {
     }, 1000);
   };
 
-  const filteredCustomers = customers.filter(c => 
+  const filteredCustomers = currentList.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     c.email.toLowerCase().includes(searchQuery.toLowerCase()) || 
     c.phone.toLowerCase().includes(searchQuery.toLowerCase())
@@ -247,8 +252,26 @@ export default function CustomerMemoAssistant() {
           </div>
 
           <div className="cust-list-tabs">
-            <Link to="/customer-management-registration-1" style={{ textDecoration: "none", color: "inherit", flex: 1 }}><div className="cust-list-tab">전체 고객</div></Link>
-            <div className="cust-list-tab active">오늘 방문</div>
+            <div 
+              className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} 
+              onClick={() => { 
+                setActiveListTab('전체 고객'); 
+                setSelectedCustomerId(allCustomersList[0].id); 
+              }} 
+              style={{ cursor: 'pointer', flex: 1 }}
+            >
+              전체 고객
+            </div>
+            <div 
+              className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} 
+              onClick={() => { 
+                setActiveListTab('오늘 방문'); 
+                setSelectedCustomerId(todayCustomersList[0].id); 
+              }} 
+              style={{ cursor: 'pointer', flex: 1 }}
+            >
+              오늘 방문
+            </div>
           </div>
 
           <div className="cust-list-items">
@@ -695,7 +718,46 @@ export default function CustomerMemoAssistant() {
             </div>
           )}
         </div>
-      <CustomerRegistrationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CustomerRegistrationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSave={(newData) => {
+          const newId = Date.now();
+          const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          
+          let ageVal = "만 54";
+          if (newData.dob && newData.dob.includes(".")) {
+            const birthYear = parseInt(newData.dob.split(".")[0]);
+            if (!isNaN(birthYear)) {
+              ageVal = `만 ${new Date().getFullYear() - birthYear}`;
+            }
+          }
+
+          const newCustomer = {
+            id: newId,
+            name: newData.name || "신규 고객",
+            email: newData.email || "new@email.com",
+            phone: newData.phone || "010-0000-0000",
+            color: randomColor,
+            initial: (newData.name || "신")[0],
+            job: newData.job || "회사원",
+            vipStatus: newData.grade || "VIP",
+            gridData: {
+              totalAsset: "10억",
+              age: ageVal,
+              startDate: newData.startDate || "2026.05.20",
+              lastConsult: "없음",
+              nextVisit: newData.nextVisit || "미정"
+            }
+          };
+          
+          setAllCustomersList(prev => [newCustomer, ...prev]);
+          setActiveListTab("전체 고객");
+          setSelectedCustomerId(newId);
+          setIsModalOpen(false);
+        }}
+      />
       </div>
     </div>
   );

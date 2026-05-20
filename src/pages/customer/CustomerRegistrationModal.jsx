@@ -1,6 +1,42 @@
 import { X, Calendar as CalendarIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 
+const formatDateForInput = (dateStr) => {
+  if (!dateStr) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  
+  if (dateStr.includes(".")) {
+    const parts = dateStr.split(".").map(p => p.trim());
+    if (parts.length >= 3) {
+      const yyyy = parts[0];
+      const mm = parts[1].padStart(2, "0");
+      const dd = parts[2].padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+  }
+  
+  if (dateStr.includes("/")) {
+    const parts = dateStr.split("/").map(p => p.trim());
+    if (parts.length >= 3) {
+      const dd = parts[0].padStart(2, "0");
+      const mm = parts[1].padStart(2, "0");
+      const yyyy = parts[2];
+      return `${yyyy}-${mm}-${dd}`;
+    }
+  }
+  
+  return dateStr;
+};
+
+const formatDateForSave = (dateStr) => {
+  if (!dateStr) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [yyyy, mm, dd] = dateStr.split("-");
+    return `${yyyy}.${mm}.${dd}`;
+  }
+  return dateStr;
+};
+
 export default function CustomerRegistrationModal({ isOpen, onClose, initialData, onSave }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -17,13 +53,13 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
     if (initialData) {
       setFormData({
         name: initialData.name || "",
-        dob: "",
+        dob: formatDateForInput(initialData.dob || ""),
         job: initialData.job || "",
         grade: initialData.vipStatus || "VIP",
         phone: initialData.phone || "",
         email: initialData.email || "",
-        startDate: initialData.gridData?.startDate || "",
-        nextVisit: initialData.gridData?.nextVisit || ""
+        startDate: formatDateForInput(initialData.gridData?.startDate || ""),
+        nextVisit: formatDateForInput(initialData.gridData?.nextVisit || "")
       });
     } else {
       setFormData({
@@ -54,12 +90,34 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
       return;
     }
     if (onSave) {
-      onSave(formData);
+      onSave({
+        ...formData,
+        dob: formatDateForSave(formData.dob),
+        startDate: formatDateForSave(formData.startDate),
+        nextVisit: formatDateForSave(formData.nextVisit)
+      });
     }
   };
 
   return (
     <div className="cust-modal-overlay">
+      <style>{`
+        .cust-form-input-date {
+          position: relative;
+        }
+        .cust-form-input-date::-webkit-calendar-picker-indicator {
+          background: transparent;
+          bottom: 0;
+          color: transparent;
+          cursor: pointer;
+          height: auto;
+          left: 0;
+          position: absolute;
+          right: 0;
+          top: 0;
+          width: auto;
+        }
+      `}</style>
       <div className="cust-modal" style={{ width: 520, maxContent: 'fit-content' }}>
         <button className="cust-modal-close" onClick={onClose} style={{ border: 'none', background: '#e0f2fe', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
           <X size={16} color="#0284c7" />
@@ -88,14 +146,14 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
                 <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>생년월일 <span style={{ color: '#ef4444' }}>*</span></label>
                 <div style={{ position: 'relative' }}>
                   <input 
-                    type="text" 
-                    className="cust-form-input" 
-                    placeholder="dd/mm/yyyy" 
-                    style={{ width: '100%', boxSizing: 'border-box' }}
+                    type="date" 
+                    className="cust-form-input cust-form-input-date" 
+                    style={{ width: '100%', boxSizing: 'border-box', paddingRight: '40px' }}
                     value={formData.dob}
                     onChange={(e) => handleChange("dob", e.target.value)}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
                   />
-                  <CalendarIcon size={16} color="#0284c7" style={{ position: 'absolute', right: 12, top: 12 }} />
+                  <CalendarIcon size={16} color="#0284c7" style={{ position: 'absolute', right: 12, top: 12, pointerEvents: 'none' }} />
                 </div>
               </div>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -152,28 +210,28 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
                 <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>거래 시작일</label>
                 <div style={{ position: 'relative' }}>
                   <input 
-                    type="text" 
-                    className="cust-form-input" 
-                    placeholder="dd/mm/yyyy" 
-                    style={{ width: '100%', boxSizing: 'border-box' }}
+                    type="date" 
+                    className="cust-form-input cust-form-input-date" 
+                    style={{ width: '100%', boxSizing: 'border-box', paddingRight: '40px' }}
                     value={formData.startDate}
                     onChange={(e) => handleChange("startDate", e.target.value)}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
                   />
-                  <CalendarIcon size={16} color="#0284c7" style={{ position: 'absolute', right: 12, top: 12 }} />
+                  <CalendarIcon size={16} color="#0284c7" style={{ position: 'absolute', right: 12, top: 12, pointerEvents: 'none' }} />
                 </div>
               </div>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>다음 방문 예정</label>
                 <div style={{ position: 'relative' }}>
                   <input 
-                    type="text" 
-                    className="cust-form-input" 
-                    placeholder="dd/mm/yyyy" 
-                    style={{ width: '100%', boxSizing: 'border-box' }}
+                    type="date" 
+                    className="cust-form-input cust-form-input-date" 
+                    style={{ width: '100%', boxSizing: 'border-box', paddingRight: '40px' }}
                     value={formData.nextVisit}
                     onChange={(e) => handleChange("nextVisit", e.target.value)}
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
                   />
-                  <CalendarIcon size={16} color="#0284c7" style={{ position: 'absolute', right: 12, top: 12 }} />
+                  <CalendarIcon size={16} color="#0284c7" style={{ position: 'absolute', right: 12, top: 12, pointerEvents: 'none' }} />
                 </div>
               </div>
             </div>
