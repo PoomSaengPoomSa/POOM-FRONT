@@ -94,36 +94,45 @@ export const formatFullHeaderDate = (date) => {
   return `${SHORT_MONTH_NAMES[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} (${DAY_NAMES[date.getDay()]})`;
 };
 
+const getTodayStr = (offsetDays = 0) => {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 export const DEMO_EVENTS = [
   {
     id: 1,
-    title: "이OO 고객님 미팅",
-    startTime: "2026-05-09 08:00",
-    endTime: "2026-05-09 09:00",
+    title: "정기 재무 상담",
+    startTime: `${getTodayStr()} 10:00`,
+    endTime: `${getTodayStr()} 11:30`,
     category: "상담",
-    customer: "이OO",
+    customer: "박세진",
     color: "green",
-    memo: "달러 자산 비중 축소 논의.\n국내 리츠 상품 3종 비교안 지참."
+    memo: "고객 자산 포트폴리오 비중 재조정 상담.\n국내 리츠 상품 3종 비교안 지참."
   },
   {
     id: 2,
-    title: "점심 약속",
-    startTime: "2026-05-09 12:00",
-    endTime: "2026-05-09 13:00",
+    title: "팀 점심 식사",
+    startTime: `${getTodayStr()} 12:00`,
+    endTime: `${getTodayStr()} 13:00`,
     category: "개인",
     customer: "",
     color: "blue",
-    memo: "팀원들과 식사"
+    memo: "지점 PB 팀원들과 점심 약속"
   },
   {
     id: 3,
-    title: "내부 회의",
-    startTime: "2026-05-09 13:30",
-    endTime: "2026-05-09 15:30",
+    title: "지점 주간 회의",
+    startTime: `${getTodayStr()} 14:00`,
+    endTime: `${getTodayStr()} 15:30`,
     category: "공지",
     customer: "",
     color: "orange",
-    memo: "주간 업무 보고 및 이슈 사항 점검."
+    memo: "신규 ELS 상품 교육 및 판매 현황 점검."
   }
 ];
 
