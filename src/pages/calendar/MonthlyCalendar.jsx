@@ -7,6 +7,7 @@ import ScheduleRegistrationModal from "./ScheduleRegistrationModal";
 import ScheduleDetailModal from "./ScheduleDetailModal";
 import ScheduleEditModal from "./ScheduleEditModal";
 import AiTodoDetailModal from "./AiTodoDetailModal";
+import SeasonProductModal from "./SeasonProductModal";
 import { generateMiniCalendar, formatMonthYear } from './calendarUtils';
 import { useCalendar } from './CalendarContext';
 
@@ -18,6 +19,7 @@ export default function MonthlyCalendar() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAiTodoDetailOpen, setIsAiTodoDetailOpen] = useState(false);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos } = useCalendar();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentMonth, setCurrentMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
@@ -228,7 +230,7 @@ export default function MonthlyCalendar() {
                 <div className="kpi-title" style={{ color: '#0ea5e9' }}>시즌 주력 상품</div>
                 <div className="kpi-subtitle" style={{ display: 'flex', justifyContent: 'space-between' }}>
                   2026 상반기
-                  <span style={{ fontSize: 11, color: '#0ea5e9', fontWeight: 500, cursor: 'pointer' }}>전체 상품 보기</span>
+                  <span onClick={() => setIsProductModalOpen(true)} style={{ fontSize: 11, color: '#0ea5e9', fontWeight: 500, cursor: 'pointer' }}>전체 상품 보기</span>
                 </div>
                 <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>4<span style={{ fontSize: 14, fontWeight: 500 }}>종</span></div>
                 <div className="product-tags">
@@ -331,6 +333,7 @@ export default function MonthlyCalendar() {
       <ScheduleDetailModal isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)} onEdit={openEditModal} event={selectedEvent} />
       <ScheduleEditModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} event={selectedEvent} />
       <AiTodoDetailModal isOpen={isAiTodoDetailOpen} onClose={() => setIsAiTodoDetailOpen(false)} />
+      <SeasonProductModal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)} />
     </div>
   );
 }
