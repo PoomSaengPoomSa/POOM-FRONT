@@ -103,6 +103,21 @@ export function CalendarProvider({ children }) {
     }
   ];
 
+  const [toast, setToast] = useState({ show: false, message: '' });
+
+  const showToast = (message) => {
+    setToast({ show: true, message });
+  };
+
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast({ show: false, message: '' });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show]);
+
   const [aiTodos, setAiTodos] = useState(() => {
     const saved = localStorage.getItem('poom_ai_todos');
     return saved ? JSON.parse(saved) : DEFAULT_AI_TODOS;
@@ -168,7 +183,10 @@ export function CalendarProvider({ children }) {
 
   const transferCheckedAiTodos = (date) => {
     const checkedTodos = aiTodos.filter(t => t.checked);
-    if (checkedTodos.length === 0) return;
+    if (checkedTodos.length === 0) {
+      showToast("선택된 AI To Do 항목이 없습니다.");
+      return;
+    }
 
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -222,6 +240,7 @@ export function CalendarProvider({ children }) {
     });
 
     setAiTodos(prev => prev.filter(t => !t.checked));
+    showToast(`My To Do에 ${checkedTodos.length}개의 일정이 등록되었습니다!`);
   };
 
   const revertAiTodo = (eventId) => {
@@ -265,6 +284,8 @@ export function CalendarProvider({ children }) {
       const newTodos = [...prev, originalTodo];
       return newTodos.sort((a, b) => a.id - b.id);
     });
+
+    showToast("일정이 취소되고 AI To Do 목록으로 되돌아갔습니다.");
   };
 
   return (
@@ -281,7 +302,9 @@ export function CalendarProvider({ children }) {
       revertAiTodo,
       leftPanelWidth,
       isResizing,
-      startResize
+      startResize,
+      toast,
+      showToast
     }}>
       {children}
     </CalendarContext.Provider>
