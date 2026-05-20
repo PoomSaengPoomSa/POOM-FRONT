@@ -20,7 +20,7 @@ export default function DailyCalendar() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAiTodoDetailOpen, setIsAiTodoDetailOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos, revertAiTodo } = useCalendar();
+  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos, revertAiTodo, leftPanelWidth, isResizing, startResize } = useCalendar();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [miniCalMonth, setMiniCalMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
 
@@ -109,7 +109,12 @@ export default function DailyCalendar() {
       <div className="cal-main" style={{ paddingTop: 32 }}>
         <div className="cal-content-row">
           {/* Left Panel */}
-          <div className="cal-left-panel">
+          <div 
+            className={`cal-left-panel ${isResizing ? 'resizing' : ''}`}
+            style={{ width: leftPanelWidth }}
+          >
+            {/* Resizer Handle */}
+            <div className={`cal-resizer ${isResizing ? 'resizing' : ''}`} onMouseDown={startResize} />
             {/* AI To Do */}
              <div className="todo-section">
               <div className="todo-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
