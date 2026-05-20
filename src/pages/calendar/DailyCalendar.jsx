@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut, Settings } from "lucide-react";
+import Sidebar from "../../components/common/Sidebar";
 import "./CalendarNew.css";
 import ScheduleRegistrationModal from "./ScheduleRegistrationModal";
 import ScheduleDetailModal from "./ScheduleDetailModal";
@@ -93,43 +94,7 @@ export default function DailyCalendar() {
   return (
     <div className="cal-layout">
       {/* Sidebar */}
-      <div className="cal-sidebar">
-        <div className="cal-logo">
-          <div className="cal-logo-circle"></div>
-        </div>
-        
-        <div className="cal-menu">
-          <Link to="/daily-calendar" className="cal-menu-item active">
-            <CalendarIcon size={20} />
-            캘린더
-          </Link>
-          <Link to="/trend-archive" className="cal-menu-item">
-            <TrendingUp size={20} />
-            트렌드 아카이브
-          </Link>
-          <Link to="/customer-management-registration-1" className="cal-menu-item">
-            <Users size={20} />
-            고객관리
-          </Link>
-          <Link to="/news-bucket-bucket" className="cal-menu-item">
-            <Bell size={20} />
-            뉴스 버킷
-          </Link>
-          <Link to="/settings" className="cal-menu-item">
-            <Settings size={20} />
-            설정
-          </Link>
-        </div>
-
-        <div className="cal-profile">
-          <img src="https://i.pravatar.cc/150?img=11" alt="Profile" />
-          <div className="cal-profile-info">
-            <span className="cal-profile-name">김재욱</span>
-            <span className="cal-profile-role">Private Banker</span>
-          </div>
-          <LogOut onClick={() => window.location.href='/login-pb'} size={16} color="#94a3b8" style={{ marginLeft: 'auto', cursor: 'pointer' }} />
-        </div>
-      </div>
+      <Sidebar type="cal" />
 
       {/* Main Content */}
       <div className="cal-main" style={{ paddingTop: 32 }}>
