@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Calendar as CalendarIcon, MoreHorizontal } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
-import { notifications, addNotification } from "./notificationsData";
+import { notifications } from "./notificationsData";
 import "./News.css";
 
 export default function CustomerNotifications() {
@@ -26,31 +26,7 @@ export default function CustomerNotifications() {
     return () => window.removeEventListener("notifications-updated", handleUpdate);
   }, []);
 
-  const handleAddNewNotification = () => {
-    const newId = notifications.length > 0 ? Math.max(...notifications.map(n => n.id)) + 1 : 1;
-    const alertTypes = [
-      { type: "거액 거래 감지", category: "pink", content: "최영희 고객 — 1억 원 타행 이체 발생" },
-      { type: "만기 알림 D-14", category: "blue", content: "정민수 고객 — 정기예금 만기 도래" },
-      { type: "이탈 위험", category: "red", content: "이지혜 고객 — 이탈 위험 징후 포착" },
-      { type: "안부 연락 알림", category: "indigo", content: "박영호 고객 — 생신 축하 연락 권장" }
-    ];
-    const randomAlert = alertTypes[Math.floor(Math.random() * alertTypes.length)];
-    
-    const newAlert = {
-      id: newId,
-      type: randomAlert.type,
-      content: `${randomAlert.content} (추가됨)`,
-      date: "20 May, 2026",
-      category: randomAlert.category,
-      today: true,
-      expandedContent: [
-        "추가 알림 정보: 실시간 모니터링 시스템에 의해 감지된 추가 알림입니다.",
-        "자세한 상담 및 대응 이력 관리가 필요합니다."
-      ]
-    };
-    
-    addNotification(newAlert);
-  };
+
 
   const handleResizeStart = (e) => {
     e.preventDefault();
@@ -136,14 +112,6 @@ export default function CustomerNotifications() {
                 전체
               </button>
             </div>
-            
-            <button 
-              className="news-btn news-btn-primary"
-              style={{ padding: '8px 16px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '8px' }}
-              onClick={handleAddNewNotification}
-            >
-              <span>+ 알림 추가</span>
-            </button>
           </div>
 
           {/* Notifications Card List */}
