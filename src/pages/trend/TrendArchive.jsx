@@ -225,12 +225,7 @@ export default function TrendArchive() {
                 ))}
               </div>
 
-              <div className="news-mod-sidebar" style={{ width: 280, background: '#f8fafc', borderLeft: '1px solid var(--trend-border)', padding: '16px 32px', overflowY: 'auto' }}>
-                <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: '#0f172a' }}>참고자료</h3>
-                {selectedNewsItem.references.map((ref, idx) => (
-                  <div key={idx} className="ref-box">{ref}</div>
-                ))}
-              </div>
+
             </div>
           </div>
         </div>

@@ -48,7 +48,6 @@ export default function NewsArchiveDetails() {
                 <span className="news-arch-title">{item.title}</span>
                 <div className="news-arch-meta">
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CalendarIcon size={14} color="#38bdf8" /> {item.date}</span>
-                  <Star size={16} className="news-arch-star" fill="#fbbf24" />
                   <MoreHorizontal size={16} color="#94a3b8" />
                 </div>
               </div>
@@ -110,17 +109,7 @@ export default function NewsArchiveDetails() {
               </p>
             </div>
 
-            <div className="news-mod-sidebar">
-              <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: '#0f172a' }}>참고자료</h3>
-              
-              <div className="ref-box">셀트리온, 미국소화기학회서 짐펜트라 임상 공개</div>
-              <div className="ref-box">"비수기에도"...셀트리온, 1분기 매출 1.1조 '역대최고'</div>
-              <div className="ref-box">셀트리온 "1분기 매출 1.1조·영업이익 0.3조...역대 최대"</div>
-              <div className="ref-box">바이오시밀러의 힘... 셀트리온 1분기 매출 1조 돌파</div>
-              <div className="ref-box">셀트리온, 매출 1조1450억원... 역대 1분기 최대</div>
-              <div className="ref-box">셀트리온제약, 올 1분기 최대 실적...케미컬·바이오·CMO...</div>
-              <div className="ref-box">셀트리온, 美 DDW서 'CT-P13 SC' 경쟁력 입증...글로...</div>
-            </div>
+
           </div>
         </div>
       </div>

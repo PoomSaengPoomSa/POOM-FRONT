@@ -152,12 +152,6 @@ export default function NewsArchive() {
                     <span className="news-arch-title">{item.title}</span>
                     <div className="news-arch-meta">
                       <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CalendarIcon size={14} color="#38bdf8" /> {item.date}</span>
-                      <Star 
-                        size={16} 
-                        fill={bucketItems.includes(item.id) ? "#fbbf24" : "none"}
-                        color={bucketItems.includes(item.id) ? "#fbbf24" : "#cbd5e1"}
-                        onClick={(e) => toggleBucket(e, item.id)}
-                      />
                       <MoreHorizontal size={16} color="#94a3b8" />
                     </div>
                   </div>
@@ -205,12 +199,7 @@ export default function NewsArchive() {
                 ))}
               </div>
 
-              <div className="news-mod-sidebar" style={{ width: 280, background: '#f8fafc', borderLeft: '1px solid var(--trend-border)', padding: '16px 32px', overflowY: 'auto' }}>
-                <h3 style={{ margin: '0 0 16px 0', fontSize: 16, color: '#0f172a' }}>참고자료</h3>
-                {selectedNewsItem.references.map((ref, idx) => (
-                  <div key={idx} className="ref-box">{ref}</div>
-                ))}
-              </div>
+
             </div>
           </div>
         </div>

@@ -224,7 +224,8 @@ export default function Sidebar({ type = "cal" }) {
       `}</style>
 
       {/* Sidebar Logo */}
-      <div 
+      <Link 
+        to="/daily-calendar"
         className={`${prefix}-logo`} 
         style={{ 
           display: "flex", 
@@ -232,7 +233,8 @@ export default function Sidebar({ type = "cal" }) {
           alignItems: "center", 
           height: "60px",
           padding: isCollapsed ? "16px 8px" : "32px 24px",
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          textDecoration: 'none'
         }}
       >
         {isCollapsed ? (
@@ -254,7 +256,7 @@ export default function Sidebar({ type = "cal" }) {
             }} 
           />
         )}
-      </div>
+      </Link>
       
       {/* Sidebar Navigation Menu */}
       <div className={`${prefix}-menu`} style={{ marginTop: isCollapsed ? '16px' : '32px' }}>
