@@ -24,10 +24,9 @@ const todayCustomers = [
 
 
 const assetData = [
-  { name: '국내주식', value: 35, color: '#a855f7' },
-  { name: '해외주식', value: 28, color: '#c084fc' },
-  { name: '채권', value: 20, color: '#2dd4bf' },
-  { name: '현금', value: 17, color: '#cbd5e1' },
+  { name: '예적금', value: 45, color: '#2dd4bf' },
+  { name: '투자상품', value: 35, color: '#a855f7' },
+  { name: '연금보험', value: 20, color: '#cbd5e1' },
 ];
 
 const emotionHistory = [
@@ -52,12 +51,11 @@ const getCustomerDetails = (customer) => {
     },
     assetTotal: "32억",
     assetList: [
-      { name: '국내주식', value: 35, color: '#a855f7' },
-      { name: '해외주식', value: 28, color: '#c084fc' },
-      { name: '채권', value: 20, color: '#2dd4bf' },
-      { name: '현금', value: 17, color: '#cbd5e1' },
+      { name: '예적금', value: 45, color: '#2dd4bf' },
+      { name: '투자상품', value: 35, color: '#a855f7' },
+      { name: '연금보험', value: 20, color: '#cbd5e1' },
     ],
-    assetLLMInsight: "총자산 32억 원 중 주식 비중이 63%로 자산 성장성이 돋보이나, 국내 주식(35%)에 비해 다소 낮은 해외 주식(28%) 비중을 다변화하여 글로벌 리스크 분산 효과를 극대화할 필요가 있습니다.",
+    assetLLMInsight: "순자산 32억 원 중 투자상품 비중이 35%로 자산 성장성을 도모하고 있으나, 안정적인 예적금(45%) 및 연금보험(20%)과의 균형 있는 포트폴리오 구성을 유지하여 자산 안정성과 수익성의 조화를 극대화할 필요가 있습니다.",
     riskLevel: "낮음",
     riskLabel: "양호",
     riskDesc: "이탈 위험이 낮습니다",
@@ -569,7 +567,7 @@ export default function CustomerRegistration1() {
                            </PieChart>
                         </ResponsiveContainer>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                          <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>총자산</span>
+                          <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>순자산</span>
                           <span style={{ fontSize: 16, fontWeight: 700, color: '#d97706' }}>{details.assetTotal}</span>
                         </div>
                       </div>
