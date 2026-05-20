@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut, CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
+import Sidebar from "../../components/common/Sidebar";
 import "./CalendarNew.css";
 import ScheduleRegistrationModal from "./ScheduleRegistrationModal";
 import ScheduleDetailModal from "./ScheduleDetailModal";
@@ -100,43 +101,7 @@ export default function DailyCalendar() {
   return (
     <div className="cal-layout">
       {/* Sidebar */}
-      <div className="cal-sidebar">
-        <div className="cal-logo">
-          <div className="cal-logo-circle"></div>
-        </div>
-        
-        <div className="cal-menu">
-          <Link to="/daily-calendar" className={`cal-menu-item ${path.includes('calendar') ? 'active' : ''}`}>
-            <CalendarIcon size={20} />
-            <span>캘린더</span>
-          </Link>
-          <Link to="/trend-archive" className={`cal-menu-item ${path.includes('/trend') ? 'active' : ''}`}>
-            <TrendingUp size={20} />
-            <span>트렌드 아카이브</span>
-          </Link>
-          <Link to="/customer-management-registration-1" className={`cal-menu-item ${path.includes('/customer-management') ? 'active' : ''}`}>
-            <Users size={20} />
-            <span>고객관리</span>
-          </Link>
-          <Link to="/news-bucket-bucket" className={`cal-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
-            <Bell size={20} />
-            <span>뉴스 버킷</span>
-          </Link>
-        </div>
-
-        <div className="cal-profile">
-          <img src="https://i.pravatar.cc/150?img=11" alt="Profile" />
-          <div className="cal-profile-info">
-            <span className="cal-profile-name">김재욱</span>
-            <span className="cal-profile-role">Private Banker</span>
-          </div>
-          <LogOut onClick={() => {
-            localStorage.removeItem('poom_calendar_events');
-            localStorage.removeItem('poom_ai_todos');
-            window.location.href='/login-pb';
-          }} size={16} color="#94a3b8" style={{ marginLeft: 'auto', cursor: 'pointer' }} />
-        </div>
-      </div>
+      <Sidebar type="cal" />
 
       {/* Main Content */}
       <div className="cal-main" style={{ paddingTop: 32 }}>
