@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, TrendingUp, Users, Bell, LogOut, MoreHorizontal } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, LogOut, MoreHorizontal, Settings } from "lucide-react";
+import Sidebar from "../../components/common/Sidebar";
 import "./Trend.css";
 
 // ---------------------------------------------------------
@@ -55,39 +56,7 @@ export default function EconomicIndicatorArchive() {
   return (
     <div className="trend-container">
       {/* Sidebar */}
-      <div className="trend-sidebar">
-        <div className="trend-logo">
-          <div className="trend-logo-circle"></div>
-        </div>
-
-        <div className="trend-menu">
-          <Link to="/daily-calendar" className={`trend-menu-item ${path.includes('/calendar') ? 'active' : ''}`}>
-            <Calendar size={20} />
-            캘린더
-          </Link>
-          <Link to="/trend-archive" className={`trend-menu-item ${path.includes('/trend') || path.includes('/economic') || path.includes('/news-archive') ? 'active' : ''}`}>
-            <TrendingUp size={20} />
-            트렌드 아카이브
-          </Link>
-          <Link to="/customer-management-registration-1" className="trend-menu-item">
-            <Users size={20} />
-            고객관리
-          </Link>
-          <Link to="/news-bucket-bucket" className="trend-menu-item">
-            <Bell size={20} />
-            뉴스 버킷
-          </Link>
-        </div>
-
-        <div className="trend-profile">
-          <img src="https://i.pravatar.cc/150?img=11" alt="Profile" />
-          <div className="trend-profile-info">
-            <span className="trend-profile-name">김재욱</span>
-            <span className="trend-profile-role">Private Banker</span>
-          </div>
-          <LogOut onClick={() => window.location.href = '/login-pb'} size={16} color="#94a3b8" style={{ marginLeft: 'auto', cursor: 'pointer' }} />
-        </div>
-      </div>
+      <Sidebar type="trend" />
 
       {/* Main Content */}
       <div className="trend-main">
