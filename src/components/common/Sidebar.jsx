@@ -71,7 +71,7 @@ export default function Sidebar({ type = "cal" }) {
           <span className={`${prefix}-profile-name`}>김재욱</span>
           <span className={`${prefix}-profile-role`}>Private Banker</span>
         </div>
-        <LogOut onClick={() => window.location.href='/login-pb'} size={16} color="#94a3b8" style={{ marginLeft: 'auto', cursor: 'pointer' }} />
+        <LogOut onClick={() => window.location.href='/login'} size={16} color="#94a3b8" style={{ marginLeft: 'auto', cursor: 'pointer' }} />
       </div>
     </div>
   );
