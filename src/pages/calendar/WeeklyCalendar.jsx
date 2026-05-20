@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut, CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut, CheckCircle2, ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
 import "./CalendarNew.css";
 import ScheduleRegistrationModal from "./ScheduleRegistrationModal";
@@ -20,7 +20,7 @@ export default function WeeklyCalendar() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAiTodoDetailOpen, setIsAiTodoDetailOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos } = useCalendar();
+  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos, revertAiTodo } = useCalendar();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [miniCalMonth, setMiniCalMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
 
@@ -170,17 +170,31 @@ export default function WeeklyCalendar() {
                 ) : (
                   todayEvents.map(e => {
                     const timeStr = `${e.startTime.split(' ')[1]} ~`;
+                    const isAiRecommended = e.aiTodoSource || (e.memo && e.memo.includes("AI To Do"));
                     return (
                       <div className="my-todo-item" key={e.id}>
                         <div className="todo-time-tag">
                           <span className="todo-time">{timeStr}</span>
                           {e.color === 'pink' && <span className="todo-tag tag-red">이탈위험</span>}
                           {e.color === 'yellow' && <span className="todo-tag tag-yellow">기념일</span>}
+                          {e.color === 'blue' && <span className="todo-tag tag-blue">예금만기</span>}
                         </div>
                         <div className="todo-content" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                           <span>{e.title}</span>
                           <span style={{ fontSize: 11, color: '#94a3b8' }}>{e.memo || '상담 요망'}</span>
                         </div>
+                        {isAiRecommended && (
+                          <button 
+                            className="todo-undo-btn" 
+                            onClick={(ev) => { 
+                              ev.stopPropagation(); 
+                              revertAiTodo(e.id); 
+                            }}
+                            title="AI 추천 목록으로 되돌리기"
+                          >
+                            <RotateCcw size={12} />
+                          </button>
+                        )}
                       </div>
                     );
                   })
