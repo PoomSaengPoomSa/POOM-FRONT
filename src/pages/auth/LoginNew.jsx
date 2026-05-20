@@ -62,21 +62,7 @@ export default function LoginNew() {
         <div className="auth-new-form-section">
           <div className="auth-new-logo-area">
             {/* High-Fidelity POOM Smiley Logo */}
-            <svg width="140" height="60" viewBox="0 0 140 60" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginBottom: "8px" }}>
-              {/* P */}
-              <text x="10" y="44" font-family="'Inter', 'Outfit', sans-serif" font-weight="900" font-size="42" fill="#0284c7" letterSpacing="1">P</text>
-              
-              {/* Smiley Face */}
-              {/* Left Eye */}
-              <circle cx="62" cy="22" r="5" fill="#0284c7" />
-              {/* Right Eye */}
-              <circle cx="82" cy="22" r="5" fill="#0284c7" />
-              {/* Smile Mouth Arc */}
-              <path d="M 58 34 A 15 15 0 0 0 86 34" stroke="#0284c7" strokeWidth="5" strokeLinecap="round" fill="none" />
-              
-              {/* M */}
-              <text x="98" y="44" font-family="'Inter', 'Outfit', sans-serif" font-weight="900" font-size="42" fill="#0284c7" letterSpacing="1">M</text>
-            </svg>
+            <img src="/poom-logo.png" alt="POOM Logo" style={{ height: "50px", marginBottom: "8px", objectFit: "contain" }} />
             <h1 className="auth-new-title">Log in</h1>
           </div>
 
