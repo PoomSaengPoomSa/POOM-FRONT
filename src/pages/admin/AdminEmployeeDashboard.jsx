@@ -65,7 +65,7 @@ const AdminHeader = ({ title }) => {
           <div className="admin-avatar">
             <img src="https://i.pravatar.cc/150?img=11" alt="Profile" />
           </div>
-          <LogOut onClick={() => window.location.href='/login-pb'} size={20} className="admin-logout" />
+          <LogOut onClick={() => window.location.href='/login'} size={20} className="admin-logout" />
         </div>
       </div>
     </div>

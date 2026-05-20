@@ -24,8 +24,7 @@ import NotificationMessageDraft from "../pages/news/NotificationMessageDraft.jsx
 
 // Phase 2: Auth and Calendar New Pages
 import SignUpNew from "../pages/auth/SignUpNew.jsx";
-import LoginDeveloper from "../pages/auth/LoginDeveloper.jsx";
-import LoginPb from "../pages/auth/LoginPb.jsx";
+import LoginNew from "../pages/auth/LoginNew.jsx";
 import WeeklyCalendar from "../pages/calendar/WeeklyCalendar.jsx";
 import MonthlyCalendar from "../pages/calendar/MonthlyCalendar.jsx";
 
@@ -53,15 +52,16 @@ import SettingsPage from "../pages/settings/SettingsPage.jsx";
 export default function AppRouter() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login-pb" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/auth/signup" element={<SignUpPage />} />
 
       {/* Phase 2 Auth Routes */}
       <Route path="/sign-up" element={<SignUpNew />} />
-      <Route path="/login-developer" element={<LoginDeveloper />} />
-      <Route path="/login-pb" element={<LoginPb />} />
+      <Route path="/login" element={<LoginNew />} />
+      <Route path="/login-pb" element={<Navigate to="/login" replace />} />
+      <Route path="/login-developer" element={<Navigate to="/login" replace />} />
 
       <Route element={<AppLayout />}>
 
