@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut, CheckCircle2, ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
+import { Calendar as CalendarIcon, TrendingUp, Users, Bell, Plus, ChevronLeft, ChevronRight, LogOut, CheckCircle2, ChevronDown, ChevronUp, RotateCcw, User, Landmark, PieChart, Coins } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
 import "./CalendarNew.css";
 import ScheduleRegistrationModal from "./ScheduleRegistrationModal";
@@ -228,50 +228,132 @@ export default function DailyCalendar() {
             {/* KPI Cards */}
             <div className="kpi-container">
               <div className="kpi-card">
-                <div className="kpi-title">개인 KPI</div>
-                <div className="kpi-subtitle">김재욱 PB</div>
-                <div className="kpi-stats">
+                <div className="kpi-card-header">
+                  <div className="kpi-title-korean">개인 KPI</div>
+                  <div className="kpi-subtitle-korean">김재욱 PB</div>
+                </div>
+                <div className="kpi-stats-grid">
                   <div className="kpi-stat-item">
-                    <div className="kpi-stat-label"><Users size={12}/> 고객 수</div>
-                    <div className="kpi-stat-value">148<span style={{ fontSize: 12, fontWeight: 500 }}>명</span></div>
-                    <div className="kpi-stat-desc">92% 목표 200명</div>
-                    <div className="kpi-trend">▲ 전월 대비 +5%</div>
+                    <div className="kpi-stat-label-wrap">
+                      <div className="kpi-icon-container">
+                        <User size={12} className="kpi-icon" />
+                      </div>
+                      <span className="kpi-label-text">고객 수</span>
+                    </div>
+                    <div className="kpi-stat-value">148<span className="kpi-unit">명</span></div>
+                    <div className="kpi-progress-bar-container">
+                      <div className="kpi-progress-bar-fill" style={{ width: '92%' }}></div>
+                    </div>
+                    <div className="kpi-progress-labels">
+                      <span className="kpi-progress-pct">92%</span>
+                      <span className="kpi-progress-target">목표 160명</span>
+                    </div>
+                    <div className="kpi-trend green">
+                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +5명
+                    </div>
                   </div>
                   <div className="kpi-stat-item">
-                    <div className="kpi-stat-label"><TrendingUp size={12}/> AUM</div>
-                    <div className="kpi-stat-value">91<span style={{ fontSize: 12, fontWeight: 500 }}>억</span></div>
-                    <div className="kpi-stat-desc">95% 목표 100억</div>
-                    <div className="kpi-trend">▲ 전월 대비 +3%</div>
+                    <div className="kpi-stat-label-wrap">
+                      <div className="kpi-icon-container">
+                        <PieChart size={12} className="kpi-icon" />
+                      </div>
+                      <span className="kpi-label-text">포트폴리오</span>
+                    </div>
+                    <div className="kpi-stat-value">91<span className="kpi-unit">점</span></div>
+                    <div className="kpi-progress-bar-container">
+                      <div className="kpi-progress-bar-fill" style={{ width: '95%' }}></div>
+                    </div>
+                    <div className="kpi-progress-labels">
+                      <span className="kpi-progress-pct">95%</span>
+                      <span className="kpi-progress-target">목표 95점</span>
+                    </div>
+                    <div className="kpi-trend green">
+                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +5점
+                    </div>
                   </div>
                   <div className="kpi-stat-item">
-                    <div className="kpi-stat-label"><TrendingUp size={12}/> 비이자 이익</div>
-                    <div className="kpi-stat-value">6,240<span style={{ fontSize: 12, fontWeight: 500 }}>만</span></div>
-                    <div className="kpi-stat-desc">84% 목표 8,000만</div>
-                    <div className="kpi-trend">▲ 전월 대비 +3%</div>
+                    <div className="kpi-stat-label-wrap">
+                      <div className="kpi-icon-container">
+                        <Coins size={12} className="kpi-icon" />
+                      </div>
+                      <span className="kpi-label-text">비이자 이익</span>
+                    </div>
+                    <div className="kpi-stat-value">6,240<span className="kpi-unit">만</span></div>
+                    <div className="kpi-progress-bar-container">
+                      <div className="kpi-progress-bar-fill" style={{ width: '94%' }}></div>
+                    </div>
+                    <div className="kpi-progress-labels">
+                      <span className="kpi-progress-pct">94%</span>
+                      <span className="kpi-progress-target">목표 6,600만</span>
+                    </div>
+                    <div className="kpi-trend green">
+                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +5명
+                    </div>
                   </div>
                 </div>
               </div>
               <div className="kpi-card">
-                <div className="kpi-title">지점 KPI</div>
-                <div className="kpi-subtitle">서울 강남지점</div>
-                <div className="kpi-stats">
+                <div className="kpi-card-header">
+                  <div className="kpi-title-korean">지점 KPI</div>
+                  <div className="kpi-subtitle-korean">서울 강남지점</div>
+                </div>
+                <div className="kpi-stats-grid">
                   <div className="kpi-stat-item">
-                    <div className="kpi-stat-label"><Users size={12}/> 고객 수</div>
-                    <div className="kpi-stat-value">1,284<span style={{ fontSize: 12, fontWeight: 500 }}>명</span></div>
-                    <div className="kpi-stat-desc">85% 목표 1,500명</div>
-                    <div className="kpi-trend">▲ 전월 대비 +4%</div>
+                    <div className="kpi-stat-label-wrap">
+                      <div className="kpi-icon-container">
+                        <User size={12} className="kpi-icon" />
+                      </div>
+                      <span className="kpi-label-text">고객 수</span>
+                    </div>
+                    <div className="kpi-stat-value">1,284<span className="kpi-unit">명</span></div>
+                    <div className="kpi-progress-bar-container">
+                      <div className="kpi-progress-bar-fill" style={{ width: '85%' }}></div>
+                    </div>
+                    <div className="kpi-progress-labels">
+                      <span className="kpi-progress-pct">85%</span>
+                      <span className="kpi-progress-target">목표 1,500명</span>
+                    </div>
+                    <div className="kpi-trend green">
+                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +42명
+                    </div>
                   </div>
                   <div className="kpi-stat-item">
-                    <div className="kpi-stat-label"><TrendingUp size={12}/> AUM</div>
-                    <div className="kpi-stat-value">824<span style={{ fontSize: 12, fontWeight: 500 }}>억</span></div>
-                    <div className="kpi-stat-desc">91% 목표 900억</div>
-                    <div className="kpi-trend">▲ 전월 대비 +3%</div>
+                    <div className="kpi-stat-label-wrap">
+                      <div className="kpi-icon-container">
+                        <PieChart size={12} className="kpi-icon" />
+                      </div>
+                      <span className="kpi-label-text">포트폴리오</span>
+                    </div>
+                    <div className="kpi-stat-value">82<span className="kpi-unit">점</span></div>
+                    <div className="kpi-progress-bar-container">
+                      <div className="kpi-progress-bar-fill" style={{ width: '91%' }}></div>
+                    </div>
+                    <div className="kpi-progress-labels">
+                      <span className="kpi-progress-pct">91%</span>
+                      <span className="kpi-progress-target">목표 90점</span>
+                    </div>
+                    <div className="kpi-trend green">
+                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +3점
+                    </div>
                   </div>
                   <div className="kpi-stat-item">
-                    <div className="kpi-stat-label"><TrendingUp size={12}/> 비이자 이익</div>
-                    <div className="kpi-stat-value">4.8<span style={{ fontSize: 12, fontWeight: 500 }}>억</span></div>
-                    <div className="kpi-stat-desc">87% 목표 5.5 억</div>
-                    <div className="kpi-trend">▲ 전월 대비 +4.2%</div>
+                    <div className="kpi-stat-label-wrap">
+                      <div className="kpi-icon-container">
+                        <Coins size={12} className="kpi-icon" />
+                      </div>
+                      <span className="kpi-label-text">비이자 이익</span>
+                    </div>
+                    <div className="kpi-stat-value">4.8<span className="kpi-unit">억</span></div>
+                    <div className="kpi-progress-bar-container">
+                      <div className="kpi-progress-bar-fill" style={{ width: '87%' }}></div>
+                    </div>
+                    <div className="kpi-progress-labels">
+                      <span className="kpi-progress-pct">87%</span>
+                      <span className="kpi-progress-target">목표 5.5억</span>
+                    </div>
+                    <div className="kpi-trend green">
+                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +4.2%
+                    </div>
                   </div>
                 </div>
               </div>
