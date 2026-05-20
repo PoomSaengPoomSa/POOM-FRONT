@@ -1,8 +1,20 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
-import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, Settings } from "lucide-react";
+import Sidebar from "../../components/common/Sidebar";
 import "./Customer.css";
+
+
+const allCustomers = [
+  { id: 101, name: "강OO", email: "dohyun@naver.com", phone: "010-7134-2353", color: "yellow", initial: "강" },
+  { id: 102, name: "강OO", email: "lsjshid@gmail.com", phone: "010-4563-2364", color: "green", initial: "강" },
+  { id: 103, name: "고OO", email: "shiho@gmail.com", phone: "010-9291-1342", color: "red", initial: "고" },
+  { id: 104, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김" },
+  { id: 105, name: "김OO", email: "kim1004@gmail.com", phone: "010-4333-1245", color: "blue", initial: "김" },
+  { id: 106, name: "김OO", email: "kimvils@naver.com", phone: "010-2214-3621", color: "gray", initial: "김" },
+  { id: 107, name: "김OO", email: "ppjisd@naver.com", phone: "010-6335-2365", color: "purple", initial: "김" },
+];
 
 const customers = [
   { id: 1, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김", time: "10:00 AM" },
@@ -15,45 +27,20 @@ export default function CustomerVisitBriefing() {
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
+
+  const filteredCustomers = customers.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.email.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.phone.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
 
   return (
     <div className="cust-container">
       {/* Sidebar */}
-      <div className="cust-sidebar">
-        <div className="cust-logo">
-          <div className="cust-logo-circle"></div>
-        </div>
-        
-        <div className="cust-menu">
-          <Link to="/daily-calendar" className={`cust-menu-item ${path.includes('/calendar') ? 'active' : ''}`}>
-            <Calendar size={20} />
-            캘린더
-          </Link>
-          <Link to="/trend-archive" className={`cust-menu-item ${path.includes('/trend') ? 'active' : ''}`}>
-            <TrendingUp size={20} />
-            트렌드 아카이브
-          </Link>
-          <Link to="/customer-management-registration-1" className={`cust-menu-item ${path.includes('/customer-management') ? 'active' : ''}`}>
-            <Users size={20} />
-            고객관리
-            <span className="cust-badge">23</span>
-          </Link>
-          <Link to="/news-bucket-bucket" className={`cust-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
-            <Bell size={20} />
-            뉴스 버킷
-          </Link>
-        </div>
-
-        <div className="cust-profile">
-          <img src="https://i.pravatar.cc/150?img=11" alt="Profile" />
-          <div className="cust-profile-info">
-            <span className="cust-profile-name">김재욱</span>
-            <span className="cust-profile-role">Private Banker</span>
-          </div>
-          <LogOut onClick={() => window.location.href='/login-pb'} size={16} color="#94a3b8" style={{ marginLeft: 'auto', cursor: 'pointer' }} />
-        </div>
-      </div>
+      <Sidebar type="cust" />
 
       {/* Main Content */}
       <div className="cust-main">
@@ -67,16 +54,22 @@ export default function CustomerVisitBriefing() {
           
           <div className="cust-search">
             <Search size={16} className="cust-search-icon" />
-            <input type="text" className="cust-search-input" placeholder="Search" />
+            <input 
+              type="text" 
+              className="cust-search-input" 
+              placeholder="Search" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
           <div className="cust-list-tabs">
-            <div className="cust-list-tab">전체 고객</div>
+            <Link to="/customer-management-registration-1" style={{ textDecoration: "none", color: "inherit", flex: 1 }}><div className="cust-list-tab">전체 고객</div></Link>
             <div className="cust-list-tab active">오늘 방문</div>
           </div>
 
           <div className="cust-list-items">
-            {customers.map(c => (
+            {filteredCustomers.map(c => (
               <div className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomerId(c.id)} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">
@@ -100,7 +93,7 @@ export default function CustomerVisitBriefing() {
             <Link to="/customer-management-dashboard-2" style={{ textDecoration: 'none' }}>
               <button className="cust-detail-tab">고객 대시보드</button>
             </Link>
-            <button className="cust-detail-tab active">방문 브리핑</button>
+            
             <Link to="/customer-management-memo-assistant" style={{ textDecoration: 'none' }}>
               <button className="cust-detail-tab">메모 어시스턴트</button>
             </Link>
@@ -110,7 +103,6 @@ export default function CustomerVisitBriefing() {
                 <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
                 <h2>{selectedCustomer.name}</h2>
               </div>
-              <MoreVertical className="cust-more-btn" size={20} />
             </div>
           </div>
 

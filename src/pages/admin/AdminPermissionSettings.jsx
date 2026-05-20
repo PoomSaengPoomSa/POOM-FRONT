@@ -7,7 +7,7 @@ const employees = [
   { id: "100021", name: "이수현", branch: "강남지점", clients: "18명", pending: false },
   { id: "100089", name: "이종혁", branch: "강남지점", clients: "41명", pending: false },
   { id: "100088", name: "김수빈", branch: "여의도지점", clients: "19명", pending: false },
-  { id: "100102", name: "이주리", branch: "압구정지점", branchNote: "발령 대기 압구정 → 강남", clients: "5명", pending: true },
+  { id: "100102", name: "이주리", branch: "강남지점", branchNote: "발령 대기 강남 → 압구정", clients: "5명", pending: true },
   { id: "100118", name: "유채린", branch: "여의도지점", clients: "32명", pending: false },
 ];
 
@@ -23,20 +23,20 @@ const AdminTabs = () => {
 
   return (
     <div className="admin-tabs">
-      <Link 
-        to="/admin-permission-settings" 
+      <Link
+        to="/admin-permission-settings"
         className={`admin-tab ${path === '/admin-permission-settings' ? 'active' : ''}`}
       >
         권한 설정
       </Link>
-      <Link 
-        to="/admin-system-dashboard-1" 
+      <Link
+        to="/admin-system-dashboard-1"
         className={`admin-tab ${path.includes('/admin-system-dashboard') ? 'active' : ''}`}
       >
         시스템 대시보드
       </Link>
-      <Link 
-        to="/admin-employee-dashboard" 
+      <Link
+        to="/admin-employee-dashboard"
         className={`admin-tab ${path === '/admin-employee-dashboard' ? 'active' : ''}`}
       >
         직원 대시보드
@@ -59,7 +59,7 @@ const AdminHeader = ({ title }) => {
           <div className="admin-avatar">
             <img src="https://i.pravatar.cc/150?img=11" alt="Profile" />
           </div>
-          <LogOut onClick={() => window.location.href='/login-pb'} size={20} className="admin-logout" />
+          <LogOut onClick={() => window.location.href = '/login-pb'} size={20} className="admin-logout" />
         </div>
       </div>
     </div>
@@ -85,9 +85,9 @@ export default function AdminPermissionSettings() {
     if (!e || !targetBranchStr) return false;
     const nb1 = (e.branch || '').replace('지점', '');
     const nb2 = targetBranchStr.replace('지점', '');
-    
+
     if (nb1.includes(nb2) || nb2.includes(nb1)) return true;
-    
+
     // 발령 대기 중인 직원이 이동할 목적지 지점이 타겟 지점과 같다면 인수가능 직원에 포함
     if (e.branchNote && e.branchNote.includes(nb2)) {
       return true;
@@ -97,7 +97,7 @@ export default function AdminPermissionSettings() {
 
   const handleTransferClick = (emp) => {
     setTransferEmp(emp);
-    
+
     // Set target branch if pending
     let initialTarget = '강남 지점';
     if (emp.branchNote && emp.branchNote.includes('→')) {
@@ -105,7 +105,7 @@ export default function AdminPermissionSettings() {
       initialTarget = parts[1].trim() + ' 지점';
     }
     setTargetBranch(initialTarget);
-    
+
     // Set available replacements
     const avail = employeeData.filter(e => e.id !== emp.id && isSameBranch(e, emp.branch));
     setSelectedReplacement(avail.length > 0 ? avail[0].id : '');
@@ -113,14 +113,14 @@ export default function AdminPermissionSettings() {
     // Generate mock customer list based on count
     const count = parseInt(emp.clients.replace('명', '')) || 0;
     const newCustomers = Array.from({ length: count }, (_, i) => ({
-      id: `c${i+1}`,
-      name: `고객${i+1}`,
+      id: `c${i + 1}`,
+      name: `고객${i + 1}`,
       assets: ['VVIP · 자산 50억', 'VIP · 자산 12억', '일반 · 자산 5억', '일반 · 자산 1억'][i % 4]
     }));
-    
+
     setCurrentCustomerList(newCustomers);
     setSelectedCustomers(new Set(newCustomers.map(c => c.id)));
-    
+
     setModalStep(2);
     setIsModalOpen(true);
   };
@@ -166,7 +166,7 @@ export default function AdminPermissionSettings() {
       if (emp.id === transferEmp.id) {
         const oldClients = parseInt(emp.clients.replace('명', ''));
         const newClients = Math.max(0, oldClients - selectedCustomers.size);
-        
+
         // 발령 완료(고객 수 0명) 시점에만 지점 변경 적용
         let newBranch = emp.branch;
         let isPending = emp.pending;
@@ -243,23 +243,23 @@ export default function AdminPermissionSettings() {
   return (
     <div className="admin-container">
       <AdminHeader title="관리자 - 권한 설정" />
-      
+
       <div className="permission-layout">
         <div className="permission-main">
           {/* Search Bar */}
           <div className="search-bar">
             <div style={{ position: 'relative', flex: 1 }}>
               <Search style={{ position: 'absolute', left: 16, top: 12, color: '#9ca3af' }} size={20} />
-              <input 
-                type="text" 
-                className="search-input" 
-                placeholder="사번 또는 이름 검색" 
+              <input
+                type="text"
+                className="search-input"
+                placeholder="사번 또는 이름 검색"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ paddingLeft: 48, width: '100%', boxSizing: 'border-box' }}
               />
             </div>
-            <select 
+            <select
               className="search-select"
               value={branchFilter}
               onChange={(e) => setBranchFilter(e.target.value)}
@@ -277,7 +277,7 @@ export default function AdminPermissionSettings() {
               <h3 className="admin-chart-title" style={{ margin: 0 }}>직원 계정 목록</h3>
               <span style={{ fontSize: '13px', color: '#0284c7', fontWeight: 500 }}>총 직원수 5명</span>
             </div>
-            
+
             <table className="permission-table">
               <thead>
                 <tr>
@@ -298,10 +298,10 @@ export default function AdminPermissionSettings() {
                     <td style={{ textAlign: 'left', borderBottom: 'none' }}>
                       <div className="employee-name-cell" style={{ justifyContent: 'flex-start' }}>
                         <div className="employee-avatar" style={{
-                          background: i === 0 ? '#fef3c7' : 
-                                      i === 1 ? '#ede9fe' : 
-                                      i === 2 ? '#fce7f3' : 
-                                      i === 3 ? '#e2e8f0' : '#dbeafe',
+                          background: i === 0 ? '#fef3c7' :
+                            i === 1 ? '#ede9fe' :
+                              i === 2 ? '#fce7f3' :
+                                i === 3 ? '#e2e8f0' : '#dbeafe',
                           color: '#475569'
                         }}>
                           {emp.name.charAt(0)}
@@ -358,7 +358,7 @@ export default function AdminPermissionSettings() {
               <h2>발령 인수인계 __ {transferEmp.name} ({transferEmp.id})</h2>
               <button className="modal-close" onClick={closeModal}><X size={16} strokeWidth={3} /></button>
             </div>
-            
+
             <div className="modal-progress">
               <div className={`progress-step ${modalStep >= 1 ? 'active' : ''}`}><span className="step-num">1</span> 발령 확인</div>
               <div className={`progress-line ${modalStep >= 2 ? 'active' : ''}`}></div>
@@ -368,19 +368,19 @@ export default function AdminPermissionSettings() {
               <div className={`progress-line ${modalStep >= 4 ? 'active' : ''}`}></div>
               <div className={`progress-step ${modalStep >= 4 ? 'active' : ''}`}><span className="step-num">4</span> 지점 변경</div>
             </div>
-            
+
             {modalStep === 2 && (
               <>
                 <div className="modal-info-box">
                   <p>{transferEmp.name} PB는 {transferEmp.branch.replace('지점', '')}지점 → {targetBranch.replace(' ', '')} 발령 예정입니다.</p>
                   <p>담당 고객 {transferEmp.clients}을 인수받을 직원을 선택해주세요.</p>
                 </div>
-                
+
                 <div className="modal-subtitle">인수 가능 직원 (같은 지점)</div>
-                
+
                 <div className="replacement-list">
                   {employeeData.filter(e => e.id !== transferEmp.id && isSameBranch(e, transferEmp.branch)).map(emp => (
-                    <div 
+                    <div
                       key={emp.id}
                       className={`replacement-item ${selectedReplacement === emp.id ? 'selected' : ''}`}
                       onClick={() => setSelectedReplacement(emp.id)}
@@ -406,12 +406,12 @@ export default function AdminPermissionSettings() {
                 <div className="modal-info-box" style={{ background: '#f0fdf4', color: '#166534', border: 'none' }}>
                   <p style={{ color: '#166534', fontWeight: 500 }}>담당 고객 {selectedCustomers.size}명을 {replacementName}에게 재배정합니다. 개별 조정도 가능합니다.</p>
                 </div>
-                
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <div className="modal-subtitle" style={{ marginBottom: 0 }}>담당 고객 목록</div>
                   <label style={{ fontSize: 12, color: '#0284c7', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={currentCustomerList.length > 0 && selectedCustomers.size === currentCustomerList.length}
                       onChange={toggleAllCustomers}
                       ref={el => {
@@ -420,19 +420,19 @@ export default function AdminPermissionSettings() {
                     /> 전체선택
                   </label>
                 </div>
-                
+
                 <div className="customer-reassign-list">
                   {currentCustomerList.map(customer => (
-                    <div 
+                    <div
                       key={customer.id}
                       className={`customer-reassign-item ${selectedCustomers.has(customer.id) ? 'selected' : ''}`}
                       onClick={() => toggleCustomer(customer.id)}
                       style={{ cursor: 'pointer' }}
                     >
-                      <input 
-                        type="checkbox" 
-                        checked={selectedCustomers.has(customer.id)} 
-                        readOnly 
+                      <input
+                        type="checkbox"
+                        checked={selectedCustomers.has(customer.id)}
+                        readOnly
                       />
                       <div className="customer-info">
                         <span className="customer-name">{customer.name}</span>
@@ -449,9 +449,9 @@ export default function AdminPermissionSettings() {
                 <div className="modal-info-box" style={{ background: '#f0fdf4', color: '#166534', border: 'none' }}>
                   <p style={{ color: '#166534', fontWeight: 500 }}>고객 재배정 완료 — {replacementName}에게 {selectedCustomers.size}명 이전됨</p>
                 </div>
-                
+
                 <div className="modal-subtitle" style={{ color: '#9ca3af' }}>발령 지점을 선택해주세요</div>
-                
+
                 <div className="branch-change-box">
                   <div className="branch-current">
                     <span className="branch-label">현재 지점</span>
@@ -459,7 +459,7 @@ export default function AdminPermissionSettings() {
                   </div>
                   <div className="branch-arrow">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="#0284c7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                   <div className="branch-new">
@@ -473,12 +473,12 @@ export default function AdminPermissionSettings() {
                 </div>
               </>
             )}
-            
+
             <div className="modal-footer" style={{ justifyContent: modalStep > 2 ? 'space-between' : 'flex-end' }}>
               {modalStep > 2 && (
                 <button className="btn-prev" onClick={handlePrevStep}>이전</button>
               )}
-              
+
               {modalStep < 4 ? (
                 <button className="btn-next" onClick={handleNextStep}>다음</button>
               ) : (
