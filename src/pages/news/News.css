@@ -264,3 +264,422 @@
 .news-btn-primary:hover {
   background-color: var(--news-primary-hover);
 }
+
+/* ==========================================================================
+   Customer Notification Alerts Styling
+   ========================================================================== */
+
+.news-alert-tabs-row {
+  display: flex;
+  margin-bottom: 24px;
+}
+
+.news-alert-tabs {
+  display: flex;
+  background-color: #e2e8f0;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.news-alert-tab {
+  border: none;
+  background: transparent;
+  padding: 8px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.news-alert-tab.active {
+  background-color: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.news-alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+  max-height: calc(100vh - 280px);
+}
+
+/* Custom scrollbar for news alert list */
+.news-alert-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.news-alert-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.news-alert-list::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 3px;
+}
+
+.news-alert-list::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+.news-alert-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.news-alert-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  border-color: #cbd5e1;
+}
+
+.news-alert-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.news-alert-badge {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Badge Color Maps */
+.badge-green {
+  background-color: #e2fbf0;
+  color: #10b981;
+}
+
+.badge-pink {
+  background-color: #fce7f3;
+  color: #db2777;
+}
+
+.badge-blue {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.badge-red {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.badge-indigo {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.news-alert-content {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.news-alert-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.news-alert-date-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.news-alert-date {
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.news-alert-more-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.news-alert-more-btn:hover {
+  background-color: #f1f5f9;
+}
+
+/* ==========================================================================
+   Alert Expanded Content Styling
+   ========================================================================== */
+
+.news-alert-expanded-content {
+  padding: 16px 24px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  margin-top: -16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.6;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: slideDownDetail 0.2s ease-out;
+}
+
+@keyframes slideDownDetail {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.news-alert-expanded-line {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+/* ==========================================================================
+   Briefing Modal Overlay & Card Styling
+   ========================================================================== */
+
+.briefing-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 40px;
+}
+
+.briefing-modal-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: modalFadeIn 0.3s ease-out;
+  overflow: hidden;
+  position: relative;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.briefing-modal-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+}
+
+.briefing-modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.briefing-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.briefing-modal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.briefing-modal-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.briefing-modal-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.briefing-modal-close-btn:hover {
+  background-color: #e2e8f0;
+}
+
+.briefing-modal-body {
+  padding: 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: #ffffff;
+}
+
+.briefing-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.briefing-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.briefing-section-card {
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.briefing-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #334155;
+  margin: 0;
+}
+
+.briefing-text.font-semibold {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.briefing-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.briefing-list li {
+  position: relative;
+  padding-left: 12px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.briefing-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #64748b;
+}
+
+.briefing-list li.indent {
+  padding-left: 24px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.briefing-list li.indent::before {
+  content: "";
+}
+
+.briefing-list li.indent-2 {
+  padding-left: 36px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.briefing-list li.indent-2::before {
+  content: "-";
+  position: absolute;
+  left: 24px;
+}
+
+.briefing-list li.bullet-title {
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 6px;
+}
+
+.briefing-list li.bullet-title::before {
+  content: "•";
+  color: #0f172a;
+}
+
+/* Resizer handle for the briefing modal popup */
+.briefing-modal-resizer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  cursor: se-resize;
+  background-image: linear-gradient(135deg, transparent 50%, #94a3b8 50%);
+  border-bottom-right-radius: 16px;
+  z-index: 1010;
+  transition: all 0.2s ease;
+}
+
+.briefing-modal-resizer:hover {
+  background-image: linear-gradient(135deg, transparent 50%, #0284c7 50%);
+}
+
+
