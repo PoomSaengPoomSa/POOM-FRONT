@@ -108,6 +108,40 @@ export function CalendarProvider({ children }) {
     return saved ? JSON.parse(saved) : DEFAULT_AI_TODOS;
   });
 
+  const [leftPanelWidth, setLeftPanelWidth] = useState(() => {
+    const saved = localStorage.getItem('poom_left_panel_width');
+    return saved ? parseInt(saved, 10) : 320;
+  });
+
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startResize = (e) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = leftPanelWidth;
+
+    const handleMouseMove = (moveEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const newWidth = Math.max(320, Math.min(600, startWidth + deltaX));
+      setLeftPanelWidth(newWidth);
+      localStorage.setItem('poom_left_panel_width', String(newWidth));
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'default';
+      document.body.style.userSelect = 'auto';
+      setIsResizing(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    setIsResizing(true);
+  };
+
   useEffect(() => {
     localStorage.setItem('poom_calendar_events', JSON.stringify(events));
   }, [events]);
@@ -244,7 +278,10 @@ export function CalendarProvider({ children }) {
       aiTodos,
       toggleAiTodo,
       transferCheckedAiTodos,
-      revertAiTodo
+      revertAiTodo,
+      leftPanelWidth,
+      isResizing,
+      startResize
     }}>
       {children}
     </CalendarContext.Provider>
