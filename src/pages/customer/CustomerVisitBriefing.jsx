@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
 import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, Settings } from "lucide-react";
+import Sidebar from "../../components/common/Sidebar";
 import "./Customer.css";
 
 
@@ -39,44 +40,7 @@ export default function CustomerVisitBriefing() {
   return (
     <div className="cust-container">
       {/* Sidebar */}
-      <div className="cust-sidebar">
-        <div className="cust-logo">
-          <div className="cust-logo-circle"></div>
-        </div>
-        
-        <div className="cust-menu">
-          <Link to="/daily-calendar" className={`cust-menu-item ${path.includes('/calendar') ? 'active' : ''}`}>
-            <Calendar size={20} />
-            캘린더
-          </Link>
-          <Link to="/trend-archive" className={`cust-menu-item ${path.includes('/trend') ? 'active' : ''}`}>
-            <TrendingUp size={20} />
-            트렌드 아카이브
-          </Link>
-          <Link to="/customer-management-registration-1" className={`cust-menu-item ${path.includes('/customer-management') ? 'active' : ''}`}>
-            <Users size={20} />
-            고객관리
-            <span className="cust-badge">{allCustomers.length}</span>
-          </Link>
-          <Link to="/news-bucket-bucket" className={`cust-menu-item ${path.includes('/news-bucket') ? 'active' : ''}`}>
-            <Bell size={20} />
-            뉴스 버킷
-          </Link>
-          <Link to="/settings" className={`cust-menu-item ${path.includes('/settings') ? 'active' : ''}`}>
-            <Settings size={20} />
-            설정
-          </Link>
-        </div>
-
-        <div className="cust-profile">
-          <img src="https://i.pravatar.cc/150?img=11" alt="Profile" />
-          <div className="cust-profile-info">
-            <span className="cust-profile-name">김재욱</span>
-            <span className="cust-profile-role">Private Banker</span>
-          </div>
-          <LogOut onClick={() => window.location.href='/login-pb'} size={16} color="#94a3b8" style={{ marginLeft: 'auto', cursor: 'pointer' }} />
-        </div>
-      </div>
+      <Sidebar type="cust" />
 
       {/* Main Content */}
       <div className="cust-main">
