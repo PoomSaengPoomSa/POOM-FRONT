@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
 import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, UserCircle, Settings, Trash2 } from "lucide-react";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import Sidebar from "../../components/common/Sidebar";
+import { api } from "../../api";
 import "./Customer.css";
+
 
 const allCustomers = [
   { id: 101, name: "강OO", email: "dohyun@naver.com", phone: "010-7134-2353", color: "yellow", initial: "강" },
@@ -35,31 +37,31 @@ const emotionHistory = [
   { date: '2026.01.08', emoji: '😐', type: '중립', typeColor: '#94a3b8', text: '조용하게 진행, 큰 반응 없음' },
 ];
 
-const getCustomerDetails = (customer) => {
+const getCustomerDetails = (customer, fullDetail) => {
   if (!customer) return null;
   
   const defaults = {
-    job: "중견기업 CEO",
-    vipStatus: "VIP",
-    typeStatus: "중립형",
+    job: fullDetail?.job || "중견기업 CEO",
+    vipStatus: fullDetail?.grade || "VIP",
+    typeStatus: fullDetail?.tendency || "위험중립형",
     gridData: {
-      totalAsset: "16억",
-      age: "만 54",
-      startDate: "2018.03.05",
+      totalAsset: fullDetail?.total_assets !== undefined ? `${(fullDetail.total_assets / 100000000).toFixed(1)}억` : "16억",
+      age: fullDetail?.birthday ? `만 ${new Date().getFullYear() - new Date(fullDetail.birthday).getFullYear()}세` : "만 54세",
+      startDate: fullDetail?.start_date ? fullDetail.start_date.replace(/-/g, ".") : "2018.03.05",
       lastConsult: "2026.01.11",
       nextVisit: "2026.05.02",
     },
-    assetTotal: "32억",
+    assetTotal: fullDetail?.total_assets !== undefined ? `${(fullDetail.total_assets / 100000000).toFixed(1)}억` : "32억",
     assetList: [
-      { name: '예적금', value: 45, color: '#2dd4bf' },
-      { name: '투자상품', value: 35, color: '#a855f7' },
-      { name: '연금보험', value: 20, color: '#cbd5e1' },
+      { name: '예적금', value: fullDetail ? Math.round((fullDetail.deposit / (fullDetail.total_assets || 1)) * 100) : 45, color: '#2dd4bf' },
+      { name: '투자상품', value: fullDetail ? Math.round((fullDetail.investment / (fullDetail.total_assets || 1)) * 100) : 35, color: '#a855f7' },
+      { name: '연금보험', value: fullDetail ? Math.round((fullDetail.pension / (fullDetail.total_assets || 1)) * 100) : 20, color: '#cbd5e1' },
     ],
-    assetLLMInsight: "순자산 32억 원 중 투자상품 비중이 35%로 자산 성장성을 도모하고 있으나, 안정적인 예적금(45%) 및 연금보험(20%)과의 균형 있는 포트폴리오 구성을 유지하여 자산 안정성과 수익성의 조화를 극대화할 필요가 있습니다.",
+    assetLLMInsight: fullDetail?.llm_insight || "순자산 중 예적금 및 투자상품 비율이 적절한 균형을 유지하고 있습니다.",
     riskLevel: "낮음",
     riskLabel: "양호",
     riskDesc: "이탈 위험이 낮습니다",
-    riskLLMInsight: "최근 3번의 상담 메모 분석 결과, PB의 고객관리 및 상품 추천에서 큰 만족감을 보이고 있습니다. 또한 최근 취업한 자녀를 위한 저축 상품을 고려하는 등 우리은행 서비스의 큰 만족감을 표하고 있습니다.",
+    riskLLMInsight: "최근 3번의 상담 메모 분석 결과, PB의 고객관리 및 상품 추천에서 큰 만족감을 보이고 있습니다. 서비스 만족도가 높은 편입니다.",
     visitData: {
       totalVisits: 4,
       averageInterval: 53,
@@ -84,12 +86,21 @@ const getCustomerDetails = (customer) => {
     ],
     productMatching: {
       productName: "우리 테마형 국내 리츠 펀드",
-      productDesc: "본 펀드는 국내 우량 리츠 및 상장 부동산 자산에 집중 투자하여 안정적인 배당 수익과 중장기적인 자산 가치 상승을 동시에 추구합니다. 특히 변동성이 큰 자산의 비중을 낮추고 정기적인 인컴(Income) 수익을 확보하려는 중립 성향의 투자자에게 안정적인 대안을 제공합니다.",
+      productDesc: "본 펀드는 국내 우량 리츠 및 상장 부동산 자산에 집중 투자하여 안정적인 배당 수익과 중장기적인 자산 가치 상승을 동시에 추구합니다.",
       status: "부적합",
       statusColor: "#ef4444",
-      matchingDesc: "현재 달러 자산의 비중을 낮추고 변동성이 적은 안정적인 인컴 수익을 확보하고자 하는 고객님의 자산 리밸런싱 방향성과 정확히 부합합니다. 달러 매도 대금을 국내 우량 부동산 기반의 리츠 자산으로 안전하게 이전함으로써, 원금 손실 우려를 최소화하는 동시에 정기적인 배당 수익을 제공하는 최적의 대안입니다."
+      matchingDesc: "현재 달러 자산의 비중을 낮추고 변동성이 적은 안정적인 인컴 수익을 확보하고자 하는 고객님의 자산 리밸런싱 방향성과 정확히 부합합니다."
     }
   };
+
+  // 자산이 0원인 경우 PieChart 퍼센트 비중을 0으로 강제 조정
+  if (fullDetail && fullDetail.total_assets === 0) {
+    defaults.assetList = [
+      { name: '예적금', value: 0, color: '#2dd4bf' },
+      { name: '투자상품', value: 0, color: '#a855f7' },
+      { name: '연금보험', value: 0, color: '#cbd5e1' },
+    ];
+  }
 
   return {
     ...defaults,
@@ -113,8 +124,9 @@ const getCustomerDetails = (customer) => {
 export default function CustomerRegistration1() {
   const location = useLocation();
   const path = location.pathname;
-  const [allCustomersList, setAllCustomersList] = useState(allCustomers);
-  const [todayCustomersList, setTodayCustomersList] = useState(todayCustomers);
+  const [allCustomersList, setAllCustomersList] = useState([]);
+  const [todayCustomersList, setTodayCustomersList] = useState([]);
+  const [fullCustomerDetail, setFullCustomerDetail] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeListTab, setActiveListTab] = useState('전체 고객');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -135,6 +147,67 @@ export default function CustomerRegistration1() {
 
   const [listWidth, setListWidth] = useState(320);
   const [isDragging, setIsDragging] = useState(false);
+
+  // API로부터 고객 목록 로드
+  const fetchCustomers = async () => {
+    try {
+      const tabParam = activeListTab === '전체 고객' ? 'all' : 'today';
+      const response = await api.customer.getList(tabParam);
+      
+      const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
+      const mapped = response.map((c) => {
+        const char = c.name ? c.name[0] : "고";
+        return {
+          id: c.c_id,
+          name: c.name,
+          email: c.email || `${c.c_id}@poom.com`,
+          phone: c.phone || "010-0000-0000",
+          color: colors[c.c_id % colors.length],
+          initial: char,
+          tendency: c.tendency,
+          total_assets: c.total_assets
+        };
+      });
+
+      if (activeListTab === '전체 고객') {
+        setAllCustomersList(mapped);
+      } else {
+        setTodayCustomersList(mapped);
+      }
+
+      // 목록 최초 로딩 완료 및 탭 스위칭 시 첫 번째 고객 자동 선택
+      if (mapped.length > 0) {
+        setSelectedCustomer(mapped[0]);
+      } else {
+        setSelectedCustomer(null);
+      }
+    } catch (error) {
+      console.error("고객 목록 조회 실패:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [activeListTab]);
+
+  // 선택된 고객이 바뀔 때 상세 정보 로드
+  useEffect(() => {
+    if (!selectedCustomer) {
+      setFullCustomerDetail(null);
+      return;
+    }
+    
+    const fetchDetail = async () => {
+      try {
+        const detail = await api.customer.getDetail(selectedCustomer.id);
+        setFullCustomerDetail(detail);
+      } catch (error) {
+        console.error("고객 상세 정보 조회 실패:", error);
+      }
+    };
+    
+    fetchDetail();
+  }, [selectedCustomer]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -165,7 +238,7 @@ export default function CustomerRegistration1() {
     c.phone.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const details = getCustomerDetails(selectedCustomer);
+  const details = getCustomerDetails(selectedCustomer, fullCustomerDetail);
 
   const handleInputChange = (field, value) => {
     setEditForm(prev => ({
@@ -174,24 +247,21 @@ export default function CustomerRegistration1() {
     }));
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!selectedCustomer) return;
-    const updatedCustomer = {
-      ...selectedCustomer,
-      phone: editForm.phone,
-      gridData: {
-        ...(selectedCustomer.gridData || {}),
-        totalAsset: editForm.totalAsset,
-        age: editForm.age,
-        startDate: editForm.startDate,
-        lastConsult: editForm.lastConsult,
-        nextVisit: editForm.nextVisit
-      }
-    };
-    setAllCustomersList(prev => prev.map(c => c.id === selectedCustomer.id ? updatedCustomer : c));
-    setTodayCustomersList(prev => prev.map(c => c.id === selectedCustomer.id ? updatedCustomer : c));
-    setSelectedCustomer(updatedCustomer);
-    setIsEditing(false);
+    try {
+      await api.customer.update(selectedCustomer.id, {
+        phone: editForm.phone
+      });
+      await fetchCustomers();
+      setSelectedCustomer(prev => ({
+        ...prev,
+        phone: editForm.phone
+      }));
+      setIsEditing(false);
+    } catch (error) {
+      alert("고객 정보 수정 중 오류가 발생했습니다: " + error.message);
+    }
   };
 
   return (
@@ -221,8 +291,8 @@ export default function CustomerRegistration1() {
           </div>
 
           <div className="cust-list-tabs">
-            <div className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} onClick={() => { setActiveListTab('전체 고객'); setSelectedCustomer(null); setIsEditing(false); }} style={{ cursor: 'pointer' }}>전체 고객</div>
-            <div className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} onClick={() => { setActiveListTab('오늘 방문'); setSelectedCustomer(null); setIsEditing(false); }} style={{ cursor: 'pointer' }}>오늘 방문</div>
+            <div className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} onClick={() => { setActiveListTab('전체 고객'); setIsEditing(false); }} style={{ cursor: 'pointer' }}>전체 고객</div>
+            <div className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} onClick={() => { setActiveListTab('오늘 방문'); setIsEditing(false); }} style={{ cursor: 'pointer' }}>오늘 방문</div>
           </div>
 
           <div className="cust-list-items">
@@ -849,12 +919,17 @@ export default function CustomerRegistration1() {
                   취소
                 </button>
                 <button 
-                  onClick={() => {
-                    setIsDeleteModalOpen(false);
-                    setAllCustomersList(prev => prev.filter(c => c.id !== selectedCustomer.id));
-                    setTodayCustomersList(prev => prev.filter(c => c.id !== selectedCustomer.id));
-                    setSelectedCustomer(null);
-                    setIsEditing(false);
+                  onClick={async () => {
+                    try {
+                      setIsDeleteModalOpen(false);
+                      await api.customer.delete(selectedCustomer.id);
+                      setAllCustomersList(prev => prev.filter(c => c.id !== selectedCustomer.id));
+                      setTodayCustomersList(prev => prev.filter(c => c.id !== selectedCustomer.id));
+                      setSelectedCustomer(null);
+                      setIsEditing(false);
+                    } catch (error) {
+                      alert("고객 삭제 실패: " + error.message);
+                    }
                   }}
                   style={{ flex: 1, padding: '12px', borderRadius: 8, border: 'none', background: '#ef4444', color: 'white', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
                 >
@@ -869,47 +944,51 @@ export default function CustomerRegistration1() {
         isOpen={isModalOpen || !!editModalData} 
         onClose={() => { setIsModalOpen(false); setEditModalData(null); }} 
         initialData={editModalData}
-        onSave={(newData) => {
+        onSave={async (newData) => {
           if (editModalData) {
-            const updatedCustomer = {
-              ...editModalData,
-              name: newData.name,
-              phone: newData.phone,
-              email: newData.email,
-              vipStatus: newData.grade,
-              job: newData.job,
-              gridData: {
-                ...(editModalData.gridData || {}),
-                startDate: newData.startDate,
-                nextVisit: newData.nextVisit
-              }
-            };
-            setAllCustomersList(prev => prev.map(c => c.id === editModalData.id ? updatedCustomer : c));
-            setTodayCustomersList(prev => prev.map(c => c.id === editModalData.id ? updatedCustomer : c));
-            setSelectedCustomer(updatedCustomer);
+            try {
+              await api.customer.update(editModalData.id, {
+                name: newData.name,
+                phone: newData.phone,
+                email: newData.email,
+                job: newData.job,
+                grade: newData.grade,
+              });
+              await fetchCustomers();
+              setSelectedCustomer(prev => prev && prev.id === editModalData.id ? { 
+                ...prev, 
+                name: newData.name, 
+                phone: newData.phone, 
+                email: newData.email 
+              } : prev);
+            } catch (err) {
+              alert("수정 실패: " + err.message);
+            }
           } else {
-            const newId = Date.now();
-            const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            const newCustomer = {
-              id: newId,
-              name: newData.name || "신규 고객",
-              email: newData.email || "new@email.com",
-              phone: newData.phone || "010-0000-0000",
-              color: randomColor,
-              initial: (newData.name || "신")[0],
-              job: newData.job || "회사원",
-              vipStatus: newData.grade || "VIP",
-              gridData: {
-                totalAsset: "10억",
-                age: newData.dob ? `만 ${new Date().getFullYear() - parseInt(newData.dob.split("/")[2] || new Date().getFullYear())}` : "만 54",
-                startDate: newData.startDate || "2026.05.20",
-                lastConsult: "없음",
-                nextVisit: newData.nextVisit || "미정"
-              }
-            };
-            setAllCustomersList(prev => [newCustomer, ...prev]);
-            setSelectedCustomer(newCustomer);
+            try {
+              const created = await api.customer.create({
+                name: newData.name || "신규 고객",
+                email: newData.email || "new@email.com",
+                phone: newData.phone || "010-0000-0000",
+                address: "서울시 강남구", // 기본값
+                job: newData.job || "회사원",
+                grade: newData.grade || "VIP",
+                investment_type: "위험중립형",
+              });
+              await fetchCustomers();
+              
+              const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
+              setSelectedCustomer({
+                id: created.c_id,
+                name: created.name,
+                email: created.email,
+                phone: created.number || created.phone || "010-0000-0000",
+                color: colors[created.c_id % colors.length],
+                initial: created.name ? created.name[0] : "신",
+              });
+            } catch (err) {
+              alert("등록 실패: " + err.message);
+            }
           }
           setIsModalOpen(false);
           setEditModalData(null);

@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
 import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, PenLine, Check, Settings, ArrowUp } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
+import { api } from "../../api";
 import "./Customer.css";
 
 
@@ -78,15 +79,87 @@ export default function CustomerMemoAssistant() {
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeListTab, setActiveListTab] = useState("오늘 방문");
-  const [allCustomersList, setAllCustomersList] = useState(allCustomers);
-  const [todayCustomersList, setTodayCustomersList] = useState(customers);
-  const [selectedCustomerId, setSelectedCustomerId] = useState(1);
+  const [allCustomersList, setAllCustomersList] = useState([]);
+  const [todayCustomersList, setTodayCustomersList] = useState([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [fullCustomerDetail, setFullCustomerDetail] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedTimelineId, setExpandedTimelineId] = useState(null);
   const [showSaveToast, setShowSaveToast] = useState(false);
+
+  const formatAssets = (assetVal) => {
+    if (assetVal === undefined || assetVal === null) return "32억 1,234만";
+    const bill = assetVal / 100000000;
+    if (bill >= 1) {
+      const rest = assetVal % 100000000;
+      const restTenThousand = Math.round(rest / 10000);
+      if (restTenThousand > 0) {
+        return `${Math.floor(bill)}억 ${restTenThousand.toLocaleString()}만`;
+      }
+      return `${bill.toFixed(1)}억`;
+    }
+    return `${Math.round(assetVal / 10000).toLocaleString()}만`;
+  };
+
+  const fetchCustomers = async () => {
+    try {
+      const tabParam = activeListTab === '전체 고객' ? 'all' : 'today';
+      const response = await api.customer.getList(tabParam);
+      
+      const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
+      const mapped = response.map((c) => {
+        const char = c.name ? c.name[0] : "고";
+        return {
+          id: c.c_id,
+          name: c.name,
+          email: c.email || `${c.c_id}@poom.com`,
+          phone: c.phone || "010-0000-0000",
+          color: colors[c.c_id % colors.length],
+          initial: char,
+          time: c.c_id % 2 === 0 ? "10:00 AM" : "14:30 PM",
+        };
+      });
+
+      if (activeListTab === '전체 고객') {
+        setAllCustomersList(mapped);
+      } else {
+        setTodayCustomersList(mapped);
+      }
+      
+      if (mapped.length > 0) {
+        setSelectedCustomerId(mapped[0].id);
+      } else {
+        setSelectedCustomerId(null);
+      }
+    } catch (error) {
+      console.error("고객 목록 조회 실패:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [activeListTab]);
+
+  useEffect(() => {
+    if (!selectedCustomerId) {
+      setFullCustomerDetail(null);
+      return;
+    }
+    
+    const fetchDetail = async () => {
+      try {
+        const detail = await api.customer.getDetail(selectedCustomerId);
+        setFullCustomerDetail(detail);
+      } catch (error) {
+        console.error("고객 상세 정보 조회 실패:", error);
+      }
+    };
+    
+    fetchDetail();
+  }, [selectedCustomerId]);
   
   const currentList = activeListTab === '전체 고객' ? allCustomersList : todayCustomersList;
-  const selectedCustomer = allCustomersList.concat(todayCustomersList).find(c => c.id === selectedCustomerId) || currentList[0];
+  const selectedCustomer = (allCustomersList.concat(todayCustomersList).find(c => c.id === selectedCustomerId) || currentList[0]) || { name: "로딩중...", color: "gray", initial: "고" };
 
   const [activeTab, setActiveTab] = useState("memo"); // "memo" or "simulator"
   const [listWidth, setListWidth] = useState(320);
@@ -139,37 +212,22 @@ export default function CustomerMemoAssistant() {
     }
   }, [chatMessages, isTyping, activeTab]);
 
-  const simulatorCustomerDetails = {
-    1: {
-      name: "김OO (우량)",
-      assets: "15억 2,100만",
-      needs: "포트폴리오 다각화",
-      risk: "적극 투자형",
-      products: "국내주식 + 채권",
-      lastCounsel: "2026.04.20",
-      nextCounsel: "2026.05 하순"
-    },
-    2: {
-      name: "박OO (일반)",
-      assets: "5억 5,000만",
-      needs: "노후 자금 마련",
-      risk: "안정 추구형",
-      products: "예적금 + 국채",
-      lastCounsel: "2026.05.10",
-      nextCounsel: "2026.06 초순"
-    },
-    3: {
-      name: "이OO (우량)",
-      assets: "21억 8,000만",
-      needs: "상속 및 증여세 절감",
-      risk: "위험 중립형",
-      products: "해외주식 + ELF",
-      lastCounsel: "2026.05.12",
-      nextCounsel: "2026.06 중순"
-    }
+  const selectedSimDetails = {
+    name: selectedCustomer ? `${selectedCustomer.name} (${fullCustomerDetail?.grade || "VIP"})` : "로딩중...",
+    assets: formatAssets(fullCustomerDetail?.total_assets),
+    assetsRaw: fullCustomerDetail?.total_assets !== undefined ? (fullCustomerDetail.total_assets / 100000000) : 32.1234, // in 100M units
+    needs: fullCustomerDetail?.llm_insight ? 
+      (fullCustomerDetail.llm_insight.length > 30 ? fullCustomerDetail.llm_insight.slice(0, 30) + "..." : fullCustomerDetail.llm_insight) 
+      : "포트폴리오 다각화 및 절세",
+    risk: fullCustomerDetail?.tendency || "위험 중립형",
+    products: fullCustomerDetail ? [
+      fullCustomerDetail.deposit > 0 ? "예적금" : null,
+      fullCustomerDetail.investment > 0 ? "투자상품" : null,
+      fullCustomerDetail.pension > 0 ? "연금보험" : null,
+    ].filter(Boolean).join(" + ") || "예적금 + 투자상품" : "예적금 + 투자상품",
+    lastCounsel: "2026.05.12",
+    nextCounsel: "2026.06 중순"
   };
-
-  const selectedSimDetails = simulatorCustomerDetails[selectedCustomerId] || simulatorCustomerDetails[1];
 
   const handleNotesChange = (id, val) => {
     setAdditionalNotes(prev => ({
@@ -199,12 +257,13 @@ export default function CustomerMemoAssistant() {
     setTimeout(() => {
       let aiResponseText = "";
       const customerName = selectedCustomer.name;
-      const details = simulatorCustomerDetails[selectedCustomerId] || simulatorCustomerDetails[1];
+      const details = selectedSimDetails;
+      const rawAssets = details.assetsRaw;
       
       if (question.includes("절세")) {
         aiResponseText = `${customerName} 고객님의 자산 포트폴리오(${details.assets}, ${details.products} 비중 다수)를 기반으로 제안해 드리는 맞춤형 절세 전략입니다:\n\n1. 금융소득종합과세 대비 비과세/분리과세 상품 활용\n- 현재 총자산 규모 및 자산 구성상 금융소득종합과세 대상에 해당할 가능성이 높습니다.\n- 이자소득 배당소득 절세를 위해 분리과세 하이일드 펀드나 비과세 채권 활용을 확대하는 것을 권장합니다.\n\n2. ISA(개인종합자산관리계좌) 적극 활용\n- 중개형 ISA를 통해 국내주식 및 채권 거래 시 발생하는 이자·배당 소득에 대해 비과세 및 9.9% 분리과세 혜택을 적용받으실 수 있습니다.\n\n3. 채권 매매차익 비과세 혜택 극대화\n- 현재 보유하신 채권 포트폴리오 중 금리 하락기에 유리한 저쿠폰 표면금리가 낮은 국채 위주로 세팅하여 이자소득세 과세 대상 금액을 줄이고, 대신 매매차익을 극대화하는 세테크를 추천합니다.`;
       } else if (question.includes("10년") || question.includes("수익") || question.includes("시뮬레이션")) {
-        aiResponseText = `${customerName} 고객님의 ${details.risk} 성향과 현재 포트폴리오 및 추가 입력 정보를 토대로 시뮬레이션한 10년 후 예상 자산 추이입니다:\n\n[시뮬레이션 조건]\n- 초기 자산: ${details.assets}\n- 기대 수익률: 연평균 6.5% (${details.risk} 기준)\n- 인플레이션율: 연 2.0% 반영\n\n[10년 후 예상 포트폴리오 가치]\n- 1년 후: 약 ${(parseFloat(details.assets) * 1.065).toFixed(1)}억 원 수준\n- 5년 후: 약 ${(parseFloat(details.assets) * 1.37).toFixed(1)}억 원 수준\n- 10년 후: 약 ${(parseFloat(details.assets) * 1.87).toFixed(1)}억 원 수준 (누적 수익률 약 +87%)\n\n[투자 다각화 제안]\n- 주요 니즈이신 '${details.needs}'를 달성하기 위해 현재 포트폴리오 구성에서 글로벌 자산 및 대체자산 비중을 20% 수준으로 조율할 경우, 포트폴리오 변동성(위험)을 15% 낮추면서 유사한 수익률을 방어할 수 있습니다.`;
+        aiResponseText = `${customerName} 고객님의 ${details.risk} 성향과 현재 포트폴리오 및 추가 입력 정보를 토대로 시뮬레이션한 10년 후 예상 자산 추이입니다:\n\n[시뮬레이션 조건]\n- 초기 자산: ${details.assets}\n- 기대 수익률: 연평균 6.5% (${details.risk} 기준)\n- 인플레이션율: 연 2.0% 반영\n\n[10년 후 예상 포트폴리오 가치]\n- 1년 후: 약 ${(rawAssets * 1.065).toFixed(1)}억 원 수준\n- 5년 후: 약 ${(rawAssets * 1.37).toFixed(1)}억 원 수준\n- 10년 후: 약 ${(rawAssets * 1.87).toFixed(1)}억 원 수준 (누적 수익률 약 +87%)\n\n[투자 다각화 제안]\n- 주요 니즈이신 '${details.needs}'를 달성하기 위해 현재 포트폴리오 구성에서 글로벌 자산 및 대체자산 비중을 20% 수준으로 조율할 경우, 포트폴리오 변동성(위험)을 15% 낮추면서 유사한 수익률을 방어할 수 있습니다.`;
       } else {
         aiResponseText = `문의하신 질문에 대해 ${customerName} 고객님의 프로필(자산 ${details.assets}, ${details.risk}) 및 시장 트렌드를 분석하여 시뮬레이션을 진행하고 있습니다. \n\n추가 입력 사항에 기재해주신 세부 니즈를 바탕으로 보다 세부적인 자산 배분 시뮬레이션 및 포트폴리오 제안을 원하실 경우, 구체적인 목표 수익률이나 투자 기간을 말씀해주시면 더욱 정확한 진단이 가능합니다.`;
       }
@@ -256,7 +315,6 @@ export default function CustomerMemoAssistant() {
               className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} 
               onClick={() => { 
                 setActiveListTab('전체 고객'); 
-                setSelectedCustomerId(allCustomersList[0].id); 
               }} 
               style={{ cursor: 'pointer', flex: 1 }}
             >
@@ -266,7 +324,6 @@ export default function CustomerMemoAssistant() {
               className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} 
               onClick={() => { 
                 setActiveListTab('오늘 방문'); 
-                setSelectedCustomerId(todayCustomersList[0].id); 
               }} 
               style={{ cursor: 'pointer', flex: 1 }}
             >
@@ -351,9 +408,9 @@ export default function CustomerMemoAssistant() {
               
               <table className="report-table">
                 <tbody>
-                  <tr><th>고객명</th><td>{selectedCustomer.name} (VIP)</td></tr>
-                  <tr><th>총자산</th><td>32억 1234만</td></tr>
-                  <tr><th>주요 니즈</th><td>달러 자산 비중 축소/국내 리츠 편입 검토</td></tr>
+                  <tr><th>고객명</th><td>{selectedCustomer.name} ({fullCustomerDetail?.grade || "VIP"})</td></tr>
+                  <tr><th>총자산</th><td>{formatAssets(fullCustomerDetail?.total_assets)}</td></tr>
+                  <tr><th>주요 니즈</th><td>{fullCustomerDetail?.llm_insight || "달러 자산 비중 축소/국내 리츠 편입 검토"}</td></tr>
                   <tr><th>후속 조치</th><td>리츠 상품 비교안 준비</td></tr>
                   <tr><th>차기 상담</th><td>2026.05 초순</td></tr>
                 </tbody>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
+import { api } from "../../api";
 import "./AuthNew.css";
 
 // Mock Database for Users and Roles
@@ -21,7 +22,7 @@ export default function LoginNew() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -38,22 +39,20 @@ export default function LoginNew() {
       return;
     }
 
-    // Lookup user in mock database
-    const user = MOCK_USERS.find(
-      (u) => u.id.toLowerCase() === id.trim().toLowerCase() && u.password === password
-    );
+    try {
+      // 실제 백엔드 API 연동
+      const user = await api.auth.login(id.trim(), password);
 
-    if (user) {
-      // Successful login - route based on role
       if (user.role === "admin") {
         navigate("/admin-system-dashboard-1");
       } else {
         navigate("/daily-calendar");
       }
-    } else {
-      setError("아이디 또는 비밀번호가 일치하지 않습니다.");
+    } catch (err) {
+      setError(err.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
     }
   };
+
 
   return (
     <div className="auth-new-layout">

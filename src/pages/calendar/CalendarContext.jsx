@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DEMO_EVENTS } from './calendarUtils';
+import { api } from '../../api';
 
 const CalendarContext = createContext();
 
@@ -8,102 +9,17 @@ export function useCalendar() {
 }
 
 export function CalendarProvider({ children }) {
-  const [events, setEvents] = useState(() => {
-    const saved = localStorage.getItem('poom_calendar_events');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      const hasOldDemo = parsed.some(e => e.startTime && e.startTime.startsWith('2026-05-09'));
-      if (hasOldDemo) {
-        return DEMO_EVENTS;
-      }
-      return parsed;
-    }
-    return DEMO_EVENTS;
+  const [events, setEvents] = useState([]);
+  const [aiTodos, setAiTodos] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [toast, setToast] = useState({ show: false, message: '' });
+
+  const [leftPanelWidth, setLeftPanelWidth] = useState(() => {
+    const saved = localStorage.getItem('poom_left_panel_width');
+    return saved ? parseInt(saved, 10) : 320;
   });
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  const DEFAULT_AI_TODOS = [
-    { 
-      id: 1, 
-      time: '09:00 - 10:00', 
-      tag: '이탈위험', 
-      tagColor: 'tag-red', 
-      content: '김민지 고객님 연락 (이탈 위험)', 
-      checked: false,
-      group: '상담 일정 제안',
-      subText: '48일 이상 상담 없음 · 메모 기반 예측',
-      tags: ['이탈 위험 높음', '타행 신규 대출 확인']
-    },
-    { 
-      id: 2, 
-      time: '10:00 - 11:00', 
-      tag: '상담제안', 
-      tagColor: 'tag-green', 
-      content: '이광수 고객님 연락 (상담 제안)', 
-      checked: false,
-      group: '상담 일정 제안',
-      subText: '89일 상담 이력없음 · 계좌 활동 감소',
-      tags: ['3개월 미상담']
-    },
-    { 
-      id: 3, 
-      time: '13:00 - 14:00', 
-      tag: '기념일', 
-      tagColor: 'tag-yellow', 
-      content: '강동원 고객님 문자 (배우자 생일)', 
-      checked: false,
-      group: '안부 연락 제안',
-      subText: '오늘 · 안부 메시지 추천',
-      tags: ['오늘', '가족 기념일']
-    },
-    { 
-      id: 4, 
-      time: '11:00 - 12:00', 
-      tag: '예금만기', 
-      tagColor: 'tag-blue', 
-      content: '김종현 고객님 연락 (예금만기 D-7)', 
-      checked: false,
-      group: '안부 연락 제안',
-      subText: '정기예금 3억 · 만기일 5월 25일',
-      tags: ['D-7']
-    },
-    { 
-      id: 5, 
-      time: '14:00 - 15:00', 
-      tag: '기념일', 
-      tagColor: 'tag-yellow', 
-      content: '김재원 고객님 문자 (결혼 기념일)', 
-      checked: false,
-      group: '안부 연락 제안',
-      subText: '오늘 · 안부 메시지 추천',
-      tags: ['D-3', '본인 기념일']
-    },
-    { 
-      id: 6, 
-      time: '15:00 - 16:00', 
-      tag: '상품분석', 
-      tagColor: 'tag-lightblue', 
-      content: '우리 사장님 성장 적금 분석', 
-      checked: false,
-      group: '신규 상품 분석',
-      subText: '목돈모으기상품',
-      tags: ['연 2.0%', '12개월']
-    },
-    { 
-      id: 7, 
-      time: '16:00 - 17:00', 
-      tag: 'KPI추천', 
-      tagColor: 'tag-pink', 
-      content: '안건호 고객님 연락 (고수수료 상품 제안)', 
-      checked: false,
-      group: 'KPI 목표 달성',
-      subText: 'KPI 비이자이익 달성을 위한 추천',
-      tags: ['연 2.0%', '12개월']
-    }
-  ];
-
-  const [toast, setToast] = useState({ show: false, message: '' });
+  const [isResizing, setIsResizing] = useState(false);
 
   const showToast = (message) => {
     setToast({ show: true, message });
@@ -117,18 +33,6 @@ export function CalendarProvider({ children }) {
       return () => clearTimeout(timer);
     }
   }, [toast.show]);
-
-  const [aiTodos, setAiTodos] = useState(() => {
-    const saved = localStorage.getItem('poom_ai_todos');
-    return saved ? JSON.parse(saved) : DEFAULT_AI_TODOS;
-  });
-
-  const [leftPanelWidth, setLeftPanelWidth] = useState(() => {
-    const saved = localStorage.getItem('poom_left_panel_width');
-    return saved ? parseInt(saved, 10) : 320;
-  });
-
-  const [isResizing, setIsResizing] = useState(false);
 
   const startResize = (e) => {
     e.preventDefault();
@@ -157,135 +61,238 @@ export function CalendarProvider({ children }) {
     setIsResizing(true);
   };
 
-  useEffect(() => {
-    localStorage.setItem('poom_calendar_events', JSON.stringify(events));
-  }, [events]);
+  // 실시간 캘린더 및 AI To-Do 데이터 페치
+  const fetchCalendarData = async () => {
+    try {
+      const currentUser = api.auth.getCurrentUser();
+      const u_id = currentUser ? currentUser.id : null;
 
-  useEffect(() => {
-    localStorage.setItem('poom_ai_todos', JSON.stringify(aiTodos));
-  }, [aiTodos]);
+      // 1. 고객 c_id -> name 매핑 사전 구축
+      const customersList = await api.customer.getList("all");
+      const customersMap = {};
+      customersList.forEach(c => {
+        customersMap[c.c_id] = c.name;
+      });
 
-  const addEvent = (newEvent) => {
-    setEvents(prev => [...prev, { ...newEvent, id: Date.now() }]);
+      // 2. AI 투두 페치 및 포맷팅
+      const aiTodoResponse = await api.aiTodo.getList(u_id);
+      const dbAiTodos = aiTodoResponse.todos || [];
+      const mappedAiTodos = dbAiTodos.map(todo => {
+        let tag = 'AI추천';
+        let tagColor = 'tag-blue';
+        let group = '상담 일정 제안';
+        let tags = [];
+
+        if (todo.category === 'KPI 기반') {
+          tag = 'KPI추천';
+          tagColor = 'tag-pink';
+          group = 'KPI 목표 달성';
+          tags = ['KPI추천'];
+        } else if (todo.category === '상담 일정 제안') {
+          tag = '상담제안';
+          tagColor = 'tag-green';
+          group = '상담 일정 제안';
+          tags = ['상담제안'];
+        } else if (todo.category === '안부 연락 제안') {
+          tag = '기념일';
+          tagColor = 'tag-yellow';
+          group = '안부 연락 제안';
+          tags = ['기념일'];
+        } else if (todo.category === '신규 상품 분석') {
+          tag = '상품분석';
+          tagColor = 'tag-lightblue';
+          group = '신규 상품 분석';
+          tags = ['상품분석'];
+        }
+
+        const execDate = new Date(todo.execution_date);
+        const startHour = String(execDate.getHours()).padStart(2, '0');
+        const startMin = String(execDate.getMinutes()).padStart(2, '0');
+        const endHour = String((execDate.getHours() + 1) % 24).padStart(2, '0');
+        const timeStr = `${startHour}:${startMin} - ${endHour}:${startMin}`;
+
+        return {
+          id: todo.at_id,
+          time: timeStr,
+          tag,
+          tagColor,
+          content: todo.title,
+          checked: todo.is_checked || false,
+          group,
+          subText: todo.memo || 'AI 권장 조치사항',
+          tags,
+          c_id: todo.c_id
+        };
+      });
+
+      setAiTodos(mappedAiTodos.filter(t => !t.checked));
+
+      // 3. 일정 페치 및 포맷팅
+      const dbSchedules = await api.schedule.getList();
+      const mappedEvents = dbSchedules.map(sch => {
+        const execDate = new Date(sch.execution_date);
+        const yyyy = execDate.getFullYear();
+        const mm = String(execDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(execDate.getDate()).padStart(2, '0');
+        const dateStr = `${yyyy}-${mm}-${dd}`;
+
+        const startHour = String(execDate.getHours()).padStart(2, '0');
+        const startMin = String(execDate.getMinutes()).padStart(2, '0');
+        const startTimeStr = `${dateStr} ${startHour}:${startMin}`;
+
+        // 종료 시간은 간단히 1시간 후로 계산
+        const endHourVal = (execDate.getHours() + 1) % 24;
+        const endHour = String(endHourVal).padStart(2, '0');
+        const endTimeStr = `${dateStr} ${endHour}:${startMin}`;
+
+        let eventColor = 'blue';
+        if (sch.category === '상담') {
+          eventColor = 'pink';
+        } else if (sch.category === '개인') {
+          eventColor = 'yellow';
+        } else if (sch.category === '공지') {
+          eventColor = 'green';
+        }
+
+        const customerName = sch.c_id ? (customersMap[sch.c_id] || `고객(${sch.c_id})`) : '';
+
+        return {
+          id: sch.s_id,
+          title: sch.title,
+          startTime: startTimeStr,
+          endTime: endTimeStr,
+          category: sch.category || '상담',
+          customer: customerName,
+          c_id: sch.c_id,
+          color: eventColor,
+          memo: sch.memo || '',
+          at_id: sch.at_id
+        };
+      });
+
+      setEvents(mappedEvents);
+    } catch (error) {
+      console.error("캘린더 실시간 데이터 조회 실패:", error);
+    }
   };
 
-  const updateEvent = (updatedEvent) => {
-    setEvents(prev => prev.map(e => e.id === updatedEvent.id ? updatedEvent : e));
+  useEffect(() => {
+    fetchCalendarData();
+  }, []);
+
+  const addEvent = async (newEvent) => {
+    try {
+      let customerId = null;
+      if (newEvent.customer) {
+        const customersList = await api.customer.getList("all");
+        const matched = customersList.find(c => c.name === newEvent.customer);
+        if (matched) {
+          customerId = matched.c_id;
+        }
+      }
+
+      const startIso = new Date(newEvent.startTime.replace(' ', 'T')).toISOString();
+      const endIso = new Date(newEvent.endTime.replace(' ', 'T')).toISOString();
+
+      await api.schedule.create({
+        category: newEvent.category || '상담',
+        content: newEvent.title,
+        startDatetime: startIso,
+        endDatetime: endIso,
+        color: newEvent.color || 'blue',
+        customer_id: customerId,
+        memo: newEvent.memo || ''
+      });
+
+      await fetchCalendarData();
+      showToast("일정이 정상적으로 등록되었습니다.");
+    } catch (error) {
+      console.error("일정 등록 실패:", error);
+      showToast("일정 등록에 실패했습니다.");
+    }
   };
 
-  const deleteEvent = (id) => {
-    setEvents(prev => prev.filter(e => e.id !== id));
+  const updateEvent = async (updatedEvent) => {
+    try {
+      const currentUser = api.auth.getCurrentUser();
+      const u_id = currentUser ? currentUser.id : null;
+      if (!u_id) return;
+
+      const startIso = new Date(updatedEvent.startTime.replace(' ', 'T')).toISOString();
+      const endIso = new Date(updatedEvent.endTime.replace(' ', 'T')).toISOString();
+
+      await api.schedule.update(u_id, updatedEvent.id, {
+        category: updatedEvent.category,
+        content: updatedEvent.title,
+        start_datetime: startIso,
+        end_datetime: endIso,
+        color: updatedEvent.color,
+        memo: updatedEvent.memo
+      });
+
+      await fetchCalendarData();
+      showToast("일정이 정상적으로 수정되었습니다.");
+    } catch (error) {
+      console.error("일정 수정 실패:", error);
+      showToast("일정 수정에 실패했습니다.");
+    }
+  };
+
+  const deleteEvent = async (id) => {
+    try {
+      await api.schedule.delete(id);
+      await fetchCalendarData();
+      showToast("일정이 삭제되었습니다.");
+    } catch (error) {
+      console.error("일정 삭제 실패:", error);
+      showToast("일정 삭제에 실패했습니다.");
+    }
   };
 
   const toggleAiTodo = (id) => {
     setAiTodos(prev => prev.map(t => t.id === id ? { ...t, checked: !t.checked } : t));
   };
 
-  const transferCheckedAiTodos = (date) => {
+  const transferCheckedAiTodos = async (date) => {
     const checkedTodos = aiTodos.filter(t => t.checked);
     if (checkedTodos.length === 0) {
       showToast("선택된 AI To Do 항목이 없습니다.");
       return;
     }
 
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const dateStr = `${yyyy}-${mm}-${dd}`;
+    try {
+      const currentUser = api.auth.getCurrentUser();
+      const u_id = currentUser ? currentUser.id : null;
+      if (!u_id) return;
 
-    const newEvents = checkedTodos.map(todo => {
-      const timeParts = todo.time.split('-').map(t => t.trim());
-      const startTimePart = timeParts[0] || '09:00';
-      const endTimePart = timeParts[1] || '10:00';
+      const at_ids = checkedTodos.map(t => t.id);
+      await api.aiTodo.confirm(u_id, at_ids);
 
-      let eventColor = 'blue';
-      let category = '상담';
-      let customer = '';
-
-      if (todo.tagColor === 'tag-red') {
-        eventColor = 'pink';
-        category = '상담';
-      } else if (todo.tagColor === 'tag-yellow') {
-        eventColor = 'yellow';
-        category = '개인';
-      }
-
-      if (todo.content.includes('고객님')) {
-        customer = todo.content.split('고객님')[0].trim();
-      }
-
-      return {
-        id: Date.now() + Math.random(),
-        title: todo.content,
-        startTime: `${dateStr} ${startTimePart}`,
-        endTime: `${dateStr} ${endTimePart}`,
-        category,
-        customer,
-        color: eventColor,
-        memo: `AI To Do 추천에서 My To Do 및 일정으로 등록된 업무입니다.`,
-        aiTodoSource: todo
-      };
-    });
-
-    setEvents(prev => {
-      // 중복 체크: 이미 동일한 title과 startTime을 갖는 일정이 존재하면 제외
-      const filteredNewEvents = newEvents.filter(newEvent => {
-        const isDuplicate = prev.some(existingEvent => 
-          existingEvent.title === newEvent.title && 
-          existingEvent.startTime === newEvent.startTime
-        );
-        return !isDuplicate;
-      });
-      return [...prev, ...filteredNewEvents];
-    });
-
-    setAiTodos(prev => prev.filter(t => !t.checked));
-    showToast(`My To Do에 ${checkedTodos.length}개의 일정이 등록되었습니다!`);
+      await fetchCalendarData();
+      showToast(`My To Do에 ${checkedTodos.length}개의 일정이 등록되었습니다!`);
+    } catch (error) {
+      console.error("AI To Do 일정 등록 실패:", error);
+      showToast("일정 승인 등록에 실패했습니다.");
+    }
   };
 
-  const revertAiTodo = (eventId) => {
+  const revertAiTodo = async (eventId) => {
     const eventToRevert = events.find(e => e.id === eventId);
     if (!eventToRevert) return;
 
-    // 1. Remove the event from events list
-    setEvents(prev => prev.filter(e => e.id !== eventId));
-
-    // 2. Put the AI Todo back to aiTodos list
-    let originalTodo = eventToRevert.aiTodoSource;
-
-    if (!originalTodo) {
-      // Reconstruct it from DEFAULT_AI_TODOS using content match
-      const matchedDefault = DEFAULT_AI_TODOS.find(t => t.content === eventToRevert.title);
-      if (matchedDefault) {
-        originalTodo = { ...matchedDefault, checked: false };
-      } else {
-        // Fallback for custom or unmatched events
-        originalTodo = {
-          id: Date.now() + Math.random(),
-          time: '09:00 - 10:00',
-          tag: 'AI추천',
-          tagColor: 'tag-blue',
-          content: eventToRevert.title,
-          checked: false,
-          group: '상담 일정 제안',
-          subText: 'AI 추천에서 복원된 항목입니다.',
-          tags: ['복원됨']
-        };
-      }
-    } else {
-      originalTodo = { ...originalTodo, checked: false };
+    if (!eventToRevert.at_id) {
+      showToast("AI To Do에서 자동 추천되어 생성된 일정이 아닙니다.");
+      return;
     }
 
-    // 3. Put it back to aiTodos list, keeping original id sort order
-    setAiTodos(prev => {
-      if (prev.some(t => t.content === originalTodo.content)) {
-        return prev;
-      }
-      const newTodos = [...prev, originalTodo];
-      return newTodos.sort((a, b) => a.id - b.id);
-    });
-
-    showToast("일정이 취소되고 AI To Do 목록으로 되돌아갔습니다.");
+    try {
+      await api.aiTodo.unconfirm(eventToRevert.at_id);
+      await fetchCalendarData();
+      showToast("일정이 취소되고 AI To Do 목록으로 복원되었습니다.");
+    } catch (error) {
+      console.error("AI To Do 일정 복원 실패:", error);
+      showToast("AI To Do 일정 복원에 실패했습니다.");
+    }
   };
 
   return (
