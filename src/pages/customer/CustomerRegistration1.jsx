@@ -200,15 +200,17 @@ export default function CustomerRegistration1() {
       const tabParam = activeListTab === '전체 고객' ? 'all' : 'today';
       const response = await api.customer.getList(tabParam);
       
-      const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
       const mapped = response.map((c) => {
         const char = c.name ? c.name[0] : "고";
+        const avatarColor = c.gender === "F" ? "pink" : "blue";
+
         return {
           id: c.c_id,
           name: c.name,
           email: c.email || `${c.c_id}@poom.com`,
           phone: c.phone || "010-0000-0000",
-          color: colors[c.c_id % colors.length],
+          color: avatarColor,
+          gender: c.gender,
           initial: char,
           tendency: c.tendency,
           total_assets: c.total_assets
@@ -221,12 +223,8 @@ export default function CustomerRegistration1() {
         setTodayCustomersList(mapped);
       }
 
-      // 목록 최초 로딩 완료 및 탭 스위칭 시 첫 번째 고객 자동 선택
-      if (mapped.length > 0) {
-        setSelectedCustomer(mapped[0]);
-      } else {
-        setSelectedCustomer(null);
-      }
+      // 탭 전환 및 최초 진입 시, 사용자의 도입부 화면 요구사항에 맞추어 선택된 고객을 비워 둡니다.
+      setSelectedCustomer(null);
     } catch (error) {
       console.error("고객 목록 조회 실패:", error);
     }
@@ -299,7 +297,7 @@ export default function CustomerRegistration1() {
 
     const handleMouseMove = (moveEvent) => {
       const deltaX = moveEvent.clientX - startX;
-      const newWidth = Math.max(240, Math.min(550, startWidth + deltaX));
+      const newWidth = Math.max(110, Math.min(550, startWidth + deltaX));
       setListWidth(newWidth);
     };
 
@@ -321,6 +319,7 @@ export default function CustomerRegistration1() {
   );
 
   const details = getCustomerDetails(selectedCustomer, fullCustomerDetail, visitStats, churnRisk, customerFeatures, productMatches);
+  const isNarrow = listWidth < 220;
 
   const handleSaveCustomer = async (formData) => {
     try {
@@ -335,6 +334,7 @@ export default function CustomerRegistration1() {
           grade: formData.grade,
           investment_type: formData.investment_type,
           birth: formData.dob ? formData.dob.replace(/\./g, "-") : null,
+          gender: formData.gender,
         });
         setEditModalData(null);
         await fetchCustomers();
@@ -343,11 +343,16 @@ export default function CustomerRegistration1() {
         if (selectedCustomer && selectedCustomer.id === editModalData.id) {
           const detail = await api.customer.getDetail(selectedCustomer.id);
           setFullCustomerDetail(detail);
+          
+          const updatedColor = formData.gender === "F" ? "pink" : "blue";
+
           setSelectedCustomer(prev => ({
             ...prev,
             name: formData.name,
             phone: formData.phone,
-            email: formData.email
+            email: formData.email,
+            gender: formData.gender,
+            color: updatedColor
           }));
         }
       } else {
@@ -361,17 +366,20 @@ export default function CustomerRegistration1() {
           grade: formData.grade || "일반",
           investment_type: formData.investment_type || "위험중립형",
           birth: formData.dob ? formData.dob.replace(/\./g, "-") : null,
+          gender: formData.gender || "M",
         });
         setIsModalOpen(false);
         await fetchCustomers();
 
-        const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
+        const createdColor = created.gender === "F" ? "pink" : "blue";
+
         setSelectedCustomer({
           id: created.c_id,
           name: created.name,
           email: created.email,
           phone: created.number || created.phone || "010-0000-0000",
-          color: colors[created.c_id % colors.length],
+          color: createdColor,
+          gender: created.gender,
           initial: created.name ? created.name[0] : "신",
         });
       }
@@ -389,38 +397,58 @@ export default function CustomerRegistration1() {
       <div className={`cust-main ${isDragging ? 'dragging' : ''}`}>
 
         {/* Left Panel */}
-        <div className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''}`} style={{ width: listWidth, flexShrink: 0 }}>
-          <div className="cust-list-header">
-            <h2 className="cust-list-title">나의 고객</h2>
+        <div className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''} ${isNarrow ? 'narrow' : ''}`} style={{ width: listWidth, flexShrink: 0, padding: isNarrow ? '20px 10px' : '24px' }}>
+          <div className="cust-list-header" style={{ marginBottom: isNarrow ? '16px' : '24px' }}>
+            <h2 className="cust-list-title" style={{ fontSize: isNarrow ? '15px' : '18px' }}>나의 고객</h2>
             <button className="cust-add-btn" onClick={() => setIsModalOpen(true)}><Plus size={16} /></button>
           </div>
           
-          <div className="cust-search">
-            <Search size={16} className="cust-search-icon" />
+          <div className="cust-search" style={{ marginBottom: isNarrow ? '16px' : '24px' }}>
+            <Search size={16} className="cust-search-icon" style={{ left: isNarrow ? '10px' : '12px' }} />
             <input 
               type="text" 
               className="cust-search-input" 
-              placeholder="Search" 
+              placeholder={isNarrow ? "" : "Search"} 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ paddingLeft: isNarrow ? '32px' : '40px', paddingRight: isNarrow ? '8px' : '16px' }}
             />
           </div>
 
-          <div className="cust-list-tabs">
-            <div className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} onClick={() => { setActiveListTab('전체 고객'); }} style={{ cursor: 'pointer' }}>전체 고객</div>
-            <div className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} onClick={() => { setActiveListTab('오늘 방문'); }} style={{ cursor: 'pointer' }}>오늘 방문</div>
+          <div className="cust-list-tabs" style={{ marginBottom: isNarrow ? '12px' : '16px' }}>
+            <div className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} onClick={() => { setActiveListTab('전체 고객'); }} style={{ cursor: 'pointer', padding: isNarrow ? '8px 0' : '12px 0', fontSize: isNarrow ? '12px' : '14px' }}>
+              {isNarrow ? '전체' : '전체 고객'}
+            </div>
+            <div className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} onClick={() => { setActiveListTab('오늘 방문'); }} style={{ cursor: 'pointer', padding: isNarrow ? '8px 0' : '12px 0', fontSize: isNarrow ? '12px' : '14px' }}>
+              {isNarrow ? '오늘' : '오늘 방문'}
+            </div>
           </div>
 
           <div className="cust-list-items">
             {filteredCustomers.map(c => (
-              <div className={`cust-list-item ${selectedCustomer?.id === c.id ? 'active' : ''}`} key={c.id} onClick={() => { setSelectedCustomer(c); setFeatureSubTab("전체"); }} style={{ cursor: 'pointer' }}>
+              <div 
+                className={`cust-list-item ${selectedCustomer?.id === c.id ? 'active' : ''}`} 
+                key={c.id} 
+                onClick={() => { setSelectedCustomer(c); setFeatureSubTab("전체"); }} 
+                style={{ 
+                  cursor: 'pointer',
+                  padding: isNarrow ? '10px 8px' : '12px 16px',
+                  gap: isNarrow ? '10px' : '16px'
+                }}
+              >
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
-                <div className="cust-item-info">
-                  <span className="cust-item-name">{c.name}</span>
-                  <span className="cust-item-sub">{c.email}</span>
-                  <span className="cust-item-sub">{c.phone}</span>
-                </div>
-                {c.time && <div className="cust-item-time">{c.time}</div>}
+                {!isNarrow ? (
+                  <div className="cust-item-info">
+                    <span className="cust-item-name">{c.name}</span>
+                    <span className="cust-item-sub">{c.email}</span>
+                    <span className="cust-item-sub">{c.phone}</span>
+                  </div>
+                ) : (
+                  <div className="cust-item-info" style={{ justifyContent: 'center' }}>
+                    <span className="cust-item-name" style={{ fontSize: '14px' }}>{c.name}</span>
+                  </div>
+                )}
+                {c.time && !isNarrow && <div className="cust-item-time">{c.time}</div>}
               </div>
             ))}
           </div>
@@ -436,8 +464,8 @@ export default function CustomerRegistration1() {
           <div className="cust-detail-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '16px', borderBottom: 'none', paddingBottom: 0 }}>
             <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
               <div className="cust-detail-profile" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div className={`cust-avatar ${selectedCustomer.color}`} style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {/* Clean solid color circle without text */}
+                <div className={`cust-avatar ${selectedCustomer.color}`} style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>
+                  {selectedCustomer.initial}
                 </div>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 }}>{selectedCustomer.name}</h2>
               </div>
@@ -511,7 +539,7 @@ export default function CustomerRegistration1() {
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', gap: 24 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 64, height: 64, background: 'white', borderRadius: 8, border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: '#cbd5e1' }}>
+                      <div className={`cust-avatar ${selectedCustomer.color}`} style={{ width: 64, height: 64, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700 }}>
                         {selectedCustomer.initial}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -536,7 +564,8 @@ export default function CustomerRegistration1() {
                           job: fullCustomerDetail?.job || "",
                           grade: fullCustomerDetail?.grade || "일반",
                           address: fullCustomerDetail?.address || "",
-                          tendency: fullCustomerDetail?.tendency || "위험중립형"
+                          tendency: fullCustomerDetail?.tendency || "위험중립형",
+                          gender: selectedCustomer.gender || fullCustomerDetail?.gender || "M"
                         });
                       }}
                       style={{ background: '#0284c7', color: 'white', border: 'none', borderRadius: 8, padding: '8px 24px', fontSize: 14, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
@@ -867,10 +896,16 @@ export default function CustomerRegistration1() {
           </div>
             </>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#64748b', textAlign: 'center', flex: 1, backgroundColor: '#f8fafc', borderRadius: 12 }}>
-              <div style={{ width: 100, height: 100, borderRadius: '50%', background: '#e0f2fe', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-                {activeListTab === '전체 고객' ? <UserCircle size={48} color="#0284c7" strokeWidth={2.5} /> : <Calendar size={48} color="#0284c7" strokeWidth={2.5} />}
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#64748b', textAlign: 'center', flex: 1 }}>
+              {activeListTab === '전체 고객' ? (
+                <div style={{ width: 100, height: 100, borderRadius: '50%', background: '#e0f2fe', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+                  <UserCircle size={48} color="#0284c7" strokeWidth={1.5} />
+                </div>
+              ) : (
+                <div style={{ width: 100, height: 100, borderRadius: '50%', background: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+                  <Calendar size={48} color="#ffffff" strokeWidth={1.5} />
+                </div>
+              )}
               <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>{activeListTab === '전체 고객' ? '전체 고객 목록' : '오늘 방문 고객'}</h2>
               <p style={{ fontSize: 15, lineHeight: 1.6, marginBottom: 40, whiteSpace: 'pre-wrap', color: '#94a3b8' }}>
                 {activeListTab === '전체 고객' ? '왼쪽 목록에서 고객을 선택하면\n상세 정보를 확인할 수 있어요.' : '왼쪽에서 오늘 방문 고객을 선택하면\n상세 정보를 확인할 수 있어요.'}
