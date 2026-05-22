@@ -31,6 +31,8 @@ export default function CustomerDashboard() {
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [fullCustomerDetail, setFullCustomerDetail] = useState(null);
+  const [visitStats, setVisitStats] = useState(null);
+  const [churnRisk, setChurnRisk] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchCustomers = async () => {
@@ -74,6 +76,22 @@ export default function CustomerDashboard() {
       try {
         const detail = await api.customer.getDetail(selectedCustomerId);
         setFullCustomerDetail(detail);
+
+        try {
+          const stats = await api.customer.getVisitStats(selectedCustomerId);
+          setVisitStats(stats);
+        } catch (err) {
+          console.error("방문 주기 조회 실패:", err);
+          setVisitStats(null);
+        }
+
+        try {
+          const risk = await api.customer.getChurnRisk(selectedCustomerId);
+          setChurnRisk(risk);
+        } catch (err) {
+          console.error("이탈 위험 조회 실패:", err);
+          setChurnRisk(null);
+        }
       } catch (error) {
         console.error("상세 정보 조회 실패:", error);
       }
@@ -88,11 +106,77 @@ export default function CustomerDashboard() {
   );
 
   const assetTotal = fullCustomerDetail?.total_assets !== undefined ? `${(fullCustomerDetail.total_assets / 100000000).toFixed(1)}억` : "32억";
+  const netWorthTotal = fullCustomerDetail?.net_worth !== undefined ? `${(fullCustomerDetail.net_worth / 100000000).toFixed(1)}억` : "32억";
   const dynamicAssetData = [
-    { name: '예적금', value: fullCustomerDetail ? Math.round((fullCustomerDetail.deposit / (fullCustomerDetail.total_assets || 1)) * 100) : 45, color: '#2dd4bf' },
-    { name: '투자상품', value: fullCustomerDetail ? Math.round((fullCustomerDetail.investment / (fullCustomerDetail.total_assets || 1)) * 100) : 35, color: '#a855f7' },
-    { name: '연금보험', value: fullCustomerDetail ? Math.round((fullCustomerDetail.pension / (fullCustomerDetail.total_assets || 1)) * 100) : 20, color: '#cbd5e1' },
+    { name: '예적금', value: fullCustomerDetail ? Math.round((fullCustomerDetail.deposit / (fullCustomerDetail.net_worth || 1)) * 100) : 45, color: '#2dd4bf' },
+    { name: '투자상품', value: fullCustomerDetail ? Math.round((fullCustomerDetail.investment / (fullCustomerDetail.net_worth || 1)) * 100) : 35, color: '#a855f7' },
+    { name: '연금보험', value: fullCustomerDetail ? Math.round((fullCustomerDetail.pension / (fullCustomerDetail.net_worth || 1)) * 100) : 20, color: '#cbd5e1' },
   ];
+
+  const getChurnUI = (grade) => {
+    switch (grade) {
+      case "위험":
+        return {
+          label: "높음",
+          headerColor: "#ef4444",
+          bg: "#ef4444",
+          emoji: "🚨",
+          subtitle: "즉각적인 조치가 필요합니다",
+          boxShadow: "0 4px 6px -1px rgba(239, 68, 68, 0.3)"
+        };
+      case "주의":
+        return {
+          label: "보통",
+          headerColor: "#f59e0b",
+          bg: "#f59e0b",
+          emoji: "😐",
+          subtitle: "이탈 가능성이 존재합니다",
+          boxShadow: "0 4px 6px -1px rgba(245, 158, 11, 0.3)"
+        };
+      case "양호":
+      default:
+        return {
+          label: "낮음",
+          headerColor: "#2dd4bf",
+          bg: "#14b8a6",
+          emoji: "😊",
+          subtitle: "이탈 위험이 낮습니다",
+          boxShadow: "0 4px 6px -1px rgba(20, 184, 166, 0.3)"
+        };
+    }
+  };
+
+  const getSubMetrics = (grade) => {
+    switch (grade) {
+      case "위험":
+        return { visit: 85, emotion: 90, asset: 75, response: 95 };
+      case "주의":
+        return { visit: 60, emotion: 55, asset: 40, response: 70 };
+      case "양호":
+      default:
+        return { visit: 38, emotion: 20, asset: 15, response: 53 };
+    }
+  };
+
+  const churnUI = getChurnUI(churnRisk?.grade);
+  const subMetrics = getSubMetrics(churnRisk?.grade);
+
+  let daysSinceLastVisitText = "-";
+  if (visitStats && visitStats.last_visit_date) {
+    const lastDate = new Date(visitStats.last_visit_date);
+    const today = new Date();
+    lastDate.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+    const diffTime = today.getTime() - lastDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) {
+      daysSinceLastVisitText = "오늘";
+    } else if (diffDays > 0) {
+      daysSinceLastVisitText = `${diffDays}일 전`;
+    } else {
+      daysSinceLastVisitText = `${Math.abs(diffDays)}일 후`;
+    }
+  }
 
   return (
     <div className="cust-container">
@@ -184,8 +268,8 @@ export default function CustomerDashboard() {
                           </PieChart>
                         </ResponsiveContainer>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                          <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>총자산</span>
-                          <span style={{ fontSize: 16, fontWeight: 700, color: '#f59e0b' }}>{assetTotal}</span>
+                          <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>순자산</span>
+                          <span style={{ fontSize: 16, fontWeight: 700, color: '#f59e0b' }}>{netWorthTotal}</span>
                         </div>
                       </div>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, marginLeft: 24 }}>
@@ -206,41 +290,43 @@ export default function CustomerDashboard() {
                   <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                       <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>이탈 위험 수준</h3>
-                      <span style={{ fontSize: 14, color: '#2dd4bf', fontWeight: 700 }}>낮음</span>
+                      <span style={{ fontSize: 14, color: churnUI.headerColor, fontWeight: 700 }}>{churnUI.label}</span>
                     </div>
-                    <div style={{ background: '#14b8a6', borderRadius: 12, padding: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24, boxShadow: '0 4px 6px -1px rgba(20, 184, 166, 0.3)' }}>
-                      <div style={{ fontSize: 32, marginBottom: 4 }}>😊</div>
-                      <div style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 4 }}>양호</div>
-                      <div style={{ fontSize: 12, color: 'white', fontWeight: 500 }}>이탈 위험이 낮습니다</div>
+                    <div style={{ background: churnUI.bg, borderRadius: 12, padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24, boxShadow: churnUI.boxShadow }}>
+                      <div style={{ fontSize: 32, marginBottom: 4 }}>{churnUI.emoji}</div>
+                      <div style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 4 }}>{churnRisk?.grade || "양호"}</div>
+                      <div style={{ fontSize: 12, color: 'white', fontWeight: 500, textAlign: 'center', wordBreak: 'keep-all', lineHeight: 1.4 }}>
+                        {churnRisk?.reason || churnUI.subtitle}
+                      </div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                         <span style={{ fontSize: 11, color: '#94a3b8', width: 50, textAlign: 'right' }}>방문 간격</span>
                         <div style={{ flex: 1, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
-                          <div style={{ width: '40%', height: '100%', background: '#14b8a6', borderRadius: 3 }}></div>
+                          <div style={{ width: `${subMetrics.visit}%`, height: '100%', background: churnUI.bg, borderRadius: 3, transition: 'width 0.3s ease' }}></div>
                         </div>
-                        <span style={{ fontSize: 12, color: '#14b8a6', fontWeight: 600, width: 20 }}>38</span>
+                        <span style={{ fontSize: 12, color: churnUI.bg, fontWeight: 600, width: 20 }}>{subMetrics.visit}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                         <span style={{ fontSize: 11, color: '#94a3b8', width: 50, textAlign: 'right' }}>메모 감정</span>
                         <div style={{ flex: 1, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
-                          <div style={{ width: '20%', height: '100%', background: '#14b8a6', borderRadius: 3 }}></div>
+                          <div style={{ width: `${subMetrics.emotion}%`, height: '100%', background: churnUI.bg, borderRadius: 3, transition: 'width 0.3s ease' }}></div>
                         </div>
-                        <span style={{ fontSize: 12, color: '#14b8a6', fontWeight: 600, width: 20 }}>20</span>
+                        <span style={{ fontSize: 12, color: churnUI.bg, fontWeight: 600, width: 20 }}>{subMetrics.emotion}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                         <span style={{ fontSize: 11, color: '#94a3b8', width: 50, textAlign: 'right' }}>자산 변화</span>
                         <div style={{ flex: 1, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
-                          <div style={{ width: '15%', height: '100%', background: '#14b8a6', borderRadius: 3 }}></div>
+                          <div style={{ width: `${subMetrics.asset}%`, height: '100%', background: churnUI.bg, borderRadius: 3, transition: 'width 0.3s ease' }}></div>
                         </div>
-                        <span style={{ fontSize: 12, color: '#14b8a6', fontWeight: 600, width: 20 }}>10</span>
+                        <span style={{ fontSize: 12, color: churnUI.bg, fontWeight: 600, width: 20 }}>{subMetrics.asset}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                         <span style={{ fontSize: 11, color: '#94a3b8', width: 50, textAlign: 'right' }}>응답 속도</span>
                         <div style={{ flex: 1, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
-                          <div style={{ width: '60%', height: '100%', background: '#14b8a6', borderRadius: 3 }}></div>
+                          <div style={{ width: `${subMetrics.response}%`, height: '100%', background: churnUI.bg, borderRadius: 3, transition: 'width 0.3s ease' }}></div>
                         </div>
-                        <span style={{ fontSize: 12, color: '#14b8a6', fontWeight: 600, width: 20 }}>53</span>
+                        <span style={{ fontSize: 12, color: churnUI.bg, fontWeight: 600, width: 20 }}>{subMetrics.response}</span>
                       </div>
                     </div>
                   </div>
@@ -323,52 +409,46 @@ export default function CustomerDashboard() {
                   <div style={{ display: 'flex', gap: 16, marginBottom: 64 }}>
                     <div style={{ flex: 1, background: '#e2e8f0', borderRadius: 16, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: 14, color: '#64748b', fontWeight: 600 }}>총 방문</span>
-                      <div><span style={{ fontSize: 24, fontWeight: 700, color: '#0f172a' }}>4</span> <span style={{ fontSize: 12, color: '#64748b' }}>회</span></div>
+                      <div><span style={{ fontSize: 24, fontWeight: 700, color: '#0f172a' }}>{visitStats?.total_visits ?? 0}</span> <span style={{ fontSize: 12, color: '#64748b' }}>회</span></div>
                     </div>
                     <div style={{ flex: 1, background: '#dbeafe', borderRadius: 16, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: 14, color: '#64748b', fontWeight: 600 }}>평균 주기</span>
-                      <div><span style={{ fontSize: 24, fontWeight: 700, color: '#3b82f6' }}>53</span> <span style={{ fontSize: 12, color: '#64748b' }}>일</span></div>
+                      <div><span style={{ fontSize: 24, fontWeight: 700, color: '#3b82f6' }}>{visitStats?.avg_visit_cycle_days ?? "-"}</span> <span style={{ fontSize: 12, color: '#64748b' }}>일</span></div>
                     </div>
                     <div style={{ flex: 1, background: '#e0f2fe', borderRadius: 16, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: 14, color: '#64748b', fontWeight: 600 }}>마지막 방문</span>
-                      <div><span style={{ fontSize: 24, fontWeight: 700, color: '#10b981' }}>+9</span> <span style={{ fontSize: 12, color: '#64748b' }}>일</span></div>
+                      <div><span style={{ fontSize: 24, fontWeight: 700, color: '#10b981' }}>{daysSinceLastVisitText}</span> <span style={{ fontSize: 12, color: '#64748b' }}></span></div>
                     </div>
                   </div>
 
-                  {/* Mock Bar Chart */}
+                  {/* Monthly Visit Bar Chart */}
                   <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 32, height: 120, borderBottom: '2px solid #e2e8f0', paddingBottom: 16 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 16, height: 0, background: '#6366f1', borderRadius: 4 }}></div>
-                      <span style={{ fontSize: 12, color: '#64748b' }}>09월</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 16, height: 0, background: '#6366f1', borderRadius: 4 }}></div>
-                      <span style={{ fontSize: 12, color: '#64748b' }}>10월</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 16, height: 100, background: '#6366f1', borderRadius: 4 }}></div>
-                      <span style={{ fontSize: 12, color: '#64748b' }}>11월</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 16, height: 0, background: '#6366f1', borderRadius: 4 }}></div>
-                      <span style={{ fontSize: 12, color: '#64748b' }}>12월</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 16, height: 100, background: '#6366f1', borderRadius: 4 }}></div>
-                      <span style={{ fontSize: 12, color: '#64748b' }}>01월</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 16, height: 0, background: '#6366f1', borderRadius: 4 }}></div>
-                      <span style={{ fontSize: 12, color: '#64748b' }}>02월</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 16, height: 100, background: '#6366f1', borderRadius: 4 }}></div>
-                      <span style={{ fontSize: 12, color: '#64748b' }}>03월</span>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 16, height: 100, background: '#6366f1', borderRadius: 4 }}></div>
-                      <span style={{ fontSize: 12, color: '#64748b' }}>04월</span>
-                    </div>
+                    {visitStats && visitStats.monthly_visits ? (
+                      visitStats.monthly_visits.map((item, idx) => {
+                        const maxCount = Math.max(...visitStats.monthly_visits.map(m => m.count), 1);
+                        const percentHeight = Math.min((item.count / maxCount) * 100, 100);
+                        return (
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+                            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              {item.count > 0 && (
+                                <span style={{ fontSize: 10, color: '#6366f1', fontWeight: 700, position: 'absolute', top: -18 }}>
+                                  {item.count}회
+                                </span>
+                              )}
+                              <div style={{ width: 16, height: `${percentHeight}px`, minHeight: item.count > 0 ? 10 : 2, background: item.count > 0 ? '#6366f1' : '#cbd5e1', borderRadius: 4, transition: 'height 0.3s ease' }}></div>
+                            </div>
+                            <span style={{ fontSize: 12, color: '#64748b' }}>{item.month}</span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      ["10월", "11월", "12월", "01월", "02월", "03월", "04월", "05월"].map((m, idx) => (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+                          <div style={{ width: 16, height: 2, background: '#cbd5e1', borderRadius: 4 }}></div>
+                          <span style={{ fontSize: 12, color: '#64748b' }}>{m}</span>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
 

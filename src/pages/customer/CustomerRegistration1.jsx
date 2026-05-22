@@ -37,9 +37,71 @@ const emotionHistory = [
   { date: '2026.01.08', emoji: '😐', type: '중립', typeColor: '#94a3b8', text: '조용하게 진행, 큰 반응 없음' },
 ];
 
-const getCustomerDetails = (customer, fullDetail) => {
+const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, customerFeatures, productMatches) => {
   if (!customer) return null;
   
+  let lastVisitDiffVal = "9";
+  if (visitStats && visitStats.last_visit_date) {
+    const lastDate = new Date(visitStats.last_visit_date);
+    const today = new Date();
+    lastDate.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+    const diffTime = today.getTime() - lastDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) {
+      lastVisitDiffVal = "오늘";
+    } else {
+      lastVisitDiffVal = diffDays.toString();
+    }
+  } else if (visitStats && !visitStats.last_visit_date) {
+    lastVisitDiffVal = "-";
+  }
+
+  const monthlyVisits = visitStats && visitStats.monthly_visits
+    ? visitStats.monthly_visits.map(mv => ({
+        month: mv.month,
+        visited: mv.count > 0,
+        height: mv.count > 0 ? 140 : 0
+      }))
+    : [
+        { month: "09월", visited: false },
+        { month: "10월", visited: false },
+        { month: "11월", visited: true, height: 140 },
+        { month: "12월", visited: false },
+        { month: "01월", visited: true, height: 140 },
+        { month: "02월", visited: false },
+        { month: "03월", visited: true, height: 140 },
+        { month: "04월", visited: true, height: 140 },
+      ];
+
+  let riskLevel = "미측정";
+  let riskLabel = "데이터 부족";
+  let riskDesc = "이탈 위험 수준 분석을 위한 상담 데이터가 필요합니다";
+  let riskLLMInsight = "충분한 상담 기록이 확보되지 않아 이탈 위험 수준 분석이 어렵습니다. 새로운 상담 일정을 등록하거나 최근 상담에 대한 상세 메모를 작성하여 이탈 위험 분석에 필요한 데이터를 제공해 주세요.";
+  let riskColor = "#94a3b8";
+  let riskEmoji = "🤔";
+
+  if (churnRisk && churnRisk.grade) {
+    riskLabel = churnRisk.grade;
+    riskLLMInsight = churnRisk.reason || "이탈 위험 수준에 대한 분석이 완료되었습니다. 제공된 사유를 참고해 주세요.";
+    if (churnRisk.grade === "주의") {
+      riskLevel = "보통";
+      riskDesc = "이탈 위험이 보통입니다";
+      riskColor = "#f59e0b";
+      riskEmoji = "😐";
+    } else if (churnRisk.grade === "위험") {
+      riskLevel = "높음";
+      riskDesc = "이탈 위험이 높습니다";
+      riskColor = "#ef4444";
+      riskEmoji = "😟";
+    } else if (churnRisk.grade === "양호") {
+      riskLevel = "낮음";
+      riskDesc = "이탈 위험이 낮습니다";
+      riskColor = "#14b8a6";
+      riskEmoji = "😊";
+    }
+  }
+
   const defaults = {
     job: fullDetail?.job || "중견기업 CEO",
     vipStatus: fullDetail?.grade || "VIP",
@@ -55,72 +117,39 @@ const getCustomerDetails = (customer, fullDetail) => {
       nextVisit: "2026.05.02",
     },
     assetTotal: fullDetail?.total_assets !== undefined ? `${(fullDetail.total_assets / 100000000).toFixed(1)}억` : "32억",
+    netWorthTotal: fullDetail?.net_worth !== undefined ? `${(fullDetail.net_worth / 100000000).toFixed(1)}억` : "32억",
     assetList: [
-      { name: '예적금', value: fullDetail ? Math.round((fullDetail.deposit / (fullDetail.total_assets || 1)) * 100) : 45, color: '#2dd4bf' },
-      { name: '투자상품', value: fullDetail ? Math.round((fullDetail.investment / (fullDetail.total_assets || 1)) * 100) : 35, color: '#a855f7' },
-      { name: '연금보험', value: fullDetail ? Math.round((fullDetail.pension / (fullDetail.total_assets || 1)) * 100) : 20, color: '#cbd5e1' },
+      { name: '예적금', value: fullDetail ? Math.round((fullDetail.deposit / (fullDetail.net_worth || 1)) * 100) : 45, color: '#2dd4bf' },
+      { name: '투자상품', value: fullDetail ? Math.round((fullDetail.investment / (fullDetail.net_worth || 1)) * 100) : 35, color: '#a855f7' },
+      { name: '연금보험', value: fullDetail ? Math.round((fullDetail.pension / (fullDetail.net_worth || 1)) * 100) : 20, color: '#cbd5e1' },
     ],
     assetLLMInsight: fullDetail?.llm_insight || "순자산 중 예적금 및 투자상품 비율이 적절한 균형을 유지하고 있습니다.",
-    riskLevel: "낮음",
-    riskLabel: "양호",
-    riskDesc: "이탈 위험이 낮습니다",
-    riskLLMInsight: "최근 3번의 상담 메모 분석 결과, PB의 고객관리 및 상품 추천에서 큰 만족감을 보이고 있습니다. 서비스 만족도가 높은 편입니다.",
+    riskLevel: riskLevel,
+    riskLabel: riskLabel,
+    riskDesc: riskDesc,
+    riskLLMInsight: riskLLMInsight,
+    riskColor: riskColor,
+    riskEmoji: riskEmoji,
     visitData: {
-      totalVisits: 4,
-      averageInterval: 53,
-      lastVisitDiff: 9,
-      monthlyVisits: [
-        { month: "09월", visited: false },
-        { month: "10월", visited: false },
-        { month: "11월", visited: true, height: 140 },
-        { month: "12월", visited: false },
-        { month: "01월", visited: true, height: 140 },
-        { month: "02월", visited: false },
-        { month: "03월", visited: true, height: 140 },
-        { month: "04월", visited: true, height: 140 },
-      ]
+      totalVisits: visitStats ? (visitStats.total_visits ?? 0) : 4,
+      averageInterval: visitStats ? (visitStats.avg_visit_cycle_days ?? "-") : 53,
+      lastVisitDiff: visitStats ? lastVisitDiffVal : "9",
+      monthlyVisits: monthlyVisits
     },
-    features: [
-      { category: "기호", text: "비타500 싫어함, 아메리카노 더블샷 선호", date: "2026.04.12", color: "#f97316" },
-      { category: "관계", text: "배우자가 최근 퇴직 후 자산 재배치 관심 증가", date: "2026.04.02", color: "#db2777" },
-      { category: "상품", text: "달러 자산 비중 너무 높다며 불안감 표현, 국내 상품 선호", date: "2026.03.12", color: "#0284c7" },
-      { category: "성향", text: "빠른 의사결정 선호, 서류 설명 길면 집중력 저하", date: "2026.04.12", color: "#8b5cf6" },
-      { category: "건강", text: "무릎 수술 후 장기 요양 중 - 방문 일정 오전 선호", date: "2026.04.12", color: "#10b981" },
-    ],
-    productMatchingList: [
-      {
-        productName: "우리 테마형 국내 리츠 펀드",
-        productDesc: "본 펀드는 국내 우량 리츠 및 상장 부동산 자산에 집중 투자하여 안정적인 배당 수익과 중장기적인 자산 가치 상승을 동시에 추구합니다.",
-        status: "부적합",
-        statusColor: "#ef4444",
-        matchingDesc: "현재 달러 자산의 비중을 낮추고 변동성이 적은 안정적인 인컴 수익을 확보하고자 하는 고객님의 자산 리밸런싱 방향성과 정확히 부합합니다."
-      },
-      {
-        productName: "하나 고배당 상장지수증권 (ETN)",
-        productDesc: "국내 고배당주 포트폴리오를 추종하며, 매월 분배금을 지급하여 현금 흐름을 극대화하고자 하는 은퇴자 및 자산가 고객에게 최적화된 상품입니다.",
-        status: "적합",
-        statusColor: "#10b981",
-        matchingDesc: "은퇴 자산의 안정적인 현금 흐름 창출을 최우선으로 선호하시는 고객님의 니즈와 완벽히 일치하여 고배당 매력도가 매우 높습니다."
-      },
-      {
-        productName: "글로벌 인공지능 테크 랩어카운트",
-        productDesc: "미국 및 글로벌 빅테크 기업과 차세대 AI 하드웨어/소프트웨어 혁신 선도 기업들을 중심으로 집중 포트폴리오를 구성해 초과 성장을 목표로 합니다.",
-        status: "적합",
-        statusColor: "#10b981",
-        matchingDesc: "중장기 자산 성장을 원하시고, 성장주 투자를 통해 적극적인 수익 실현을 지향하시는 고객님의 성향과 강력히 연계됩니다."
-      },
-      {
-        productName: "삼성 단기 국공채 전문투자형 사모펀드",
-        productDesc: "삼성 자산운용의 우량 국공채 집중 투자형 사모펀드로 금리 변동 리스크를 최소화하고 단기 이자 수익을 고정 확보하는 상품입니다.",
-        status: "부적합",
-        statusColor: "#ef4444",
-        matchingDesc: "현재 금리 인하 국면에서 단기 채권의 메리트가 낮고, 적극적인 리밸런싱을 통한 중장기 고수익을 원하시는 현 시점 전략과는 맞지 않습니다."
-      }
-    ]
+    features: (customerFeatures && customerFeatures.features) ? customerFeatures.features : [],
+    productMatchingList: (productMatches && productMatches.items && productMatches.items.length > 0)
+      ? productMatches.items.map(item => ({
+          productName: item.product_name,
+          productDesc: item.product_explanation,
+          status: item.is_suitable ? "적합" : "부적합",
+          statusColor: item.is_suitable ? "#10b981" : "#ef4444",
+          matchingDesc: item.reason
+        }))
+      : []
   };
-
+ 
   // 자산이 0원인 경우 PieChart 퍼센트 비중을 0으로 강제 조정
-  if (fullDetail && fullDetail.total_assets === 0) {
+  if (fullDetail && fullDetail.net_worth === 0) {
     defaults.assetList = [
       { name: '예적금', value: 0, color: '#2dd4bf' },
       { name: '투자상품', value: 0, color: '#a855f7' },
@@ -140,7 +169,7 @@ const getCustomerDetails = (customer, fullDetail) => {
       ...(customer.visitData || {})
     },
     features: customer.features || defaults.features,
-    productMatchingList: customer.productMatchingList || defaults.productMatchingList
+    productMatchingList: defaults.productMatchingList
   };
 };
 
@@ -150,6 +179,10 @@ export default function CustomerRegistration1() {
   const [allCustomersList, setAllCustomersList] = useState([]);
   const [todayCustomersList, setTodayCustomersList] = useState([]);
   const [fullCustomerDetail, setFullCustomerDetail] = useState(null);
+  const [visitStats, setVisitStats] = useState(null);
+  const [churnRisk, setChurnRisk] = useState(null);
+  const [customerFeatures, setCustomerFeatures] = useState(null);
+  const [productMatches, setProductMatches] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeListTab, setActiveListTab] = useState('전체 고객');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -203,10 +236,14 @@ export default function CustomerRegistration1() {
     fetchCustomers();
   }, [activeListTab]);
 
-  // 선택된 고객이 바뀔 때 상세 정보 로드
+  // 선택된 고객이 바뀔 때 상세 정보, 방문 통계 및 이탈 위험도 로드
   useEffect(() => {
     if (!selectedCustomer) {
       setFullCustomerDetail(null);
+      setVisitStats(null);
+      setChurnRisk(null);
+      setCustomerFeatures(null);
+      setProductMatches(null);
       return;
     }
     
@@ -216,6 +253,38 @@ export default function CustomerRegistration1() {
         setFullCustomerDetail(detail);
       } catch (error) {
         console.error("고객 상세 정보 조회 실패:", error);
+      }
+
+      try {
+        const stats = await api.customer.getVisitStats(selectedCustomer.id);
+        setVisitStats(stats);
+      } catch (error) {
+        console.error("방문 주기 조회 실패:", error);
+        setVisitStats(null);
+      }
+
+      try {
+        const risk = await api.customer.getChurnRisk(selectedCustomer.id);
+        setChurnRisk(risk);
+      } catch (error) {
+        console.error("이탈 위험 조회 실패:", error);
+        setChurnRisk(null);
+      }
+
+      try {
+        const features = await api.customer.getFeatures(selectedCustomer.id);
+        setCustomerFeatures(features);
+      } catch (error) {
+        console.error("고객 특징 조회 실패:", error);
+        setCustomerFeatures(null);
+      }
+
+      try {
+        const matches = await api.customer.getProductMatch(selectedCustomer.id);
+        setProductMatches(matches);
+      } catch (error) {
+        console.error("주력 상품 매칭 조회 실패:", error);
+        setProductMatches(null);
       }
     };
     
@@ -251,7 +320,7 @@ export default function CustomerRegistration1() {
     c.phone.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const details = getCustomerDetails(selectedCustomer, fullCustomerDetail);
+  const details = getCustomerDetails(selectedCustomer, fullCustomerDetail, visitStats, churnRisk, customerFeatures, productMatches);
 
   const handleSaveCustomer = async (formData) => {
     try {
@@ -535,7 +604,7 @@ export default function CustomerRegistration1() {
                         </ResponsiveContainer>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                           <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>순자산</span>
-                          <span style={{ fontSize: 16, fontWeight: 700, color: '#d97706' }}>{details.assetTotal}</span>
+                          <span style={{ fontSize: 16, fontWeight: 700, color: '#d97706' }}>{details.netWorthTotal}</span>
                         </div>
                       </div>
                       <div style={{ flex: '1 1 140px', display: 'flex', flexDirection: 'column', gap: 10, minWidth: 140 }}>
@@ -557,10 +626,10 @@ export default function CustomerRegistration1() {
                   <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                       <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>이탈 위험 수준</h3>
-                      <span style={{ fontSize: 14, color: '#14b8a6', fontWeight: 700 }}>{details.riskLevel}</span>
+                      <span style={{ fontSize: 14, color: details.riskColor, fontWeight: 700 }}>{details.riskLevel}</span>
                     </div>
-                    <div style={{ background: '#14b8a6', borderRadius: 12, padding: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(20, 184, 166, 0.3)', marginBottom: 20 }}>
-                      <div style={{ fontSize: 32, marginBottom: 4 }}>😊</div>
+                    <div style={{ background: details.riskColor, borderRadius: 12, padding: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: `0 4px 6px -1px ${details.riskColor}4d`, marginBottom: 20 }}>
+                      <div style={{ fontSize: 32, marginBottom: 4 }}>{details.riskEmoji}</div>
                       <div style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 2 }}>{details.riskLabel}</div>
                       <div style={{ fontSize: 12, color: 'white', fontWeight: 500 }}>{details.riskDesc}</div>
                     </div>
@@ -596,8 +665,13 @@ export default function CustomerRegistration1() {
                     <div style={{ background: '#e0e7ff', borderRadius: 16, padding: '16px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 90 }}>
                       <span style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>마지막 방문</span>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
-                        <span style={{ fontSize: 32, fontWeight: 700, color: '#14b8a6', lineHeight: 1 }}>+{details.visitData.lastVisitDiff}</span>
-                        <span style={{ fontSize: 12, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>일</span>
+                        <span style={{ fontSize: 32, fontWeight: 700, color: '#14b8a6', lineHeight: 1 }}>
+                          {details.visitData.lastVisitDiff === "-" || details.visitData.lastVisitDiff === "오늘" ? "" : "+"}
+                          {details.visitData.lastVisitDiff}
+                        </span>
+                        <span style={{ fontSize: 12, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>
+                          {details.visitData.lastVisitDiff === "-" || details.visitData.lastVisitDiff === "오늘" ? "" : "일"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -780,6 +854,11 @@ export default function CustomerRegistration1() {
                         </div>
                       </div>
                     ))}
+                    {details.productMatchingList.length === 0 && (
+                      <div style={{ padding: '40px 0', textAlign: 'center', color: '#94a3b8', fontSize: 14, fontWeight: 500, background: 'white', border: '1px solid #e2e8f0', borderRadius: 12 }}>
+                        추천된 상품 매칭 분석 결과가 없습니다.
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
