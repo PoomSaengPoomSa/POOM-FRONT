@@ -2,15 +2,17 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Calendar as CalendarIcon, MoreHorizontal } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
-import { notifications } from "./notificationsData";
+import { api } from "../../api";
 import "./News.css";
 
 export default function CustomerNotifications() {
   const [activeTab, setActiveTab] = useState("today");
   const [activeDetailId, setActiveDetailId] = useState(null);
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
+  const [selectedBriefing, setSelectedBriefing] = useState(null);
   const [modalSize, setModalSize] = useState({ width: 850, height: 650 });
-  const [notificationsList, setNotificationsList] = useState(() => notifications);
+  const [notificationsList, setNotificationsList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const location = useLocation();
 
@@ -19,12 +21,32 @@ export default function CustomerNotifications() {
   }, [location]);
 
   useEffect(() => {
-    const handleUpdate = () => {
-      setNotificationsList([...notifications]);
+    const fetchNotifications = async (showLoading = true) => {
+      if (showLoading) setLoading(true);
+      try {
+        const data = await api.notification.getList(activeTab);
+        setNotificationsList(data);
+        if (showLoading) {
+          window.dispatchEvent(new Event("notifications-updated"));
+        }
+      } catch (err) {
+        console.error("Failed to fetch notifications:", err);
+      } finally {
+        if (showLoading) setLoading(false);
+      }
     };
+
+    fetchNotifications();
+
+    const handleUpdate = () => {
+      fetchNotifications(false);
+    };
+
     window.addEventListener("notifications-updated", handleUpdate);
-    return () => window.removeEventListener("notifications-updated", handleUpdate);
-  }, []);
+    return () => {
+      window.removeEventListener("notifications-updated", handleUpdate);
+    };
+  }, [activeTab]);
 
 
 
@@ -75,12 +97,17 @@ export default function CustomerNotifications() {
 
 
 
-  const filteredNotifications = activeTab === "today" 
-    ? notificationsList.filter(n => n.today)
-    : notificationsList;
+  const getCustomerName = (title) => {
+    if (!title) return "김민준";
+    const parts = title.split("고객");
+    return parts[0].trim();
+  };
+
+  const filteredNotifications = notificationsList;
 
   const handleCardClick = (notif) => {
     if (notif.isBriefing) {
+      setSelectedBriefing(notif);
       setIsBriefingOpen(true);
       setActiveDetailId(null);
     } else {
@@ -165,7 +192,7 @@ export default function CustomerNotifications() {
 
       {/* Briefing Modal Popup */}
       {isBriefingOpen && (
-        <div className="briefing-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setIsBriefingOpen(false); }}>
+        <div className="briefing-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { setIsBriefingOpen(false); setSelectedBriefing(null); } }}>
           <div 
             className="briefing-modal-card" 
             onClick={(e) => e.stopPropagation()}
@@ -175,11 +202,11 @@ export default function CustomerNotifications() {
             <div className="briefing-modal-header">
               <div className="briefing-modal-header-left">
                 <span className="news-alert-badge badge-green">방문 예정 브리핑</span>
-                <h2 className="briefing-modal-title">김민준 고객 — 오전 10:00 방문 예정 (30분 전)</h2>
+                <h2 className="briefing-modal-title">{selectedBriefing ? selectedBriefing.content : "방문 예정 브리핑"}</h2>
               </div>
               <div className="briefing-modal-header-right">
-                <span className="briefing-modal-date">18 May, 2026</span>
-                <button className="briefing-modal-close-btn" onClick={() => setIsBriefingOpen(false)}>
+                <span className="briefing-modal-date">{selectedBriefing ? selectedBriefing.date : ""}</span>
+                <button className="briefing-modal-close-btn" onClick={() => { setIsBriefingOpen(false); setSelectedBriefing(null); }}>
                   <span style={{ fontSize: '18px', color: '#64748b', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</span>
                 </button>
               </div>
@@ -201,8 +228,8 @@ export default function CustomerNotifications() {
                 <h3 className="briefing-section-title">고객 기본 정보 & Preference</h3>
                 <div className="briefing-section-card">
                   <ul className="briefing-list">
-                    <li>고객명/등급: 김민준 고객 (VIP)</li>
-                    <li>담당 PB: OOO 팀장</li>
+                    <li>고객명/등급: {selectedBriefing ? getCustomerName(selectedBriefing.content) : "김민준"} 고객 (VIP)</li>
+                    <li>담당 PB: 김재욱 팀장</li>
                     <li>음료/편의 선호도 (★필독):</li>
                     <li className="indent">☕ 아이스 아메리카노(연하게) 선호.</li>
                     <li className="indent">❌ 비타500 절대 금지 (과거 제공 시 특유의 약품 냄새와 단맛을 싫어한다고 명확히 기재됨. 웰컴 드링크 준비 시 주의).</li>

@@ -138,5 +138,11 @@ export const api = {
     getList: (u_id) => api.get(`/ai-todo/${u_id ? `?u_id=${u_id}` : ""}`),
     confirm: (u_id, at_ids) => api.post("/ai-todo/confirm", { u_id, at_ids }),
     unconfirm: (at_id) => api.patch(`/ai-todo/${at_id}/unconfirm`),
+  },
+
+  // 5. 알림 (Notification) API
+  notification: {
+    getList: (tab = "all") => api.get(`/notifications?tab=${tab}`),
+    getTodayCount: () => api.get("/notifications/today-count"),
   }
 };

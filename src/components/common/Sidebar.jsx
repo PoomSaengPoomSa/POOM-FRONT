@@ -1,14 +1,38 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Calendar, TrendingUp, Contact, BarChart2, Bell, LogOut } from "lucide-react";
-import { notifications } from "../../pages/news/notificationsData";
+import { api } from "../../api";
 
 export default function Sidebar({ type = "cal" }) {
   const location = useLocation();
   const path = location.pathname;
 
   const prefix = type; // e.g., "cal", "cust", "news", "trend"
-  const todayCount = notifications.filter(n => n.today).length;
+  const [todayCount, setTodayCount] = useState(0);
+
+  useEffect(() => {
+    const fetchTodayCount = async () => {
+      try {
+        if (localStorage.getItem("accessToken")) {
+          const res = await api.notification.getTodayCount();
+          setTodayCount(res.today_count);
+        }
+      } catch (err) {
+        console.error("Failed to fetch today's notification count:", err);
+      }
+    };
+
+    fetchTodayCount();
+
+    const handleNotificationsUpdated = () => {
+      fetchTodayCount();
+    };
+
+    window.addEventListener("notifications-updated", handleNotificationsUpdated);
+    return () => {
+      window.removeEventListener("notifications-updated", handleNotificationsUpdated);
+    };
+  }, [path]);
 
   // Retrieve or initialize sidebar width
   const [width, setWidth] = useState(() => {
