@@ -13,6 +13,11 @@ export function CalendarProvider({ children }) {
   const [aiTodos, setAiTodos] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [toast, setToast] = useState({ show: false, message: '' });
+  
+  // KPI 및 주력 상품 상태 추가
+  const [personalKpi, setPersonalKpi] = useState(null);
+  const [branchKpi, setBranchKpi] = useState(null);
+  const [seasonalProducts, setSeasonalProducts] = useState({ total_count: 0, products: [] });
 
   const [leftPanelWidth, setLeftPanelWidth] = useState(() => {
     const saved = localStorage.getItem('poom_left_panel_width');
@@ -182,8 +187,28 @@ export function CalendarProvider({ children }) {
     }
   };
 
+  // KPI 및 주력 상품 데이터 페치
+  const fetchKpiData = async () => {
+    try {
+      const currentUser = api.auth.getCurrentUser();
+      const u_id = currentUser ? currentUser.id : "user1";
+
+      const personalData = await api.kpi.getPersonal(u_id);
+      setPersonalKpi(personalData);
+
+      const branchData = await api.kpi.getBranch(u_id);
+      setBranchKpi(branchData);
+
+      const productsData = await api.kpi.getSeasonalProducts();
+      setSeasonalProducts(productsData);
+    } catch (error) {
+      console.error("KPI 및 주력 상품 데이터 조회 실패:", error);
+    }
+  };
+
   useEffect(() => {
     fetchCalendarData();
+    fetchKpiData();
   }, []);
 
   const addEvent = async (newEvent) => {
@@ -321,7 +346,11 @@ export function CalendarProvider({ children }) {
       isResizing,
       startResize,
       toast,
-      showToast
+      showToast,
+      personalKpi,
+      branchKpi,
+      seasonalProducts,
+      fetchKpiData
     }}>
       {children}
     </CalendarContext.Provider>

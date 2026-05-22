@@ -20,7 +20,7 @@ export default function DailyCalendar() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAiTodoDetailOpen, setIsAiTodoDetailOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos, revertAiTodo, leftPanelWidth, isResizing, startResize, toast } = useCalendar();
+  const { events, selectedDate, setSelectedDate, aiTodos, toggleAiTodo, transferCheckedAiTodos, revertAiTodo, leftPanelWidth, isResizing, startResize, toast, personalKpi, branchKpi, seasonalProducts } = useCalendar();
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [miniCalMonth, setMiniCalMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
 
@@ -236,6 +236,7 @@ export default function DailyCalendar() {
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             {/* KPI Cards */}
             <div className="kpi-container">
+              {/* 개인 KPI */}
               <div className="kpi-card">
                 <div className="kpi-card-header">
                   <div className="kpi-title-korean">개인 KPI</div>
@@ -249,35 +250,39 @@ export default function DailyCalendar() {
                       </div>
                       <span className="kpi-label-text">고객 수</span>
                     </div>
-                    <div className="kpi-stat-value">148<span className="kpi-unit">명</span></div>
+                    <div className="kpi-stat-value">
+                      {personalKpi?.customer_count || 0}<span className="kpi-unit">명</span>
+                    </div>
                     <div className="kpi-progress-bar-container">
-                      <div className="kpi-progress-bar-fill" style={{ width: '92%' }}></div>
+                      <div className="kpi-progress-bar-fill" style={{ width: `${Math.min(100, Math.max(0, personalKpi?.customer_rate || 0))}%` }}></div>
                     </div>
                     <div className="kpi-progress-labels">
-                      <span className="kpi-progress-pct">92%</span>
-                      <span className="kpi-progress-target">목표 160명</span>
+                      <span className="kpi-progress-pct">{personalKpi?.customer_rate || 0}%</span>
+                      <span className="kpi-progress-target">목표 {personalKpi?.customer_goal || 0}명</span>
                     </div>
-                    <div className="kpi-trend green">
-                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +5명
+                    <div className={`kpi-trend ${personalKpi?.customer_delta >= 0 ? "green" : "red"}`}>
+                      <span className="kpi-trend-arrow">{personalKpi?.customer_delta >= 0 ? "▲" : "▼"}</span> 전월 대비 {personalKpi?.customer_delta >= 0 ? "+" : ""}{personalKpi?.customer_delta || 0}%
                     </div>
                   </div>
                   <div className="kpi-stat-item">
                     <div className="kpi-stat-label-wrap">
                       <div className="kpi-icon-container">
-                        <PieChart size={12} className="kpi-icon" />
+                        <Landmark size={12} className="kpi-icon" />
                       </div>
-                      <span className="kpi-label-text">포트폴리오</span>
+                      <span className="kpi-label-text">자산 (AUM)</span>
                     </div>
-                    <div className="kpi-stat-value">91<span className="kpi-unit">점</span></div>
+                    <div className="kpi-stat-value">
+                      {personalKpi?.aum || 0}<span className="kpi-unit">억</span>
+                    </div>
                     <div className="kpi-progress-bar-container">
-                      <div className="kpi-progress-bar-fill" style={{ width: '95%' }}></div>
+                      <div className="kpi-progress-bar-fill" style={{ width: `${Math.min(100, Math.max(0, personalKpi?.aum_rate || 0))}%` }}></div>
                     </div>
                     <div className="kpi-progress-labels">
-                      <span className="kpi-progress-pct">95%</span>
-                      <span className="kpi-progress-target">목표 95점</span>
+                      <span className="kpi-progress-pct">{personalKpi?.aum_rate || 0}%</span>
+                      <span className="kpi-progress-target">목표 {personalKpi?.aum_goal || 0}억</span>
                     </div>
-                    <div className="kpi-trend green">
-                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +5점
+                    <div className={`kpi-trend ${personalKpi?.aum_delta >= 0 ? "green" : "red"}`}>
+                      <span className="kpi-trend-arrow">{personalKpi?.aum_delta >= 0 ? "▲" : "▼"}</span> 전월 대비 {personalKpi?.aum_delta >= 0 ? "+" : ""}{personalKpi?.aum_delta || 0}%
                     </div>
                   </div>
                   <div className="kpi-stat-item">
@@ -287,24 +292,28 @@ export default function DailyCalendar() {
                       </div>
                       <span className="kpi-label-text">비이자 이익</span>
                     </div>
-                    <div className="kpi-stat-value">6,240<span className="kpi-unit">만</span></div>
+                    <div className="kpi-stat-value">
+                      {(personalKpi?.non_interest || 0).toLocaleString()}<span className="kpi-unit">만</span>
+                    </div>
                     <div className="kpi-progress-bar-container">
-                      <div className="kpi-progress-bar-fill" style={{ width: '94%' }}></div>
+                      <div className="kpi-progress-bar-fill" style={{ width: `${Math.min(100, Math.max(0, personalKpi?.non_interest_rate || 0))}%` }}></div>
                     </div>
                     <div className="kpi-progress-labels">
-                      <span className="kpi-progress-pct">94%</span>
-                      <span className="kpi-progress-target">목표 6,600만</span>
+                      <span className="kpi-progress-pct">{personalKpi?.non_interest_rate || 0}%</span>
+                      <span className="kpi-progress-target">목표 {(personalKpi?.non_interest_goal || 0).toLocaleString()}만</span>
                     </div>
-                    <div className="kpi-trend green">
-                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +5명
+                    <div className={`kpi-trend ${personalKpi?.non_interest_delta >= 0 ? "green" : "red"}`}>
+                      <span className="kpi-trend-arrow">{personalKpi?.non_interest_delta >= 0 ? "▲" : "▼"}</span> 전월 대비 {personalKpi?.non_interest_delta >= 0 ? "+" : ""}{personalKpi?.non_interest_delta || 0}%
                     </div>
                   </div>
                 </div>
               </div>
+
+              {/* 지점 KPI */}
               <div className="kpi-card">
                 <div className="kpi-card-header">
                   <div className="kpi-title-korean">지점 KPI</div>
-                  <div className="kpi-subtitle-korean">서울 강남지점</div>
+                  <div className="kpi-subtitle-korean">{branchKpi?.branch_name || "지점"}</div>
                 </div>
                 <div className="kpi-stats-grid">
                   <div className="kpi-stat-item">
@@ -314,35 +323,39 @@ export default function DailyCalendar() {
                       </div>
                       <span className="kpi-label-text">고객 수</span>
                     </div>
-                    <div className="kpi-stat-value">1,284<span className="kpi-unit">명</span></div>
+                    <div className="kpi-stat-value">
+                      {(branchKpi?.customer_count || 0).toLocaleString()}<span className="kpi-unit">명</span>
+                    </div>
                     <div className="kpi-progress-bar-container">
-                      <div className="kpi-progress-bar-fill" style={{ width: '85%' }}></div>
+                      <div className="kpi-progress-bar-fill" style={{ width: `${Math.min(100, Math.max(0, branchKpi?.customer_rate || 0))}%` }}></div>
                     </div>
                     <div className="kpi-progress-labels">
-                      <span className="kpi-progress-pct">85%</span>
-                      <span className="kpi-progress-target">목표 1,500명</span>
+                      <span className="kpi-progress-pct">{branchKpi?.customer_rate || 0}%</span>
+                      <span className="kpi-progress-target">목표 {(branchKpi?.customer_goal || 0).toLocaleString()}명</span>
                     </div>
-                    <div className="kpi-trend green">
-                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +42명
+                    <div className={`kpi-trend ${branchKpi?.customer_delta >= 0 ? "green" : "red"}`}>
+                      <span className="kpi-trend-arrow">{branchKpi?.customer_delta >= 0 ? "▲" : "▼"}</span> 전월 대비 {branchKpi?.customer_delta >= 0 ? "+" : ""}{branchKpi?.customer_delta || 0}%
                     </div>
                   </div>
                   <div className="kpi-stat-item">
                     <div className="kpi-stat-label-wrap">
                       <div className="kpi-icon-container">
-                        <PieChart size={12} className="kpi-icon" />
+                        <Landmark size={12} className="kpi-icon" />
                       </div>
-                      <span className="kpi-label-text">포트폴리오</span>
+                      <span className="kpi-label-text">자산 (AUM)</span>
                     </div>
-                    <div className="kpi-stat-value">82<span className="kpi-unit">점</span></div>
+                    <div className="kpi-stat-value">
+                      {(branchKpi?.aum || 0).toLocaleString()}<span className="kpi-unit">억</span>
+                    </div>
                     <div className="kpi-progress-bar-container">
-                      <div className="kpi-progress-bar-fill" style={{ width: '91%' }}></div>
+                      <div className="kpi-progress-bar-fill" style={{ width: `${Math.min(100, Math.max(0, branchKpi?.aum_rate || 0))}%` }}></div>
                     </div>
                     <div className="kpi-progress-labels">
-                      <span className="kpi-progress-pct">91%</span>
-                      <span className="kpi-progress-target">목표 90점</span>
+                      <span className="kpi-progress-pct">{branchKpi?.aum_rate || 0}%</span>
+                      <span className="kpi-progress-target">목표 {(branchKpi?.aum_goal || 0).toLocaleString()}억</span>
                     </div>
-                    <div className="kpi-trend green">
-                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +3점
+                    <div className={`kpi-trend ${branchKpi?.aum_delta >= 0 ? "green" : "red"}`}>
+                      <span className="kpi-trend-arrow">{branchKpi?.aum_delta >= 0 ? "▲" : "▼"}</span> 전월 대비 {branchKpi?.aum_delta >= 0 ? "+" : ""}{branchKpi?.aum_delta || 0}%
                     </div>
                   </div>
                   <div className="kpi-stat-item">
@@ -352,32 +365,37 @@ export default function DailyCalendar() {
                       </div>
                       <span className="kpi-label-text">비이자 이익</span>
                     </div>
-                    <div className="kpi-stat-value">4.8<span className="kpi-unit">억</span></div>
+                    <div className="kpi-stat-value">
+                      {(branchKpi?.non_interest || 0).toLocaleString()}<span className="kpi-unit">만</span>
+                    </div>
                     <div className="kpi-progress-bar-container">
-                      <div className="kpi-progress-bar-fill" style={{ width: '87%' }}></div>
+                      <div className="kpi-progress-bar-fill" style={{ width: `${Math.min(100, Math.max(0, branchKpi?.non_interest_rate || 0))}%` }}></div>
                     </div>
                     <div className="kpi-progress-labels">
-                      <span className="kpi-progress-pct">87%</span>
-                      <span className="kpi-progress-target">목표 5.5억</span>
+                      <span className="kpi-progress-pct">{branchKpi?.non_interest_rate || 0}%</span>
+                      <span className="kpi-progress-target">목표 {(branchKpi?.non_interest_goal || 0).toLocaleString()}만</span>
                     </div>
-                    <div className="kpi-trend green">
-                      <span className="kpi-trend-arrow">▲</span> 전월 대비 +4.2%
+                    <div className={`kpi-trend ${branchKpi?.non_interest_delta >= 0 ? "green" : "red"}`}>
+                      <span className="kpi-trend-arrow">{branchKpi?.non_interest_delta >= 0 ? "▲" : "▼"}</span> 전월 대비 {branchKpi?.non_interest_delta >= 0 ? "+" : ""}{branchKpi?.non_interest_delta || 0}%
                     </div>
                   </div>
                 </div>
               </div>
+
+              {/* 시즌 주력 상품 */}
               <div className="kpi-card">
                 <div className="kpi-title" style={{ color: '#0ea5e9' }}>시즌 주력 상품</div>
                 <div className="kpi-subtitle" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  2026 상반기
+                  {seasonalProducts?.products?.[0]?.season || "2026 상반기"}
                   <span onClick={() => setIsProductModalOpen(true)} style={{ fontSize: 11, color: '#0ea5e9', fontWeight: 500, cursor: 'pointer' }}>전체 상품 보기</span>
                 </div>
-                <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>4<span style={{ fontSize: 14, fontWeight: 500 }}>종</span></div>
+                <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>
+                  {seasonalProducts?.total_count || 0}<span style={{ fontSize: 14, fontWeight: 500 }}>종</span>
+                </div>
                 <div className="product-tags">
-                  <span className="product-tag">우리카드</span>
-                  <span className="product-tag">ELS 7.2%</span>
-                  <span className="product-tag">달러RP 5.1%</span>
-                  <span className="product-tag">리츠 6.3%</span>
+                  {seasonalProducts?.products?.slice(0, 4).map(p => (
+                    <span className="product-tag" key={p.pd_id}>{p.name}</span>
+                  ))}
                 </div>
               </div>
             </div>

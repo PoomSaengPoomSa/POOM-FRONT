@@ -150,5 +150,13 @@ export const api = {
   notification: {
     getList: (tab = "all") => api.get(`/notifications?tab=${tab}`),
     getTodayCount: () => api.get("/notifications/today-count"),
+  },
+
+  // 6. KPI & 주력 상품 API
+  kpi: {
+    getPersonal: (u_id) => api.get(`/kpi/personal${u_id ? `?u_id=${u_id}` : ""}`),
+    getBranch: (u_id) => api.get(`/kpi/branch${u_id ? `?u_id=${u_id}` : ""}`),
+    getSeasonalProducts: () => api.get('/kpi/seasonal-products'),
+    getSeasonalProductDetail: (product_id) => api.get(`/kpi/seasonal-products/${product_id}`)
   }
 };
