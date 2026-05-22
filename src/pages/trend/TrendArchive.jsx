@@ -206,8 +206,8 @@ export default function TrendArchive() {
 
       {/* Modal Overlay */}
       {selectedNewsItem && (
-        <div style={{ position: 'fixed', top: 0, left: 240, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', zIndex: 1000 }}>
-          <div className="news-arch-modal">
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', zIndex: 1000 }}>
+          <div className="news-arch-modal" style={{ left: '272px' }}>
             <div className="news-mod-header">
               <span className={`news-arch-badge ${selectedNewsItem.color}`} style={{ fontSize: 16, padding: '12px 24px' }}>{selectedNewsItem.type}</span>
               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>

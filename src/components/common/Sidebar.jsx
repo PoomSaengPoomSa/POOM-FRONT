@@ -9,6 +9,7 @@ export default function Sidebar({ type = "cal" }) {
 
   const prefix = type; // e.g., "cal", "cust", "news", "trend"
   const [todayCount, setTodayCount] = useState(0);
+  const [isTrendHovered, setIsTrendHovered] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(() => {
     try {
@@ -111,40 +112,40 @@ export default function Sidebar({ type = "cal" }) {
 
   const isCollapsed = width < 160;
 
-  const isCalendarActive = 
-    path.includes('/calendar') || 
-    path.includes('/daily-calendar') || 
-    path.includes('/weekly-calendar') || 
+  const isCalendarActive =
+    path.includes('/calendar') ||
+    path.includes('/daily-calendar') ||
+    path.includes('/weekly-calendar') ||
     path.includes('/monthly-calendar');
-    
-  const isCustomerActive = 
-    path.includes('/customer-management') && 
+
+  const isCustomerActive =
+    path.includes('/customer-management') &&
     !path.includes('/customer-management-memo-assistant');
-    
-  const isAssistantActive = 
+
+  const isAssistantActive =
     path.includes('/customer-management-memo-assistant');
-    
-  const isTrendActive = 
-    path.includes('/trend') || 
-    path.includes('/economic') || 
+
+  const isTrendActive =
+    path.includes('/trend') ||
+    path.includes('/economic') ||
     path.includes('/news-archive');
-    
-  const isNotificationActive = 
-    path.includes('/notifications') || 
+
+  const isNotificationActive =
+    path.includes('/notifications') ||
     path.includes('/notification-message-draft');
 
   return (
-    <div 
+    <div
       className={`${prefix}-sidebar sidebar-container ${isCollapsed ? 'collapsed' : ''}`}
-      style={{ 
-        width: isCollapsed ? '70px' : `${width}px`, 
-        position: 'relative', 
-        transition: resizingActive ? 'none' : 'width 0.2s cubic-bezier(0.16, 1, 0.3, 1)' 
+      style={{
+        width: isCollapsed ? '70px' : `${width}px`,
+        position: 'relative',
+        transition: resizingActive ? 'none' : 'width 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
       }}
     >
       {/* Resizing Handle */}
-      <div 
-        className="sidebar-resize-handle" 
+      <div
+        className="sidebar-resize-handle"
         onMouseDown={startResizing}
         style={{
           position: 'absolute',
@@ -237,6 +238,17 @@ export default function Sidebar({ type = "cal" }) {
           transform: translateX(0);
         }
 
+        @keyframes fadeInSlide {
+          from {
+            opacity: 0;
+            transform: translateY(-5px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
         /* Centered badge layout for collapsed view */
         .sidebar-container.collapsed .sidebar-badge {
           position: absolute !important;
@@ -281,13 +293,13 @@ export default function Sidebar({ type = "cal" }) {
       `}</style>
 
       {/* Sidebar Logo */}
-      <Link 
+      <Link
         to="/daily-calendar"
-        className={`${prefix}-logo`} 
-        style={{ 
-          display: "flex", 
-          justifyContent: "center", 
-          alignItems: "center", 
+        className={`${prefix}-logo`}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
           height: "60px",
           padding: isCollapsed ? "16px 8px" : "32px 24px",
           boxSizing: 'border-box',
@@ -302,19 +314,19 @@ export default function Sidebar({ type = "cal" }) {
             <path d="M 11 24 A 9 9 0 0 0 29 24" stroke="#0284c7" strokeWidth="3.5" strokeLinecap="round" fill="none" />
           </svg>
         ) : (
-          <img 
-            src="/poom-logo.png" 
-            alt="POOM Logo" 
-            style={{ 
-              height: "40px", 
-              maxWidth: "100%", 
+          <img
+            src="/poom-logo.png"
+            alt="POOM Logo"
+            style={{
+              height: "40px",
+              maxWidth: "100%",
               objectFit: "contain",
               cursor: 'pointer'
-            }} 
+            }}
           />
         )}
       </Link>
-      
+
       {/* Sidebar Navigation Menu */}
       <div className={`${prefix}-menu`} style={{ marginTop: isCollapsed ? '16px' : '32px' }}>
         <Link to="/daily-calendar" className={`${prefix}-menu-item sidebar-menu-item ${isCalendarActive ? 'active' : ''}`}>
@@ -332,11 +344,61 @@ export default function Sidebar({ type = "cal" }) {
           {!isCollapsed && <span className="menu-text">상담 보조</span>}
           {isCollapsed && <span className="sidebar-tooltip">상담 보조</span>}
         </Link>
-        <Link to="/trend-archive" className={`${prefix}-menu-item sidebar-menu-item ${isTrendActive ? 'active' : ''}`}>
-          <BarChart2 size={20} />
-          {!isCollapsed && <span className="menu-text">트렌드 아카이브</span>}
-          {isCollapsed && <span className="sidebar-tooltip">트렌드 아카이브</span>}
-        </Link>
+        <div
+          className="trend-menu-wrapper"
+          onMouseEnter={() => setIsTrendHovered(true)}
+          onMouseLeave={() => setIsTrendHovered(false)}
+          style={{ display: 'flex', flexDirection: 'column' }}
+        >
+          <Link to="/trend-archive" className={`${prefix}-menu-item sidebar-menu-item ${isTrendActive ? 'active' : ''}`}>
+            <BarChart2 size={20} />
+            {!isCollapsed && <span className="menu-text">트렌드 아카이브</span>}
+            {isCollapsed && <span className="sidebar-tooltip">트렌드 아카이브</span>}
+          </Link>
+
+          {/* 서브메뉴 (아래 탭) */}
+          {!isCollapsed && (isTrendHovered || isTrendActive) && (
+            <div
+              className="trend-submenu"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                paddingLeft: '36px',
+                gap: '8px',
+                marginTop: '4px',
+                marginBottom: '8px',
+                animation: 'fadeInSlide 0.2s ease-out forwards',
+              }}
+            >
+              <Link
+                to="/news-archive"
+                style={{
+                  textDecoration: 'none',
+                  color: path.includes('/news-archive') ? '#0284c7' : '#64748b',
+                  fontSize: '13px',
+                  fontWeight: path.includes('/news-archive') ? '600' : '500',
+                  padding: '4px 0',
+                  transition: 'color 0.2s',
+                }}
+              >
+                뉴스 아카이브
+              </Link>
+              <Link
+                to="/economic-indicator-archive"
+                style={{
+                  textDecoration: 'none',
+                  color: path.includes('/economic-indicator-archive') ? '#0284c7' : '#64748b',
+                  fontSize: '13px',
+                  fontWeight: path.includes('/economic-indicator-archive') ? '600' : '500',
+                  padding: '4px 0',
+                  transition: 'color 0.2s',
+                }}
+              >
+                경제지표 아카이브
+              </Link>
+            </div>
+          )}
+        </div>
         <Link to="/notifications" className={`${prefix}-menu-item sidebar-menu-item ${isNotificationActive ? 'active' : ''}`}>
           <Bell size={20} />
           {!isCollapsed && <span className="menu-text">알림</span>}
@@ -354,7 +416,7 @@ export default function Sidebar({ type = "cal" }) {
         {currentUser?.profile_url ? (
           <img src={currentUser.profile_url} alt="Profile" />
         ) : (
-          <div 
+          <div
             className="sidebar-profile-avatar"
             style={{
               width: "40px",
@@ -383,14 +445,14 @@ export default function Sidebar({ type = "cal" }) {
           </div>
         )}
         <div className="logout-wrapper" style={{ marginLeft: isCollapsed ? '0' : 'auto' }}>
-          <LogOut 
+          <LogOut
             onClick={() => {
               api.auth.logout();
-              window.location.href='/login';
-            }} 
-            size={16} 
-            color="#94a3b8" 
-            style={{ cursor: 'pointer' }} 
+              window.location.href = '/login';
+            }}
+            size={16}
+            color="#94a3b8"
+            style={{ cursor: 'pointer' }}
           />
           {isCollapsed && <span className="sidebar-tooltip">로그아웃</span>}
         </div>

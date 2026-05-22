@@ -48,7 +48,6 @@ export default function NewsArchiveDetails() {
                 <span className="news-arch-title">{item.title}</span>
                 <div className="news-arch-meta">
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CalendarIcon size={14} color="#38bdf8" /> {item.date}</span>
-                  <MoreHorizontal size={16} color="#94a3b8" />
                 </div>
               </div>
             ))}
@@ -63,8 +62,8 @@ export default function NewsArchiveDetails() {
       </div>
 
       {/* Modal Overlay */}
-      <div className="cust-modal-overlay" style={{ left: 240 }}>
-        <div className="news-arch-modal">
+      <div className="cust-modal-overlay" style={{ left: 0 }}>
+        <div className="news-arch-modal" style={{ left: '272px' }}>
           <div className="news-mod-header">
             <span className="news-arch-badge green" style={{ fontSize: 16, padding: '12px 24px' }}>경제</span>
             <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>

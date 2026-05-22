@@ -21,9 +21,6 @@ export default function EconomicIndicatorLlmReport() {
           <button className="trend-tab" style={{ background: 'white', color: '#64748b' }}>금리</button>
         </div>
 
-        <div style={{ position: 'absolute', right: 32, top: 96, cursor: 'pointer' }}>
-          <MoreHorizontal size={24} color="#94a3b8" />
-        </div>
 
         <div className="eco-grid">
           {/* Chart 1 */}
@@ -94,8 +91,8 @@ export default function EconomicIndicatorLlmReport() {
       </div>
 
       {/* Modal Overlay */}
-      <div className="cust-modal-overlay" style={{ left: 240, background: 'rgba(15, 23, 42, 0.4)' }}>
-        <div className="news-arch-modal" style={{ top: 80, bottom: 80, left: '10%', right: '10%', padding: '40px', overflowY: 'auto' }}>
+      <div className="cust-modal-overlay" style={{ left: 0, background: 'rgba(15, 23, 42, 0.4)' }}>
+        <div className="news-arch-modal" style={{ top: 80, bottom: 80, left: 'calc(240px + 8%)', right: '8%', padding: '40px', overflowY: 'auto' }}>
           <Link to="/economic-indicator-archive" style={{ position: 'absolute', top: 24, right: 24 }}>
             <button className="news-mod-close"><X size={20} color="#64748b" /></button>
           </Link>

@@ -60,9 +60,9 @@ export default function EconomicIndicatorArchive() {
 
       {/* Main Content */}
       <div className="trend-main">
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 32, marginTop: 0 }}>경제지표 아카이브</h1>
-
         <div className="trend-section-box" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 24, marginTop: 0 }}>경제지표 아카이브</h1>
+
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
             <div className="trend-tabs" style={{ marginBottom: 0 }}>
               {["금값", "부동산", "금리"].map(tab => (
@@ -75,10 +75,6 @@ export default function EconomicIndicatorArchive() {
                   {tab}
                 </button>
               ))}
-            </div>
-
-            <div style={{ cursor: 'pointer' }}>
-              <MoreHorizontal size={24} color="#94a3b8" />
             </div>
           </div>
 

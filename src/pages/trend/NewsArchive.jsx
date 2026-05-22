@@ -152,7 +152,6 @@ export default function NewsArchive() {
                     <span className="news-arch-title">{item.title}</span>
                     <div className="news-arch-meta">
                       <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CalendarIcon size={14} color="#38bdf8" /> {item.date}</span>
-                      <MoreHorizontal size={16} color="#94a3b8" />
                     </div>
                   </div>
                 </div>
@@ -180,8 +179,8 @@ export default function NewsArchive() {
 
       {/* Modal Overlay */}
       {selectedNewsItem && (
-        <div style={{ position: 'fixed', top: 0, left: 240, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', zIndex: 1000 }}>
-          <div className="news-arch-modal" style={{ top: 80, left: 40, right: 40, bottom: 40, position: 'absolute' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', zIndex: 1000 }}>
+          <div className="news-arch-modal" style={{ top: 80, left: 280, right: 40, bottom: 40, position: 'absolute' }}>
             <div className="news-mod-header">
               <span className={`news-arch-badge ${selectedNewsItem.color}`} style={{ fontSize: 16, padding: '12px 24px' }}>{selectedNewsItem.type}</span>
               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>
