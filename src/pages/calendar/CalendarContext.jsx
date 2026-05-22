@@ -140,10 +140,16 @@ export function CalendarProvider({ children }) {
         const startMin = String(execDate.getMinutes()).padStart(2, '0');
         const startTimeStr = `${dateStr} ${startHour}:${startMin}`;
 
-        // 종료 시간은 간단히 1시간 후로 계산
-        const endHourVal = (execDate.getHours() + 1) % 24;
-        const endHour = String(endHourVal).padStart(2, '0');
-        const endTimeStr = `${dateStr} ${endHour}:${startMin}`;
+        // DB에 저장된 실제 종료 시간(end_datetime) 사용
+        const endExecDate = new Date(sch.end_datetime);
+        const endYyyy = endExecDate.getFullYear();
+        const endMm = String(endExecDate.getMonth() + 1).padStart(2, '0');
+        const endDd = String(endExecDate.getDate()).padStart(2, '0');
+        const endDateStr = `${endYyyy}-${endMm}-${endDd}`;
+
+        const endHour = String(endExecDate.getHours()).padStart(2, '0');
+        const endMin = String(endExecDate.getMinutes()).padStart(2, '0');
+        const endTimeStr = `${endDateStr} ${endHour}:${endMin}`;
 
         let eventColor = 'blue';
         if (sch.category === '상담') {
@@ -191,14 +197,14 @@ export function CalendarProvider({ children }) {
         }
       }
 
-      const startIso = new Date(newEvent.startTime.replace(' ', 'T')).toISOString();
-      const endIso = new Date(newEvent.endTime.replace(' ', 'T')).toISOString();
+      const startLocal = newEvent.startTime.replace(/\//g, '-').replace(' ', 'T');
+      const endLocal = newEvent.endTime.replace(/\//g, '-').replace(' ', 'T');
 
       await api.schedule.create({
         category: newEvent.category || '상담',
         content: newEvent.title,
-        startDatetime: startIso,
-        endDatetime: endIso,
+        startDatetime: startLocal,
+        endDatetime: endLocal,
         color: newEvent.color || 'blue',
         customer_id: customerId,
         memo: newEvent.memo || ''
@@ -208,7 +214,9 @@ export function CalendarProvider({ children }) {
       showToast("일정이 정상적으로 등록되었습니다.");
     } catch (error) {
       console.error("일정 등록 실패:", error);
-      showToast("일정 등록에 실패했습니다.");
+      const errMsg = error.message || "일정 등록에 실패했습니다.";
+      alert(errMsg);
+      showToast(errMsg);
     }
   };
 
@@ -218,14 +226,14 @@ export function CalendarProvider({ children }) {
       const u_id = currentUser ? currentUser.id : null;
       if (!u_id) return;
 
-      const startIso = new Date(updatedEvent.startTime.replace(' ', 'T')).toISOString();
-      const endIso = new Date(updatedEvent.endTime.replace(' ', 'T')).toISOString();
+      const startLocal = updatedEvent.startTime.replace(/\//g, '-').replace(' ', 'T');
+      const endLocal = updatedEvent.endTime.replace(/\//g, '-').replace(' ', 'T');
 
       await api.schedule.update(u_id, updatedEvent.id, {
         category: updatedEvent.category,
         content: updatedEvent.title,
-        start_datetime: startIso,
-        end_datetime: endIso,
+        start_datetime: startLocal,
+        end_datetime: endLocal,
         color: updatedEvent.color,
         memo: updatedEvent.memo
       });
@@ -234,7 +242,9 @@ export function CalendarProvider({ children }) {
       showToast("일정이 정상적으로 수정되었습니다.");
     } catch (error) {
       console.error("일정 수정 실패:", error);
-      showToast("일정 수정에 실패했습니다.");
+      const errMsg = error.message || "일정 수정에 실패했습니다.";
+      alert(errMsg);
+      showToast(errMsg);
     }
   };
 

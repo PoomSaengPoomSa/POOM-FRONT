@@ -5,7 +5,7 @@ import MiniCalendarPicker from "./MiniCalendarPicker";
 import { useCalendar } from "./CalendarContext";
 
 export default function ScheduleRegistrationModal({ isOpen, onClose }) {
-  const { addEvent } = useCalendar();
+  const { addEvent, events } = useCalendar();
   const [category, setCategory] = useState("상담");
   const [color, setColor] = useState("blue");
   
