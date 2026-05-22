@@ -5,7 +5,7 @@ import MiniCalendarPicker from "./MiniCalendarPicker";
 import { useCalendar } from "./CalendarContext";
 
 export default function ScheduleEditModal({ isOpen, onClose, event }) {
-  const { updateEvent } = useCalendar();
+  const { updateEvent, events } = useCalendar();
   const [category, setCategory] = useState("상담");
   const [color, setColor] = useState("green");
   
