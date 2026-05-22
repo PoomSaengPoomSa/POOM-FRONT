@@ -521,6 +521,25 @@
   border-top: 2px solid #f97316;
 }
 
+/* Today Highlight for Monthly Grid */
+.monthly-day-cell.today {
+  background-color: rgba(2, 132, 199, 0.03); /* Soft subtle blue backdrop */
+}
+
+.monthly-day-number.today {
+  background-color: var(--cal-primary); /* Bold brand blue background */
+  color: white !important;
+  font-weight: 700;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px auto; /* Keep centered alignment */
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);
+}
+
 .monthly-event {
   border-radius: 4px;
   padding: 3px 8px;

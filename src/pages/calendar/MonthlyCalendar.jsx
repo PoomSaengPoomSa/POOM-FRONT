@@ -450,10 +450,15 @@ export default function MonthlyCalendar() {
                 
                 const cellEvents = events.filter(e => e.startTime.startsWith(cellDateStr));
 
+                const today = new Date();
+                const isToday = cellDate.getDate() === today.getDate() &&
+                                cellDate.getMonth() === today.getMonth() &&
+                                cellDate.getFullYear() === today.getFullYear();
+
                 return (
-                  <div key={i} className={`monthly-day-cell`} style={i >= 35 ? { borderBottom: 'none' } : {}}>
+                  <div key={i} className={`monthly-day-cell ${isToday ? 'today' : ''}`} style={i >= 35 ? { borderBottom: 'none' } : {}}>
                     <div 
-                      className={`monthly-day-number ${d.muted ? 'muted' : ''}`}
+                      className={`monthly-day-number ${d.muted ? 'muted' : ''} ${isToday ? 'today' : ''}`}
                       style={{ cursor: 'pointer' }}
                       onClick={() => {
                         setSelectedDate(cellDate);
