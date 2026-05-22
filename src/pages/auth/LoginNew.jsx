@@ -122,7 +122,7 @@ export default function LoginNew() {
               </div>
             </div>
 
-            <div className="auth-new-options" style={{ marginTop: "16px" }}>
+            <div className="auth-new-options" style={{ marginTop: "24px" }}>
               <input 
                 type="checkbox" 
                 id="agree-terms"
@@ -135,37 +135,12 @@ export default function LoginNew() {
               </label>
             </div>
 
-            <button type="submit" className="auth-new-btn" style={{ marginTop: "8px", width: "100%" }}>
+            <button type="submit" className="auth-new-btn" style={{ marginTop: "16px", width: "100%" }}>
               Log in
             </button>
           </form>
 
-          {/* Test Account Helper Grid */}
-          <div 
-            className="auth-test-helper"
-            style={{
-              marginTop: "16px",
-              padding: "12px",
-              backgroundColor: "#f8fafc",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
-              fontSize: "11px"
-            }}
-          >
-            <div style={{ fontWeight: "600", color: "#475569", marginBottom: "6px" }}>🔑 테스트 계정 안내</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", color: "#64748b" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>사용자(PB): <strong>WPB-012890</strong></span>
-                <span>비밀번호: <strong>user123</strong></span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>관리자(Admin): <strong>admin</strong></span>
-                <span>비밀번호: <strong>admin</strong></span>
-              </div>
-            </div>
-          </div>
-
-          <div className="auth-new-footer" style={{ marginTop: "24px" }}>
+          <div className="auth-new-footer" style={{ marginTop: "32px" }}>
             Don't have account yet? <Link to="/sign-up" className="auth-new-link">New Account</Link>
           </div>
         </div>

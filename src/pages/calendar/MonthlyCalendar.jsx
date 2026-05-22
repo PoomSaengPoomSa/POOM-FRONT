@@ -24,6 +24,15 @@ export default function MonthlyCalendar() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentMonth, setCurrentMonth] = useState({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
 
+  const currentUser = (() => {
+    try {
+      const userStr = localStorage.getItem("currentUser");
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (e) {
+      return null;
+    }
+  })();
+
   useEffect(() => {
     setCurrentMonth({ year: selectedDate.getFullYear(), month: selectedDate.getMonth() });
   }, [selectedDate]);
@@ -220,7 +229,7 @@ export default function MonthlyCalendar() {
               <div className="kpi-card">
                 <div className="kpi-card-header">
                   <div className="kpi-title-korean">개인 KPI</div>
-                  <div className="kpi-subtitle-korean">김재욱 PB</div>
+                  <div className="kpi-subtitle-korean">{currentUser?.name || "김재욱"} PB</div>
                 </div>
                 <div className="kpi-stats-grid">
                   <div className="kpi-stat-item">

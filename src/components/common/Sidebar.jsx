@@ -10,6 +10,38 @@ export default function Sidebar({ type = "cal" }) {
   const prefix = type; // e.g., "cal", "cust", "news", "trend"
   const [todayCount, setTodayCount] = useState(0);
 
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const userStr = localStorage.getItem("currentUser");
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        if (localStorage.getItem("accessToken")) {
+          const user = await api.auth.getMe();
+          if (user) {
+            const updatedUser = {
+              id: user.u_id,
+              role: user.role,
+              name: user.name,
+            };
+            setCurrentUser(updatedUser);
+            localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch current user profile:", err);
+      }
+    };
+
+    fetchMe();
+  }, []);
+
   useEffect(() => {
     const fetchTodayCount = async () => {
       try {
@@ -232,7 +264,8 @@ export default function Sidebar({ type = "cal" }) {
           padding: 20px 8px !important;
         }
 
-        .sidebar-container.collapsed .sidebar-profile img {
+        .sidebar-container.collapsed .sidebar-profile img,
+        .sidebar-container.collapsed .sidebar-profile .sidebar-profile-avatar {
           margin: 0 !important;
         }
 
@@ -318,15 +351,47 @@ export default function Sidebar({ type = "cal" }) {
 
       {/* Sidebar Profile Info */}
       <div className={`${prefix}-profile sidebar-profile ${isCollapsed ? 'collapsed' : ''}`}>
-        <img src="https://i.pravatar.cc/150?img=11" alt="Profile" />
+        {currentUser?.profile_url ? (
+          <img src={currentUser.profile_url} alt="Profile" />
+        ) : (
+          <div 
+            className="sidebar-profile-avatar"
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              backgroundColor: "#e0f2fe", // 하늘색
+              color: "#0284c7", // 성 한글자 색상
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "16px",
+              fontWeight: "700",
+              flexShrink: 0,
+              userSelect: "none"
+            }}
+          >
+            {(currentUser?.name || "김재욱").charAt(0)}
+          </div>
+        )}
         {!isCollapsed && (
           <div className={`${prefix}-profile-info sidebar-profile-info`}>
-            <span className={`${prefix}-profile-name`}>김재욱</span>
-            <span className={`${prefix}-profile-role`}>Private Banker</span>
+            <span className={`${prefix}-profile-name`}>{currentUser?.name || "김재욱"}</span>
+            <span className={`${prefix}-profile-role`}>
+              {currentUser?.role === "admin" ? "Super Admin" : "Private Banker"}
+            </span>
           </div>
         )}
         <div className="logout-wrapper" style={{ marginLeft: isCollapsed ? '0' : 'auto' }}>
-          <LogOut onClick={() => window.location.href='/login'} size={16} color="#94a3b8" style={{ cursor: 'pointer' }} />
+          <LogOut 
+            onClick={() => {
+              api.auth.logout();
+              window.location.href='/login';
+            }} 
+            size={16} 
+            color="#94a3b8" 
+            style={{ cursor: 'pointer' }} 
+          />
           {isCollapsed && <span className="sidebar-tooltip">로그아웃</span>}
         </div>
       </div>
