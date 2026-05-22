@@ -442,9 +442,15 @@ export default function WeeklyCalendar() {
                 return (
                   <div key={idx} className={`weekly-header-cell ${isSelected ? 'today' : ''}`} 
                        style={{ 
+                         cursor: 'pointer',
                          ...(isSunday ? { color: '#ef4444' } : {}),
                          ...(isSelected ? { borderTop: '2px solid #f97316' } : {}) 
-                       }}>
+                       }}
+                       onClick={() => {
+                         setSelectedDate(day);
+                         navigate('/daily-calendar');
+                       }}
+                  >
                     <span>{['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][day.getDay()]}</span>
                     <strong style={isSelected ? { color: '#f97316' } : {}}>
                       {String(day.getDate()).padStart(2, '0')}
