@@ -65,6 +65,7 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
     dob: "",
     phone: "",
     email: "",
+    gender: "M",
     job: "",
     grade: "일반",
     address: "",
@@ -78,6 +79,7 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
         dob: formatDateForInput(initialData.birthday || initialData.dob || ""),
         phone: initialData.phone || initialData.number || "",
         email: initialData.email || "",
+        gender: initialData.gender || "M",
         job: initialData.job || "",
         grade: initialData.grade || initialData.vipStatus || "일반",
         address: initialData.address || "",
@@ -89,6 +91,7 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
         dob: "",
         phone: "",
         email: "",
+        gender: "M",
         job: "",
         grade: "일반",
         address: "",
@@ -163,6 +166,18 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
                 />
               </div>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>성별 <span style={{ color: '#ef4444' }}>*</span></label>
+                <select 
+                  className="cust-form-input" 
+                  style={{ width: '100%', appearance: 'auto', paddingRight: 24 }}
+                  value={formData.gender}
+                  onChange={(e) => handleChange("gender", e.target.value)}
+                >
+                  <option value="M">남성</option>
+                  <option value="F">여성</option>
+                </select>
+              </div>
+              <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>생년월일 <span style={{ color: '#ef4444' }}>*</span></label>
                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                   <input 
@@ -217,7 +232,7 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
                   }}
                 />
               </div>
-              <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8, gridColumn: 'span 2' }}>
                 <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>이메일</label>
                 <input 
                   type="text" 
