@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, AlertCircle, CheckCircle, ChevronDown } from "lucide-react";
 import "./AuthNew.css";
+import { api } from "../../api";
 
 const REGIONS = ["서울", "경기", "인천", "부산", "대구", "대전", "광주", "제주"];
 const BRANCHES = [
@@ -21,6 +22,15 @@ export default function SignUpNew() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const getTodayFormatted = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    return `${yyyy}.${mm}.${dd}`;
+  };
+  const [startDate, setStartDate] = useState(getTodayFormatted());
   const [id, setId] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [region, setRegion] = useState("서울");
@@ -52,7 +62,7 @@ export default function SignUpNew() {
     }
   };
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -67,6 +77,14 @@ export default function SignUpNew() {
     }
     if (!email.trim()) {
       setError("이메일을 입력해 주세요.");
+      return;
+    }
+    if (!phone.trim()) {
+      setError("전화 번호를 입력해 주세요.");
+      return;
+    }
+    if (!startDate.trim()) {
+      setError("입사일을 입력해 주세요.");
       return;
     }
     if (!birthDate.trim()) {
@@ -86,11 +104,26 @@ export default function SignUpNew() {
       return;
     }
 
-    // Simulate successful signup
-    setSuccess("회원가입이 완료되었습니다! 잠시 후 로그인 페이지로 이동합니다.");
-    setTimeout(() => {
-      navigate("/login");
-    }, 2000);
+    try {
+      await api.auth.signup({
+        id,
+        password,
+        name,
+        email,
+        number: phone,
+        startDate,
+        birthDate,
+        region,
+        branch,
+      });
+
+      setSuccess("회원가입이 완료되었습니다! 잠시 후 로그인 페이지로 이동합니다.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err) {
+      setError(err.message || "회원가입 처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
+    }
   };
 
   const filteredBranches = BRANCHES.filter((b) => b.region === region);
@@ -196,7 +229,35 @@ export default function SignUpNew() {
                 </div>
               </div>
 
-              {/* Item 4: 생일 */}
+              {/* Item 3-2: 전화 번호 */}
+              <div className="auth-new-form-group">
+                <label className="auth-new-label">전화 번호</label>
+                <div className="auth-new-input-wrap">
+                  <input 
+                    type="text" 
+                    className="auth-new-input" 
+                    placeholder="010-1234-5678" 
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Item 4-1: 입사일 */}
+              <div className="auth-new-form-group">
+                <label className="auth-new-label">입사일</label>
+                <div className="auth-new-input-wrap">
+                  <input 
+                    type="text" 
+                    className="auth-new-input" 
+                    placeholder="2026.05.22" 
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Item 4-2: 생일 */}
               <div className="auth-new-form-group">
                 <label className="auth-new-label">생일</label>
                 <div className="auth-new-input-wrap">

@@ -85,7 +85,7 @@ export const api = {
           const user = {
             id: payload.sub,
             role: payload.role,
-            name: payload.sub === "admin1" ? "관리자" : "PB직원",
+            name: response.name || (payload.sub === "admin1" ? "관리자" : payload.sub),
           };
           localStorage.setItem("currentUser", JSON.stringify(user));
           return user;
@@ -93,10 +93,16 @@ export const api = {
       }
       throw new Error("로그인 응답 형식이 올바르지 않습니다.");
     },
+    signup: async (signUpData) => {
+      return await api.post("/auth/signup", signUpData);
+    },
     logout: () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("currentUser");
+    },
+    getMe: async () => {
+      return await api.get("/auth/me");
     },
     getCurrentUser: () => {
       const userStr = localStorage.getItem("currentUser");
