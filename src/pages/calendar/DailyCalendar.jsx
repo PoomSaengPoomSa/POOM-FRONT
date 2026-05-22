@@ -195,7 +195,7 @@ export default function DailyCalendar() {
                 ) : (
                   todayEvents.map(e => {
                     const timeStr = `${e.startTime.split(' ')[1]} ~`;
-                    const isAiRecommended = e.aiTodoSource || (e.memo && e.memo.includes("AI To Do"));
+                    const isAiRecommended = !!e.at_id;
                     return (
                       <div className="my-todo-item" key={e.id}>
                         <div className="todo-time-tag">
@@ -206,7 +206,9 @@ export default function DailyCalendar() {
                         </div>
                         <div className="todo-content" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                           <span>{e.title}</span>
-                          <span style={{ fontSize: 11, color: '#94a3b8' }}>{e.memo || '상담 요망'}</span>
+                          <span style={{ fontSize: 11, color: '#94a3b8' }}>
+                            {isAiRecommended ? "AI 추천으로 등록된 일정" : (e.memo || '상담 요망')}
+                          </span>
                         </div>
                         {isAiRecommended && (
                           <button 
