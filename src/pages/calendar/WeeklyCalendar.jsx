@@ -242,7 +242,7 @@ export default function WeeklyCalendar() {
               <div className="kpi-card">
                 <div className="kpi-card-header">
                   <div className="kpi-title-korean">개인 KPI</div>
-                  <div className="kpi-subtitle-korean">{currentUser?.name || "김재욱"} PB</div>
+                  <div className="kpi-subtitle-korean">{personalKpi?.name || currentUser?.name || "김재욱"} PB</div>
                 </div>
                 <div className="kpi-stats-grid">
                   <div className="kpi-stat-item">

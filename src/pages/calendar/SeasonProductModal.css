@@ -170,8 +170,12 @@
   font-size: 11px;
   color: #475569;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.5;
   white-space: pre-line;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-weight: 500;
 }
 
 .product-card-footer {
