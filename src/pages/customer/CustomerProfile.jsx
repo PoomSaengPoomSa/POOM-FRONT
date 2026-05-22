@@ -147,24 +147,24 @@ export default function CustomerProfile() {
                 <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>16억</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>연령</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>만 54</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>거래 시작일</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>2018.03.05</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>최근 상담</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>2026.01.11</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>다음 방문</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>2026.05.02</div>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>생년월일</label>
+                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>1972.08.14</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>연락처</label>
                 <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>{selectedCustomer.phone}</div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>이메일</label>
+                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>{selectedCustomer.email || "example@email.com"}</div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>주소</label>
+                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>서울시 강남구</div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>거래 시작일</label>
+                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>2018.03.05</div>
               </div>
             </div>
 

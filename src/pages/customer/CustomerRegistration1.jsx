@@ -44,9 +44,12 @@ const getCustomerDetails = (customer, fullDetail) => {
     job: fullDetail?.job || "중견기업 CEO",
     vipStatus: fullDetail?.grade || "VIP",
     typeStatus: fullDetail?.tendency || "위험중립형",
+    email: fullDetail?.email || customer?.email || "example@email.com",
+    address: fullDetail?.address || "서울시 강남구",
     gridData: {
       totalAsset: fullDetail?.total_assets !== undefined ? `${(fullDetail.total_assets / 100000000).toFixed(1)}억` : "16억",
       age: fullDetail?.birthday ? `만 ${new Date().getFullYear() - new Date(fullDetail.birthday).getFullYear()}세` : "만 54세",
+      birthdayStr: fullDetail?.birthday ? fullDetail.birthday.replace(/-/g, ".") : "1972.08.14",
       startDate: fullDetail?.start_date ? fullDetail.start_date.replace(/-/g, ".") : "2018.03.05",
       lastConsult: "2026.01.11",
       nextVisit: "2026.05.02",
@@ -84,13 +87,36 @@ const getCustomerDetails = (customer, fullDetail) => {
       { category: "성향", text: "빠른 의사결정 선호, 서류 설명 길면 집중력 저하", date: "2026.04.12", color: "#8b5cf6" },
       { category: "건강", text: "무릎 수술 후 장기 요양 중 - 방문 일정 오전 선호", date: "2026.04.12", color: "#10b981" },
     ],
-    productMatching: {
-      productName: "우리 테마형 국내 리츠 펀드",
-      productDesc: "본 펀드는 국내 우량 리츠 및 상장 부동산 자산에 집중 투자하여 안정적인 배당 수익과 중장기적인 자산 가치 상승을 동시에 추구합니다.",
-      status: "부적합",
-      statusColor: "#ef4444",
-      matchingDesc: "현재 달러 자산의 비중을 낮추고 변동성이 적은 안정적인 인컴 수익을 확보하고자 하는 고객님의 자산 리밸런싱 방향성과 정확히 부합합니다."
-    }
+    productMatchingList: [
+      {
+        productName: "우리 테마형 국내 리츠 펀드",
+        productDesc: "본 펀드는 국내 우량 리츠 및 상장 부동산 자산에 집중 투자하여 안정적인 배당 수익과 중장기적인 자산 가치 상승을 동시에 추구합니다.",
+        status: "부적합",
+        statusColor: "#ef4444",
+        matchingDesc: "현재 달러 자산의 비중을 낮추고 변동성이 적은 안정적인 인컴 수익을 확보하고자 하는 고객님의 자산 리밸런싱 방향성과 정확히 부합합니다."
+      },
+      {
+        productName: "하나 고배당 상장지수증권 (ETN)",
+        productDesc: "국내 고배당주 포트폴리오를 추종하며, 매월 분배금을 지급하여 현금 흐름을 극대화하고자 하는 은퇴자 및 자산가 고객에게 최적화된 상품입니다.",
+        status: "적합",
+        statusColor: "#10b981",
+        matchingDesc: "은퇴 자산의 안정적인 현금 흐름 창출을 최우선으로 선호하시는 고객님의 니즈와 완벽히 일치하여 고배당 매력도가 매우 높습니다."
+      },
+      {
+        productName: "글로벌 인공지능 테크 랩어카운트",
+        productDesc: "미국 및 글로벌 빅테크 기업과 차세대 AI 하드웨어/소프트웨어 혁신 선도 기업들을 중심으로 집중 포트폴리오를 구성해 초과 성장을 목표로 합니다.",
+        status: "적합",
+        statusColor: "#10b981",
+        matchingDesc: "중장기 자산 성장을 원하시고, 성장주 투자를 통해 적극적인 수익 실현을 지향하시는 고객님의 성향과 강력히 연계됩니다."
+      },
+      {
+        productName: "삼성 단기 국공채 전문투자형 사모펀드",
+        productDesc: "삼성 자산운용의 우량 국공채 집중 투자형 사모펀드로 금리 변동 리스크를 최소화하고 단기 이자 수익을 고정 확보하는 상품입니다.",
+        status: "부적합",
+        statusColor: "#ef4444",
+        matchingDesc: "현재 금리 인하 국면에서 단기 채권의 메리트가 낮고, 적극적인 리밸런싱을 통한 중장기 고수익을 원하시는 현 시점 전략과는 맞지 않습니다."
+      }
+    ]
   };
 
   // 자산이 0원인 경우 PieChart 퍼센트 비중을 0으로 강제 조정
@@ -114,10 +140,7 @@ const getCustomerDetails = (customer, fullDetail) => {
       ...(customer.visitData || {})
     },
     features: customer.features || defaults.features,
-    productMatching: {
-      ...defaults.productMatching,
-      ...(customer.productMatching || {})
-    }
+    productMatchingList: customer.productMatchingList || defaults.productMatchingList
   };
 };
 
@@ -135,16 +158,6 @@ export default function CustomerRegistration1() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editModalData, setEditModalData] = useState(null);
   const [featureSubTab, setFeatureSubTab] = useState("전체");
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    totalAsset: "",
-    age: "",
-    startDate: "",
-    lastConsult: "",
-    nextVisit: "",
-    phone: ""
-  });
-
   const [listWidth, setListWidth] = useState(320);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -240,27 +253,61 @@ export default function CustomerRegistration1() {
 
   const details = getCustomerDetails(selectedCustomer, fullCustomerDetail);
 
-  const handleInputChange = (field, value) => {
-    setEditForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSaveEdit = async () => {
-    if (!selectedCustomer) return;
+  const handleSaveCustomer = async (formData) => {
     try {
-      await api.customer.update(selectedCustomer.id, {
-        phone: editForm.phone
-      });
-      await fetchCustomers();
-      setSelectedCustomer(prev => ({
-        ...prev,
-        phone: editForm.phone
-      }));
-      setIsEditing(false);
+      if (editModalData) {
+        // 수정 모드
+        await api.customer.update(editModalData.id, {
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          job: formData.job,
+          address: formData.address,
+          grade: formData.grade,
+          investment_type: formData.investment_type,
+          birth: formData.dob ? formData.dob.replace(/\./g, "-") : null,
+        });
+        setEditModalData(null);
+        await fetchCustomers();
+        
+        // 상세 데이터가 현재 보고있는 고객이면 상세도 다시 로드하여 즉시 UI 반영
+        if (selectedCustomer && selectedCustomer.id === editModalData.id) {
+          const detail = await api.customer.getDetail(selectedCustomer.id);
+          setFullCustomerDetail(detail);
+          setSelectedCustomer(prev => ({
+            ...prev,
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email
+          }));
+        }
+      } else {
+        // 신규 등록 모드
+        const created = await api.customer.create({
+          name: formData.name || "신규 고객",
+          email: formData.email || "new@email.com",
+          phone: formData.phone || "010-0000-0000",
+          address: formData.address || "서울시 강남구",
+          job: formData.job || "회사원",
+          grade: formData.grade || "일반",
+          investment_type: formData.investment_type || "위험중립형",
+          birth: formData.dob ? formData.dob.replace(/\./g, "-") : null,
+        });
+        setIsModalOpen(false);
+        await fetchCustomers();
+
+        const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
+        setSelectedCustomer({
+          id: created.c_id,
+          name: created.name,
+          email: created.email,
+          phone: created.number || created.phone || "010-0000-0000",
+          color: colors[created.c_id % colors.length],
+          initial: created.name ? created.name[0] : "신",
+        });
+      }
     } catch (error) {
-      alert("고객 정보 수정 중 오류가 발생했습니다: " + error.message);
+      alert("고객 정보 저장 중 오류가 발생했습니다: " + error.message);
     }
   };
 
@@ -291,13 +338,13 @@ export default function CustomerRegistration1() {
           </div>
 
           <div className="cust-list-tabs">
-            <div className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} onClick={() => { setActiveListTab('전체 고객'); setIsEditing(false); }} style={{ cursor: 'pointer' }}>전체 고객</div>
-            <div className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} onClick={() => { setActiveListTab('오늘 방문'); setIsEditing(false); }} style={{ cursor: 'pointer' }}>오늘 방문</div>
+            <div className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} onClick={() => { setActiveListTab('전체 고객'); }} style={{ cursor: 'pointer' }}>전체 고객</div>
+            <div className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} onClick={() => { setActiveListTab('오늘 방문'); }} style={{ cursor: 'pointer' }}>오늘 방문</div>
           </div>
 
           <div className="cust-list-items">
             {filteredCustomers.map(c => (
-              <div className={`cust-list-item ${selectedCustomer?.id === c.id ? 'active' : ''}`} key={c.id} onClick={() => { setSelectedCustomer(c); setFeatureSubTab("전체"); setIsEditing(false); }} style={{ cursor: 'pointer' }}>
+              <div className={`cust-list-item ${selectedCustomer?.id === c.id ? 'active' : ''}`} key={c.id} onClick={() => { setSelectedCustomer(c); setFeatureSubTab("전체"); }} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">
                   <span className="cust-item-name">{c.name}</span>
@@ -362,26 +409,28 @@ export default function CustomerRegistration1() {
                   고객 특징
                 </button>
               </div>
-              <button 
-                onClick={() => setIsDeleteModalOpen(true)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '8px 16px',
-                  borderRadius: 8,
-                  border: '1px solid #cbd5e1',
-                  background: 'white',
-                  color: '#ef4444',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                }}
-              >
-                <Trash2 size={14} color="#ef4444" />
-                삭제하기
-              </button>
+              {activeDetailTab === "info" && (
+                <button 
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '8px 16px',
+                    borderRadius: 8,
+                    border: '1px solid #cbd5e1',
+                    background: 'white',
+                    color: '#ef4444',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                  }}
+                >
+                  <Trash2 size={14} color="#ef4444" />
+                  삭제하기
+                </button>
+              )}
             </div>
           </div>
 
@@ -407,214 +456,62 @@ export default function CustomerRegistration1() {
                         </div>
                       </div>
                     </div>
-                    {isEditing ? (
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <button 
-                          onClick={() => setIsEditing(false)}
-                          style={{ 
-                            background: 'white', 
-                            color: '#475569', 
-                            border: '1px solid #cbd5e1', 
-                            borderRadius: 8, 
-                            padding: '8px 20px', 
-                            fontSize: 14, 
-                            fontWeight: 600, 
-                            cursor: 'pointer',
-                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-                            transition: 'all 0.2s'
-                          }}
-                        >
-                          취소
-                        </button>
-                        <button 
-                          onClick={handleSaveEdit}
-                          style={{ 
-                            background: '#0284c7', 
-                            color: 'white', 
-                            border: 'none', 
-                            borderRadius: 8, 
-                            padding: '8px 24px', 
-                            fontSize: 14, 
-                            fontWeight: 600, 
-                            cursor: 'pointer',
-                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-                            transition: 'all 0.2s'
-                          }}
-                        >
-                          저장
-                        </button>
-                      </div>
-                    ) : (
-                      <button 
-                        onClick={() => {
-                          setIsEditing(true);
-                          setEditForm({
-                            totalAsset: details.gridData.totalAsset,
-                            age: details.gridData.age,
-                            startDate: details.gridData.startDate,
-                            lastConsult: details.gridData.lastConsult,
-                            nextVisit: details.gridData.nextVisit,
-                            phone: selectedCustomer.phone || ""
-                          });
-                        }}
-                        style={{ background: '#0284c7', color: 'white', border: 'none', borderRadius: 8, padding: '8px 24px', fontSize: 14, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
-                      >
-                        수정하기
-                      </button>
-                    )}
+                    <button 
+                      onClick={() => {
+                        setEditModalData({
+                          id: selectedCustomer.id,
+                          name: selectedCustomer.name,
+                          birthday: fullCustomerDetail?.birthday || "",
+                          phone: selectedCustomer.phone,
+                          email: selectedCustomer.email || fullCustomerDetail?.email || "",
+                          job: fullCustomerDetail?.job || "",
+                          grade: fullCustomerDetail?.grade || "일반",
+                          address: fullCustomerDetail?.address || "",
+                          tendency: fullCustomerDetail?.tendency || "위험중립형"
+                        });
+                      }}
+                      style={{ background: '#0284c7', color: 'white', border: 'none', borderRadius: 8, padding: '8px 24px', fontSize: 14, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                    >
+                      수정하기
+                    </button>
                   </div>
 
                   {/* 6 Grid items */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20 }}>
+                    {/* 1. 총 자산 */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>총 자산</label>
-                      {isEditing ? (
-                        <input 
-                          type="text" 
-                          value={editForm.totalAsset} 
-                          onChange={(e) => handleInputChange("totalAsset", e.target.value)}
-                          style={{
-                            width: '100%',
-                            boxSizing: 'border-box',
-                            background: 'white',
-                            border: '1px solid #cbd5e1',
-                            padding: '10px 16px',
-                            borderRadius: 8,
-                            fontSize: 14,
-                            color: '#0f172a',
-                            fontWeight: 600,
-                            outline: 'none',
-                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)',
-                          }}
-                        />
-                      ) : (
-                        <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{details.gridData.totalAsset}</div>
-                      )}
+                      <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{details.gridData.totalAsset}</div>
                     </div>
+
+                    {/* 2. 생년월일 */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>연령</label>
-                      {isEditing ? (
-                        <input 
-                          type="text" 
-                          value={editForm.age} 
-                          onChange={(e) => handleInputChange("age", e.target.value)}
-                          style={{
-                            width: '100%',
-                            boxSizing: 'border-box',
-                            background: 'white',
-                            border: '1px solid #cbd5e1',
-                            padding: '10px 16px',
-                            borderRadius: 8,
-                            fontSize: 14,
-                            color: '#0f172a',
-                            fontWeight: 600,
-                            outline: 'none',
-                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)',
-                          }}
-                        />
-                      ) : (
-                        <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{details.gridData.age}</div>
-                      )}
+                      <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>생년월일</label>
+                      <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{details.gridData.birthdayStr}</div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>거래 시작일</label>
-                      {isEditing ? (
-                        <input 
-                          type="text" 
-                          value={editForm.startDate} 
-                          onChange={(e) => handleInputChange("startDate", e.target.value)}
-                          style={{
-                            width: '100%',
-                            boxSizing: 'border-box',
-                            background: 'white',
-                            border: '1px solid #cbd5e1',
-                            padding: '10px 16px',
-                            borderRadius: 8,
-                            fontSize: 14,
-                            color: '#0f172a',
-                            fontWeight: 600,
-                            outline: 'none',
-                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)',
-                          }}
-                        />
-                      ) : (
-                        <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{details.gridData.startDate}</div>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>최근 상담</label>
-                      {isEditing ? (
-                        <input 
-                          type="text" 
-                          value={editForm.lastConsult} 
-                          onChange={(e) => handleInputChange("lastConsult", e.target.value)}
-                          style={{
-                            width: '100%',
-                            boxSizing: 'border-box',
-                            background: 'white',
-                            border: '1px solid #cbd5e1',
-                            padding: '10px 16px',
-                            borderRadius: 8,
-                            fontSize: 14,
-                            color: '#0f172a',
-                            fontWeight: 600,
-                            outline: 'none',
-                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)',
-                          }}
-                        />
-                      ) : (
-                        <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{details.gridData.lastConsult}</div>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>다음 방문</label>
-                      {isEditing ? (
-                        <input 
-                          type="text" 
-                          value={editForm.nextVisit} 
-                          onChange={(e) => handleInputChange("nextVisit", e.target.value)}
-                          style={{
-                            width: '100%',
-                            boxSizing: 'border-box',
-                            background: 'white',
-                            border: '1px solid #cbd5e1',
-                            padding: '10px 16px',
-                            borderRadius: 8,
-                            fontSize: 14,
-                            color: '#0f172a',
-                            fontWeight: 600,
-                            outline: 'none',
-                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)',
-                          }}
-                        />
-                      ) : (
-                        <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{details.gridData.nextVisit}</div>
-                      )}
-                    </div>
+
+                    {/* 3. 연락처 */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>연락처</label>
-                      {isEditing ? (
-                        <input 
-                          type="text" 
-                          value={editForm.phone} 
-                          onChange={(e) => handleInputChange("phone", e.target.value)}
-                          style={{
-                            width: '100%',
-                            boxSizing: 'border-box',
-                            background: 'white',
-                            border: '1px solid #cbd5e1',
-                            padding: '10px 16px',
-                            borderRadius: 8,
-                            fontSize: 14,
-                            color: '#0f172a',
-                            fontWeight: 600,
-                            outline: 'none',
-                            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)',
-                          }}
-                        />
-                      ) : (
-                        <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{selectedCustomer.phone}</div>
-                      )}
+                      <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{selectedCustomer.phone}</div>
+                    </div>
+
+                    {/* 4. 이메일 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>이메일</label>
+                      <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{selectedCustomer.email || details.email}</div>
+                    </div>
+
+                    {/* 5. 주소 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>주소</label>
+                      <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{details.address}</div>
+                    </div>
+
+                    {/* 6. 거래 시작일 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <label style={{ fontSize: 12, fontWeight: 500, color: '#64748b' }}>거래 시작일</label>
+                      <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a', fontWeight: 600 }}>{details.gridData.startDate}</div>
                     </div>
                   </div>
                 </div>
@@ -843,42 +740,46 @@ export default function CustomerRegistration1() {
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>주력 상품 매칭 현황</h3>
                   
-                  <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: 24, display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-                    {/* Left Column */}
-                    <div style={{ flex: '1.2 1 300px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-                      <h4 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>
-                        {details.productMatching.productName}
-                      </h4>
-                      <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.6, margin: 0 }}>
-                        {details.productMatching.productDesc}
-                      </p>
-                    </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxHeight: 400, overflowY: 'auto', paddingRight: 4 }}>
+                    {details.productMatchingList.map((product, idx) => (
+                      <div key={idx} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 12, padding: 24, display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+                        {/* Left Column */}
+                        <div style={{ flex: '1.2 1 300px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                          <h4 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                            {product.productName}
+                          </h4>
+                          <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                            {product.productDesc}
+                          </p>
+                        </div>
 
-                    {/* Separator line (only visible when side-by-side) */}
-                    <div className="cust-matching-divider" style={{ width: 1, backgroundColor: '#e2e8f0', alignSelf: 'stretch' }} />
+                        {/* Separator line */}
+                        <div className="cust-matching-divider" style={{ width: 1, backgroundColor: '#e2e8f0', alignSelf: 'stretch' }} />
 
-                    {/* Right Column */}
-                    <div style={{ flex: '0.8 1 200px', display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', justifyContent: 'center' }}>
-                      <div 
-                        style={{ 
-                          width: 100, 
-                          height: 36, 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center', 
-                          background: details.productMatching.statusColor || '#ef4444', 
-                          color: 'white', 
-                          borderRadius: 4, 
-                          fontWeight: 700, 
-                          fontSize: 14 
-                        }}
-                      >
-                        {details.productMatching.status}
+                        {/* Right Column */}
+                        <div style={{ flex: '0.8 1 200px', display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center', justifyContent: 'center' }}>
+                          <div 
+                            style={{ 
+                              width: 100, 
+                              height: 36, 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              background: product.statusColor || '#ef4444', 
+                              color: 'white', 
+                              borderRadius: 4, 
+                              fontWeight: 700, 
+                              fontSize: 14 
+                            }}
+                          >
+                            {product.status}
+                          </div>
+                          <p style={{ fontSize: 12, color: '#475569', lineHeight: 1.6, margin: 0, textAlign: 'left' }}>
+                            {product.matchingDesc}
+                          </p>
+                        </div>
                       </div>
-                      <p style={{ fontSize: 12, color: '#475569', lineHeight: 1.6, margin: 0, textAlign: 'left' }}>
-                        {details.productMatching.matchingDesc}
-                      </p>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </>
@@ -926,7 +827,6 @@ export default function CustomerRegistration1() {
                       setAllCustomersList(prev => prev.filter(c => c.id !== selectedCustomer.id));
                       setTodayCustomersList(prev => prev.filter(c => c.id !== selectedCustomer.id));
                       setSelectedCustomer(null);
-                      setIsEditing(false);
                     } catch (error) {
                       alert("고객 삭제 실패: " + error.message);
                     }
@@ -944,55 +844,7 @@ export default function CustomerRegistration1() {
         isOpen={isModalOpen || !!editModalData} 
         onClose={() => { setIsModalOpen(false); setEditModalData(null); }} 
         initialData={editModalData}
-        onSave={async (newData) => {
-          if (editModalData) {
-            try {
-              await api.customer.update(editModalData.id, {
-                name: newData.name,
-                phone: newData.phone,
-                email: newData.email,
-                job: newData.job,
-                grade: newData.grade,
-              });
-              await fetchCustomers();
-              setSelectedCustomer(prev => prev && prev.id === editModalData.id ? { 
-                ...prev, 
-                name: newData.name, 
-                phone: newData.phone, 
-                email: newData.email 
-              } : prev);
-            } catch (err) {
-              alert("수정 실패: " + err.message);
-            }
-          } else {
-            try {
-              const created = await api.customer.create({
-                name: newData.name || "신규 고객",
-                email: newData.email || "new@email.com",
-                phone: newData.phone || "010-0000-0000",
-                address: "서울시 강남구", // 기본값
-                job: newData.job || "회사원",
-                grade: newData.grade || "VIP",
-                investment_type: "위험중립형",
-              });
-              await fetchCustomers();
-              
-              const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
-              setSelectedCustomer({
-                id: created.c_id,
-                name: created.name,
-                email: created.email,
-                phone: created.number || created.phone || "010-0000-0000",
-                color: colors[created.c_id % colors.length],
-                initial: created.name ? created.name[0] : "신",
-              });
-            } catch (err) {
-              alert("등록 실패: " + err.message);
-            }
-          }
-          setIsModalOpen(false);
-          setEditModalData(null);
-        }}
+        onSave={handleSaveCustomer}
       />
       </div>
     </div>

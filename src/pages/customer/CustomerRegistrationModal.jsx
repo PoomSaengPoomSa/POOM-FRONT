@@ -41,36 +41,36 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
   const [formData, setFormData] = useState({
     name: "",
     dob: "",
-    job: "",
-    grade: "VIP",
     phone: "",
     email: "",
-    startDate: "",
-    nextVisit: ""
+    job: "",
+    grade: "일반",
+    address: "",
+    investment_type: "위험중립형"
   });
 
   useEffect(() => {
     if (initialData) {
       setFormData({
         name: initialData.name || "",
-        dob: formatDateForInput(initialData.dob || ""),
-        job: initialData.job || "",
-        grade: initialData.vipStatus || "VIP",
-        phone: initialData.phone || "",
+        dob: formatDateForInput(initialData.birthday || initialData.dob || ""),
+        phone: initialData.phone || initialData.number || "",
         email: initialData.email || "",
-        startDate: formatDateForInput(initialData.gridData?.startDate || ""),
-        nextVisit: formatDateForInput(initialData.gridData?.nextVisit || "")
+        job: initialData.job || "",
+        grade: initialData.grade || initialData.vipStatus || "일반",
+        address: initialData.address || "",
+        investment_type: initialData.tendency || initialData.investment_type || "위험중립형"
       });
     } else {
       setFormData({
         name: "",
         dob: "",
-        job: "",
-        grade: "VIP",
         phone: "",
         email: "",
-        startDate: "",
-        nextVisit: ""
+        job: "",
+        grade: "일반",
+        address: "",
+        investment_type: "위험중립형"
       });
     }
   }, [initialData, isOpen]);
@@ -85,16 +85,14 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
   };
 
   const handleSave = () => {
-    if (!formData.name || !formData.job) {
+    if (!formData.name || !formData.dob) {
       alert("필수 입력 항목(*)을 입력해 주세요.");
       return;
     }
     if (onSave) {
       onSave({
         ...formData,
-        dob: formatDateForSave(formData.dob),
-        startDate: formatDateForSave(formData.startDate),
-        nextVisit: formatDateForSave(formData.nextVisit)
+        dob: formatDateForSave(formData.dob)
       });
     }
   };
@@ -128,9 +126,9 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
 
         <div className="cust-modal-content" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           
-          {/* 기본 정보 Section */}
+          {/* 기본 인적 정보 Section */}
           <div>
-            <div className="cust-form-section-title" style={{ fontSize: 14, fontWeight: 700, color: '#0284c7', marginBottom: 16 }}>기본 정보</div>
+            <div className="cust-form-section-title" style={{ fontSize: 14, fontWeight: 700, color: '#0284c7', marginBottom: 16 }}>기본 인적 정보</div>
             <div className="cust-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>이름 <span style={{ color: '#ef4444' }}>*</span></label>
@@ -157,30 +155,7 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
                 </div>
               </div>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>직업 / 직책 <span style={{ color: '#ef4444' }}>*</span></label>
-                <input 
-                  type="text" 
-                  className="cust-form-input" 
-                  placeholder="예: 중견기업 CEO" 
-                  value={formData.job}
-                  onChange={(e) => handleChange("job", e.target.value)}
-                />
-              </div>
-              <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>등급</label>
-                <select 
-                  className="cust-form-input" 
-                  style={{ width: '100%', appearance: 'auto', paddingRight: 24 }}
-                  value={formData.grade}
-                  onChange={(e) => handleChange("grade", e.target.value)}
-                >
-                  <option value="VIP">VIP</option>
-                  <option value="일반">일반</option>
-                  <option value="골드">골드</option>
-                </select>
-              </div>
-              <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>연락처</label>
+                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>전화번호</label>
                 <input 
                   type="text" 
                   className="cust-form-input" 
@@ -202,37 +177,57 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
             </div>
           </div>
 
-          {/* 방문 일정 Section */}
+          {/* 투자 및 주소 정보 Section */}
           <div>
-            <div className="cust-form-section-title" style={{ fontSize: 14, fontWeight: 700, color: '#0284c7', marginBottom: 16 }}>방문 일정</div>
+            <div className="cust-form-section-title" style={{ fontSize: 14, fontWeight: 700, color: '#0284c7', marginBottom: 16 }}>투자 및 주소 정보</div>
             <div className="cust-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 0 }}>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>거래 시작일</label>
-                <div style={{ position: 'relative' }}>
-                  <input 
-                    type="date" 
-                    className="cust-form-input cust-form-input-date" 
-                    style={{ width: '100%', boxSizing: 'border-box', paddingRight: '40px' }}
-                    value={formData.startDate}
-                    onChange={(e) => handleChange("startDate", e.target.value)}
-                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                  />
-                  <CalendarIcon size={16} color="#0284c7" style={{ position: 'absolute', right: 12, top: 12, pointerEvents: 'none' }} />
-                </div>
+                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>직업</label>
+                <input 
+                  type="text" 
+                  className="cust-form-input" 
+                  placeholder="예: 회사원, 자영업자" 
+                  value={formData.job}
+                  onChange={(e) => handleChange("job", e.target.value)}
+                />
               </div>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>다음 방문 예정</label>
-                <div style={{ position: 'relative' }}>
-                  <input 
-                    type="date" 
-                    className="cust-form-input cust-form-input-date" 
-                    style={{ width: '100%', boxSizing: 'border-box', paddingRight: '40px' }}
-                    value={formData.nextVisit}
-                    onChange={(e) => handleChange("nextVisit", e.target.value)}
-                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                  />
-                  <CalendarIcon size={16} color="#0284c7" style={{ position: 'absolute', right: 12, top: 12, pointerEvents: 'none' }} />
-                </div>
+                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>등급</label>
+                <select 
+                  className="cust-form-input" 
+                  style={{ width: '100%', appearance: 'auto', paddingRight: 24 }}
+                  value={formData.grade}
+                  onChange={(e) => handleChange("grade", e.target.value)}
+                >
+                  <option value="일반">일반</option>
+                  <option value="VIP">VIP</option>
+                  <option value="VVIP">VVIP</option>
+                </select>
+              </div>
+              <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>주소</label>
+                <input 
+                  type="text" 
+                  className="cust-form-input" 
+                  placeholder="예: 서울시 강남구" 
+                  value={formData.address}
+                  onChange={(e) => handleChange("address", e.target.value)}
+                />
+              </div>
+              <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>투자 성향</label>
+                <select 
+                  className="cust-form-input" 
+                  style={{ width: '100%', appearance: 'auto', paddingRight: 24 }}
+                  value={formData.investment_type}
+                  onChange={(e) => handleChange("investment_type", e.target.value)}
+                >
+                  <option value="공격투자형">공격투자형</option>
+                  <option value="적극투자형">적극투자형</option>
+                  <option value="위험중립형">위험중립형</option>
+                  <option value="안정추구형">안정추구형</option>
+                  <option value="안정형">안정형</option>
+                </select>
               </div>
             </div>
           </div>
