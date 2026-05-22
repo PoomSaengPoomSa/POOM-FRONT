@@ -1,8 +1,18 @@
 import { X } from "lucide-react";
 import "./CalendarNew.css";
+import { useCalendar } from "./CalendarContext";
 
 export default function ScheduleDetailModal({ isOpen, onClose, onEdit, event }) {
+  const { deleteEvent } = useCalendar();
+
   if (!isOpen || !event) return null;
+
+  const handleDelete = async () => {
+    if (window.confirm("정말로 이 일정을 삭제하시겠습니까?")) {
+      await deleteEvent(event.id);
+      onClose();
+    }
+  };
 
   return (
     <div className="cal-modal-overlay">
@@ -62,7 +72,7 @@ export default function ScheduleDetailModal({ isOpen, onClose, onEdit, event }) 
         </div>
 
         <div className="cal-modal-actions">
-          <button className="cal-btn cal-btn-outline" onClick={onClose}>삭제</button>
+          <button className="cal-btn cal-btn-outline" onClick={handleDelete}>삭제</button>
           <button className="cal-btn cal-btn-primary" onClick={onEdit}>수정</button>
         </div>
       </div>
