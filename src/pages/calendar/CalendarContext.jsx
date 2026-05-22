@@ -126,7 +126,8 @@ export function CalendarProvider({ children }) {
           group,
           subText: todo.memo || 'AI 권장 조치사항',
           tags,
-          c_id: todo.c_id
+          c_id: todo.c_id,
+          executionDate: todo.execution_date
         };
       });
 
@@ -292,6 +293,24 @@ export function CalendarProvider({ children }) {
     const checkedTodos = aiTodos.filter(t => t.checked);
     if (checkedTodos.length === 0) {
       showToast("선택된 AI To Do 항목이 없습니다.");
+      return;
+    }
+
+    // 1차 시간대 겹침(중복) 검사
+    const overlappingTodo = checkedTodos.find(todo => {
+      const todoStart = new Date(todo.executionDate);
+      const todoEnd = new Date(todoStart.getTime() + 60 * 60 * 1000); // 시작 시간 + 1시간
+
+      return events.some(e => {
+        const eStart = new Date(e.startTime);
+        const eEnd = new Date(e.endTime);
+        return todoStart < eEnd && todoEnd > eStart;
+      });
+    });
+
+    if (overlappingTodo) {
+      alert(`추천 일정 '${overlappingTodo.content}'의 시간대에 이미 다른 일정이 존재합니다. 중복 등록할 수 없습니다.`);
+      showToast("중복되는 일정이 존재합니다.");
       return;
     }
 

@@ -452,7 +452,14 @@ export default function MonthlyCalendar() {
 
                 return (
                   <div key={i} className={`monthly-day-cell`} style={i >= 35 ? { borderBottom: 'none' } : {}}>
-                    <div className={`monthly-day-number ${d.muted ? 'muted' : ''}`}>
+                    <div 
+                      className={`monthly-day-number ${d.muted ? 'muted' : ''}`}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        setSelectedDate(cellDate);
+                        navigate('/daily-calendar');
+                      }}
+                    >
                       {String(d.day).padStart(2, '0')}
                     </div>
                     {cellEvents.map(event => {
