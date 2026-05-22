@@ -37,6 +37,28 @@ const formatDateForSave = (dateStr) => {
   return dateStr;
 };
 
+const formatDob = (value) => {
+  const nums = value.replace(/[^0-9]/g, "");
+  if (nums.length <= 4) {
+    return nums;
+  }
+  if (nums.length <= 6) {
+    return `${nums.slice(0, 4)}-${nums.slice(4)}`;
+  }
+  return `${nums.slice(0, 4)}-${nums.slice(4, 6)}-${nums.slice(6, 8)}`;
+};
+
+const formatPhone = (value) => {
+  const nums = value.replace(/[^0-9]/g, "");
+  if (nums.length <= 3) {
+    return nums;
+  }
+  if (nums.length <= 7) {
+    return `${nums.slice(0, 3)}-${nums.slice(3)}`;
+  }
+  return `${nums.slice(0, 3)}-${nums.slice(3, 7)}-${nums.slice(7, 11)}`;
+};
+
 export default function CustomerRegistrationModal({ isOpen, onClose, initialData, onSave }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -142,16 +164,43 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
               </div>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label className="cust-form-label" style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>생년월일 <span style={{ color: '#ef4444' }}>*</span></label>
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                   <input 
-                    type="date" 
-                    className="cust-form-input cust-form-input-date" 
+                    type="text" 
+                    className="cust-form-input" 
                     style={{ width: '100%', boxSizing: 'border-box', paddingRight: '40px' }}
+                    placeholder="예: 1980-01-01" 
+                    maxLength={10}
                     value={formData.dob}
-                    onChange={(e) => handleChange("dob", e.target.value)}
-                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                    onChange={(e) => {
+                      const formatted = formatDob(e.target.value);
+                      handleChange("dob", formatted);
+                    }}
                   />
-                  <CalendarIcon size={16} color="#0284c7" style={{ position: 'absolute', right: 12, top: 12, pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', right: 12, display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    <CalendarIcon size={16} color="#0284c7" style={{ pointerEvents: 'none' }} />
+                    <input 
+                      type="date" 
+                      style={{
+                        position: 'absolute',
+                        top: -8,
+                        left: -8,
+                        right: -8,
+                        bottom: -8,
+                        opacity: 0,
+                        cursor: 'pointer',
+                        width: 32,
+                        height: 32,
+                      }}
+                      value={/^\d{4}-\d{2}-\d{2}$/.test(formData.dob) ? formData.dob : ""}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleChange("dob", e.target.value);
+                        }
+                      }}
+                      onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                    />
+                  </div>
                 </div>
               </div>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -160,8 +209,12 @@ export default function CustomerRegistrationModal({ isOpen, onClose, initialData
                   type="text" 
                   className="cust-form-input" 
                   placeholder="010-0000-0000" 
+                  maxLength={13}
                   value={formData.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
+                  onChange={(e) => {
+                    const formatted = formatPhone(e.target.value);
+                    handleChange("phone", formatted);
+                  }}
                 />
               </div>
               <div className="cust-form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
