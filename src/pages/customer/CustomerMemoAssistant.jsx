@@ -86,6 +86,11 @@ export default function CustomerMemoAssistant() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedTimelineId, setExpandedTimelineId] = useState(null);
   const [showSaveToast, setShowSaveToast] = useState(false);
+  const [timelineList, setTimelineList] = useState([]);
+  const [timelineDetails, setTimelineDetails] = useState({});
+  const [generatedReport, setGeneratedReport] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [memoText, setMemoText] = useState("달러 자산 줄이고 싶다고. 국내 리츠 관심. 다음달 초 재방문.");
 
   const formatAssets = (assetVal) => {
     if (assetVal === undefined || assetVal === null) return "32억 1,234만";
@@ -126,7 +131,10 @@ export default function CustomerMemoAssistant() {
         setTodayCustomersList(mapped);
       }
       
-      if (mapped.length > 0) {
+      const exists = mapped.some(c => c.id === selectedCustomerId);
+      if (exists) {
+        // Keep the current selection
+      } else if (mapped.length > 0) {
         setSelectedCustomerId(mapped[0].id);
       } else {
         setSelectedCustomerId(null);
@@ -157,6 +165,111 @@ export default function CustomerMemoAssistant() {
     
     fetchDetail();
   }, [selectedCustomerId]);
+
+  const fetchTimeline = async (cId) => {
+    const targetId = cId || selectedCustomerId;
+    if (!targetId) return;
+    try {
+      const res = await api.customer.getMemos(targetId);
+      setTimelineList(res.timelines || []);
+      setTimelineDetails({});
+      setExpandedTimelineId(null);
+    } catch (error) {
+      console.error("타임라인 조회 실패:", error);
+      setTimelineList([]);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedCustomerId) {
+      setTimelineList([]);
+      setTimelineDetails({});
+      setExpandedTimelineId(null);
+      return;
+    }
+    
+    fetchTimeline(selectedCustomerId);
+  }, [selectedCustomerId]);
+
+  const handleTimelineClick = async (timelineId) => {
+    const isExpanded = expandedTimelineId === timelineId;
+    if (isExpanded) {
+      setExpandedTimelineId(null);
+    } else {
+      setExpandedTimelineId(timelineId);
+      if (!timelineDetails[timelineId]) {
+        try {
+          const detail = await api.customer.getMemoDetail(selectedCustomerId, timelineId);
+          setTimelineDetails(prev => ({
+            ...prev,
+            [timelineId]: detail
+          }));
+        } catch (error) {
+          console.error("타임라인 상세 조회 실패:", error);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    setGeneratedReport(null);
+    setMemoText("달러 자산 줄이고 싶다고. 국내 리츠 관심. 다음달 초 재방문.");
+  }, [selectedCustomerId]);
+
+  const handleGenerateReport = async () => {
+    if (!selectedCustomerId || !memoText.trim()) return;
+    
+    setIsGenerating(true);
+    try {
+      const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 19);
+      const res = await api.customer.generateReport(selectedCustomerId, {
+        memo: memoText,
+        consult_date: nowStr
+      });
+      
+      if (res && res.data) {
+        setGeneratedReport({
+          ...res.data,
+          date: nowStr.split(' ')[0].replace(/-/g, '.')
+        });
+      }
+    } catch (error) {
+      console.error("AI 보고서 생성 실패:", error);
+      alert("AI 보고서 생성 중 오류가 발생했습니다: " + error.message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSaveReport = async () => {
+    if (!selectedCustomerId || !memoText.trim()) return;
+    
+    const reportContent = {
+      key_needs: generatedReport ? generatedReport.key_needs : (fullCustomerDetail?.llm_insight || "달러 자산 비중 축소/국내 리츠 편입 검토"),
+      follow_up: generatedReport ? generatedReport.follow_up : "리츠 상품 비교안 준비",
+      next_consult: generatedReport ? generatedReport.next_consult : "2026.05 초순"
+    };
+
+    try {
+      const date = new Date();
+      const pad = (n) => n.toString().padStart(2, '0');
+      const formattedDate = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+
+      await api.customer.saveReport(selectedCustomerId, {
+        memo: memoText,
+        consult_date: formattedDate,
+        content: reportContent
+      });
+
+      setShowSaveToast(true);
+      setTimeout(() => setShowSaveToast(false), 2000);
+      
+      await fetchTimeline(selectedCustomerId);
+    } catch (error) {
+      console.error("보고서 저장 실패:", error);
+      alert("보고서 저장 중 오류가 발생했습니다: " + error.message);
+    }
+  };
   
   const currentList = activeListTab === '전체 고객' ? allCustomersList : todayCustomersList;
   const selectedCustomer = (allCustomersList.concat(todayCustomersList).find(c => c.id === selectedCustomerId) || currentList[0]) || { name: "로딩중...", color: "gray", initial: "고" };
@@ -201,9 +314,15 @@ export default function CustomerMemoAssistant() {
   const [isTyping, setIsTyping] = useState(false);
 
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: "smooth"
+      });
+    }
   };
 
   useEffect(() => {
@@ -241,40 +360,44 @@ export default function CustomerMemoAssistant() {
     setTimeout(() => setShowNotesSaveToast(false), 2000);
   };
 
-  const handleSendQuestion = () => {
-    if (!currentQuestion.trim()) return;
+  const handleSendQuestion = async () => {
+    if (!selectedCustomerId || !currentQuestion.trim()) return;
     
-    const userMsg = { sender: 'user', text: currentQuestion };
+    const question = currentQuestion;
+    const notes = additionalNotes[selectedCustomerId] || "";
+    
+    const userMsg = { sender: 'user', text: question };
     setChatMessages(prev => ({
       ...prev,
       [selectedCustomerId]: [...(prev[selectedCustomerId] || []), userMsg]
     }));
     
-    const question = currentQuestion;
     setCurrentQuestion("");
     setIsTyping(true);
     
-    setTimeout(() => {
-      let aiResponseText = "";
-      const customerName = selectedCustomer.name;
-      const details = selectedSimDetails;
-      const rawAssets = details.assetsRaw;
+    try {
+      const res = await api.customer.simulatorChat(selectedCustomerId, {
+        question: question,
+        additional_notes: notes
+      });
       
-      if (question.includes("절세")) {
-        aiResponseText = `${customerName} 고객님의 자산 포트폴리오(${details.assets}, ${details.products} 비중 다수)를 기반으로 제안해 드리는 맞춤형 절세 전략입니다:\n\n1. 금융소득종합과세 대비 비과세/분리과세 상품 활용\n- 현재 총자산 규모 및 자산 구성상 금융소득종합과세 대상에 해당할 가능성이 높습니다.\n- 이자소득 배당소득 절세를 위해 분리과세 하이일드 펀드나 비과세 채권 활용을 확대하는 것을 권장합니다.\n\n2. ISA(개인종합자산관리계좌) 적극 활용\n- 중개형 ISA를 통해 국내주식 및 채권 거래 시 발생하는 이자·배당 소득에 대해 비과세 및 9.9% 분리과세 혜택을 적용받으실 수 있습니다.\n\n3. 채권 매매차익 비과세 혜택 극대화\n- 현재 보유하신 채권 포트폴리오 중 금리 하락기에 유리한 저쿠폰 표면금리가 낮은 국채 위주로 세팅하여 이자소득세 과세 대상 금액을 줄이고, 대신 매매차익을 극대화하는 세테크를 추천합니다.`;
-      } else if (question.includes("10년") || question.includes("수익") || question.includes("시뮬레이션")) {
-        aiResponseText = `${customerName} 고객님의 ${details.risk} 성향과 현재 포트폴리오 및 추가 입력 정보를 토대로 시뮬레이션한 10년 후 예상 자산 추이입니다:\n\n[시뮬레이션 조건]\n- 초기 자산: ${details.assets}\n- 기대 수익률: 연평균 6.5% (${details.risk} 기준)\n- 인플레이션율: 연 2.0% 반영\n\n[10년 후 예상 포트폴리오 가치]\n- 1년 후: 약 ${(rawAssets * 1.065).toFixed(1)}억 원 수준\n- 5년 후: 약 ${(rawAssets * 1.37).toFixed(1)}억 원 수준\n- 10년 후: 약 ${(rawAssets * 1.87).toFixed(1)}억 원 수준 (누적 수익률 약 +87%)\n\n[투자 다각화 제안]\n- 주요 니즈이신 '${details.needs}'를 달성하기 위해 현재 포트폴리오 구성에서 글로벌 자산 및 대체자산 비중을 20% 수준으로 조율할 경우, 포트폴리오 변동성(위험)을 15% 낮추면서 유사한 수익률을 방어할 수 있습니다.`;
-      } else {
-        aiResponseText = `문의하신 질문에 대해 ${customerName} 고객님의 프로필(자산 ${details.assets}, ${details.risk}) 및 시장 트렌드를 분석하여 시뮬레이션을 진행하고 있습니다. \n\n추가 입력 사항에 기재해주신 세부 니즈를 바탕으로 보다 세부적인 자산 배분 시뮬레이션 및 포트폴리오 제안을 원하실 경우, 구체적인 목표 수익률이나 투자 기간을 말씀해주시면 더욱 정확한 진단이 가능합니다.`;
+      if (res && res.data && res.data.answer) {
+        const aiMsg = { sender: 'ai', text: res.data.answer };
+        setChatMessages(prev => ({
+          ...prev,
+          [selectedCustomerId]: [...(prev[selectedCustomerId] || []), aiMsg]
+        }));
       }
-      
-      const aiMsg = { sender: 'ai', text: aiResponseText };
+    } catch (error) {
+      console.error("시뮬레이션 질의 실패:", error);
+      const errorMsg = { sender: 'ai', text: "시뮬레이션 답변을 받아오는 도중 오류가 발생했습니다: " + error.message };
       setChatMessages(prev => ({
         ...prev,
-        [selectedCustomerId]: [...(prev[selectedCustomerId] || []), aiMsg]
+        [selectedCustomerId]: [...(prev[selectedCustomerId] || []), errorMsg]
       }));
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   };
 
   const filteredCustomers = currentList.filter(c => 
@@ -383,14 +506,30 @@ export default function CustomerMemoAssistant() {
               <textarea 
                 className="memo-textarea" 
                 placeholder="달러 자산 줄이고 싶다고. 국내 리츠 관심. 다음달 초 재방문."
-                defaultValue="달러 자산 줄이고 싶다고. 국내 리츠 관심. 다음달 초 재방문."
+                value={memoText}
+                onChange={(e) => setMemoText(e.target.value)}
                 style={{ minHeight: '200px', flex: 1, marginBottom: '16px', resize: 'none' }}
               />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
                 <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   💡 자유롭게 메모하세요. AI가 구조화된 상담 보고서로 변환합니다.
                 </div>
-                <button className="memo-small-btn" style={{ border: '1px solid #0284c7', color: '#0284c7', whiteSpace: 'nowrap' }}>AI 보고서 생성</button>
+                <button 
+                  className="memo-small-btn" 
+                  disabled={isGenerating}
+                  onClick={handleGenerateReport}
+                  style={{ 
+                    border: '1px solid #0284c7', 
+                    color: 'white', 
+                    background: '#0284c7',
+                    fontWeight: '600',
+                    whiteSpace: 'nowrap',
+                    cursor: isGenerating ? 'not-allowed' : 'pointer',
+                    opacity: isGenerating ? 0.6 : 1
+                  }}
+                >
+                  {isGenerating ? "생성 중..." : "AI 보고서 생성"}
+                </button>
               </div>
             </div>
 
@@ -403,16 +542,71 @@ export default function CustomerMemoAssistant() {
                 </div>
               </div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 12 }}>
-                2026.04.30 <span style={{ fontWeight: 400, color: '#94a3b8', marginLeft: 8 }}>달러 자산 비중 축소</span>
+                {generatedReport ? (
+                  <>
+                    {generatedReport.date} <span style={{ fontWeight: 400, color: '#94a3b8', marginLeft: 8 }}>
+                      {generatedReport.key_needs.length > 15 ? generatedReport.key_needs.slice(0, 15) + "..." : generatedReport.key_needs}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    2026.04.30 <span style={{ fontWeight: 400, color: '#94a3b8', marginLeft: 8 }}>달러 자산 비중 축소</span>
+                  </>
+                )}
               </div>
               
               <table className="report-table">
                 <tbody>
-                  <tr><th>고객명</th><td>{selectedCustomer.name} ({fullCustomerDetail?.grade || "VIP"})</td></tr>
-                  <tr><th>총자산</th><td>{formatAssets(fullCustomerDetail?.total_assets)}</td></tr>
-                  <tr><th>주요 니즈</th><td>{fullCustomerDetail?.llm_insight || "달러 자산 비중 축소/국내 리츠 편입 검토"}</td></tr>
-                  <tr><th>후속 조치</th><td>리츠 상품 비교안 준비</td></tr>
-                  <tr><th>차기 상담</th><td>2026.05 초순</td></tr>
+                  <tr>
+                    <th>고객명</th>
+                    <td>
+                      {generatedReport ? (
+                        `${generatedReport.customer_name} (${generatedReport.grade})`
+                      ) : (
+                        `${selectedCustomer.name} (${fullCustomerDetail?.grade || "VIP"})`
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>총자산</th>
+                    <td>
+                      {generatedReport ? (
+                        generatedReport.total_assets
+                      ) : (
+                        formatAssets(fullCustomerDetail?.total_assets)
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>주요 니즈</th>
+                    <td>
+                      {generatedReport ? (
+                        generatedReport.key_needs
+                      ) : (
+                        fullCustomerDetail?.llm_insight || "달러 자산 비중 축소/국내 리츠 편입 검토"
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>후속 조치</th>
+                    <td>
+                      {generatedReport ? (
+                        generatedReport.follow_up
+                      ) : (
+                        "리츠 상품 비교안 준비"
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>차기 상담</th>
+                    <td>
+                      {generatedReport ? (
+                        generatedReport.next_consult
+                      ) : (
+                        "2026.05 초순"
+                      )}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
 
@@ -434,10 +628,7 @@ export default function CustomerMemoAssistant() {
                 )}
                 <button 
                   className="report-btn report-btn-primary"
-                  onClick={() => {
-                    setShowSaveToast(true);
-                    setTimeout(() => setShowSaveToast(false), 2000);
-                  }}
+                  onClick={handleSaveReport}
                 >
                   저장
                 </button>
@@ -449,78 +640,102 @@ export default function CustomerMemoAssistant() {
           <div className="timeline-box">
             <div className="memo-box-title" style={{ marginBottom: 24 }}>이전 상담 타임라인</div>
             
-            {timelineData.map((item, index) => {
-              const isExpanded = expandedTimelineId === item.id;
-              const isLast = index === timelineData.length - 1;
-              return (
-                <div 
-                  key={item.id} 
-                  className="timeline-item"
-                  onClick={() => setExpandedTimelineId(isExpanded ? null : item.id)}
-                  style={{ 
-                    cursor: 'pointer', 
-                    background: isExpanded ? '#f0f4f8' : 'transparent',
-                    padding: isExpanded ? '16px' : '0',
-                    borderRadius: isExpanded ? '12px' : '0',
-                    margin: isExpanded ? '0 -16px 24px -16px' : '0 0 24px 0',
-                    transition: 'all 0.2s ease-in-out'
-                  }}
-                >
-                  <div className="timeline-dot" style={{ 
-                    borderColor: isExpanded ? '#f97316 #3b82f6 #3b82f6 #f97316' : '#0284c7',
-                    borderWidth: '2px',
-                    color: isExpanded ? '#0f172a' : '#0284c7',
-                  }}>
-                    {item.type}
-                  </div>
-                  {!isLast && (
-                    <div className="timeline-line" style={{
-                      left: isExpanded ? '32px' : '16px',
-                      top: isExpanded ? '48px' : '32px',
-                      borderLeft: '1px dotted #94a3b8',
-                      background: 'none',
-                      width: '0',
-                      bottom: '-24px'
-                    }}></div>
-                  )}
-                  <div className="timeline-content" style={{ paddingLeft: isExpanded ? '8px' : '0' }}>
-                    <span className="timeline-date">{item.date}</span>
-                    <span className="timeline-text" style={{ color: isExpanded ? '#0f172a' : '#475569' }}>{item.text}</span>
-                    
-                    {isExpanded && (
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
-                        {/* Box 1: 원본메모 */}
-                        <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '13px', fontWeight: '600', marginBottom: '12px' }}>
-                            <PenLine size={14} /> 원본메모
-                          </div>
-                          <div style={{ fontSize: '13px', color: '#475569', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
-                            {item.originalMemo}
-                          </div>
-                        </div>
-
-                        {/* Box 2: AI 요약 */}
-                        <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8b5cf6', fontSize: '13px', fontWeight: '700', marginBottom: '12px' }}>
-                            AI 요약
-                          </div>
-                          <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
-                            <tbody>
-                              {Object.entries(item.aiSummary).map(([key, value]) => (
-                                <tr key={key}>
-                                  <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>{key}</td>
-                                  <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600' }}>{value}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
+            {timelineList.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>
+                이전 상담 타임라인 이력이 없습니다.
+              </div>
+            ) : (
+              timelineList.map((item, index) => {
+                const isExpanded = expandedTimelineId === item.timelineId;
+                const isLast = index === timelineList.length - 1;
+                return (
+                  <div 
+                    key={item.timelineId} 
+                    className="timeline-item"
+                    onClick={() => handleTimelineClick(item.timelineId)}
+                    style={{ 
+                      cursor: 'pointer', 
+                      background: isExpanded ? '#f0f4f8' : 'transparent',
+                      padding: isExpanded ? '16px' : '0',
+                      borderRadius: isExpanded ? '12px' : '0',
+                      margin: isExpanded ? '0 -16px 24px -16px' : '0 0 24px 0',
+                      transition: 'all 0.2s ease-in-out'
+                    }}
+                  >
+                    <div className="timeline-dot" style={{ 
+                      borderColor: isExpanded ? '#f97316 #3b82f6 #3b82f6 #f97316' : '#0284c7',
+                      borderWidth: '2px',
+                      color: isExpanded ? '#0f172a' : '#0284c7',
+                    }}>
+                      상담
+                    </div>
+                    {!isLast && (
+                      <div className="timeline-line" style={{
+                        left: isExpanded ? '32px' : '16px',
+                        top: isExpanded ? '48px' : '32px',
+                        borderLeft: '1px dotted #94a3b8',
+                        background: 'none',
+                        width: '0',
+                        bottom: '-24px'
+                      }}></div>
                     )}
+                    <div className="timeline-content" style={{ paddingLeft: isExpanded ? '8px' : '0' }}>
+                      <span className="timeline-date">{item.date}</span>
+                      <span className="timeline-text" style={{ color: isExpanded ? '#0f172a' : '#475569' }}>
+                        {isExpanded ? (timelineDetails[item.timelineId]?.title || item.memo) : item.memo}
+                      </span>
+                      
+                      {isExpanded && (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+                          {/* Box 1: 원본메모 */}
+                          <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '13px', fontWeight: '600', marginBottom: '12px' }}>
+                              <PenLine size={14} /> 원본메모
+                            </div>
+                            <div style={{ fontSize: '13px', color: '#475569', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                              {timelineDetails[item.timelineId]?.memo || "로딩중..."}
+                            </div>
+                          </div>
+  
+                          {/* Box 2: AI 요약 */}
+                          <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8b5cf6', fontSize: '13px', fontWeight: '700', marginBottom: '12px' }}>
+                              AI 요약
+                            </div>
+                            {timelineDetails[item.timelineId] ? (
+                              <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
+                                <tbody>
+                                  <tr>
+                                    <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>주요 니즈</td>
+                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600' }}>
+                                      {timelineDetails[item.timelineId].content.key_needs || "-"}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>후속 조치</td>
+                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600' }}>
+                                      {timelineDetails[item.timelineId].content.follow_up || "-"}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>차기 상담</td>
+                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600' }}>
+                                      {timelineDetails[item.timelineId].content.next_consult || "-"}
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            ) : (
+                              <div style={{ fontSize: '13px', color: '#94a3b8' }}>로딩중...</div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
           </div>
           )}
@@ -636,16 +851,19 @@ export default function CustomerMemoAssistant() {
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', minHeight: 0 }}>
                 
                 {/* Messages Panel */}
-                <div style={{ 
-                  flex: 1, 
-                  overflowY: 'auto', 
-                  paddingRight: '8px', 
-                  paddingBottom: '80px', // Space for bottom input
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px',
-                  minHeight: 0
-                }}>
+                <div 
+                  ref={messagesContainerRef}
+                  style={{ 
+                    flex: 1, 
+                    overflowY: 'auto', 
+                    paddingRight: '8px', 
+                    paddingBottom: '80px', // Space for bottom input
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    minHeight: 0
+                  }}
+                >
                   {(!chatMessages[selectedCustomerId] || chatMessages[selectedCustomerId].length === 0) ? (
                     <div style={{ 
                       display: 'flex', 
@@ -778,41 +996,44 @@ export default function CustomerMemoAssistant() {
       <CustomerRegistrationModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        onSave={(newData) => {
-          const newId = Date.now();
-          const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
-          const randomColor = colors[Math.floor(Math.random() * colors.length)];
-          
-          let ageVal = "만 54";
-          if (newData.dob && newData.dob.includes(".")) {
-            const birthYear = parseInt(newData.dob.split(".")[0]);
-            if (!isNaN(birthYear)) {
-              ageVal = `만 ${new Date().getFullYear() - birthYear}`;
-            }
-          }
+        onSave={async (newData) => {
+          try {
+            const created = await api.customer.create({
+              name: newData.name || "신규 고객",
+              email: newData.email || "new@email.com",
+              phone: newData.phone || "010-0000-0000",
+              address: newData.address || "서울시 강남구",
+              job: newData.job || "회사원",
+              grade: newData.grade || "일반",
+              investment_type: newData.investment_type || "위험중립형",
+              birth: newData.dob ? newData.dob.replace(/\./g, "-") : null,
+              gender: newData.gender || "M",
+            });
 
-          const newCustomer = {
-            id: newId,
-            name: newData.name || "신규 고객",
-            email: newData.email || "new@email.com",
-            phone: newData.phone || "010-0000-0000",
-            color: randomColor,
-            initial: (newData.name || "신")[0],
-            job: newData.job || "회사원",
-            vipStatus: newData.grade || "VIP",
-            gridData: {
-              totalAsset: "10억",
-              age: ageVal,
-              startDate: newData.startDate || "2026.05.20",
-              lastConsult: "없음",
-              nextVisit: newData.nextVisit || "미정"
-            }
-          };
-          
-          setAllCustomersList(prev => [newCustomer, ...prev]);
-          setActiveListTab("전체 고객");
-          setSelectedCustomerId(newId);
-          setIsModalOpen(false);
+            setActiveListTab("전체 고객");
+
+            // Fetch refreshed list to update the client state
+            const response = await api.customer.getList("all");
+            const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
+            const mapped = response.map((c) => {
+              const char = c.name ? c.name[0] : "고";
+              return {
+                id: c.c_id,
+                name: c.name,
+                email: c.email || `${c.c_id}@poom.com`,
+                phone: c.phone || "010-0000-0000",
+                color: colors[c.c_id % colors.length],
+                initial: char,
+                time: c.c_id % 2 === 0 ? "10:00 AM" : "14:30 PM",
+              };
+            });
+
+            setAllCustomersList(mapped);
+            setSelectedCustomerId(created.c_id);
+            setIsModalOpen(false);
+          } catch (error) {
+            alert("고객 등록 중 오류가 발생했습니다: " + error.message);
+          }
         }}
       />
       </div>

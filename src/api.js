@@ -129,6 +129,11 @@ export const api = {
     getFeatures: (c_id) => api.get(`/customers/${c_id}/feature`),
     getVisitStats: (c_id) => api.get(`/customers/${c_id}/visit-statistics`),
     getChurnRisk: (c_id) => api.get(`/customers/${c_id}/churn-risk`),
+    getMemos: (c_id, cursor = "", size = 20) => api.get(`/customers/${c_id}/memos?cursor=${cursor}&size=${size}`),
+    getMemoDetail: (c_id, cm_id) => api.get(`/customers/${c_id}/memos/${cm_id}`),
+    generateReport: (c_id, data) => api.post(`/customers/${c_id}/reports/generate`, data),
+    saveReport: (c_id, data) => api.post(`/customers/${c_id}/reports`, data),
+    simulatorChat: (c_id, data) => api.post(`/customers/${c_id}/simulator/chat`, data),
   },
 
   // 3. 일정 (Schedule) API
