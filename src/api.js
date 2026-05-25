@@ -127,7 +127,7 @@ export const api = {
     // 추가 AI 인사이트 및 서포트 API
     getProductMatch: (c_id) => api.get(`/customers/${c_id}/main_product_match`),
     getFeatures: (c_id) => api.get(`/customers/${c_id}/feature`),
-    getVisitStats: (c_id) => api.get(`/customers/${c_id}/visit-statistics`),
+    getVisitStats: (c_id) => api.get(`/customers/${c_id}/visits-statistics`),
     getChurnRisk: (c_id) => api.get(`/customers/${c_id}/churn-risk`),
     getMemos: (c_id, cursor = "", size = 20) => api.get(`/customers/${c_id}/memos?cursor=${cursor}&size=${size}`),
     getMemoDetail: (c_id, cm_id) => api.get(`/customers/${c_id}/memos/${cm_id}`),
