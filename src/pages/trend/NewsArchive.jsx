@@ -1,58 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, TrendingUp, Users, Bell, LogOut, Search, MoreHorizontal, Calendar as CalendarIcon, Star, ChevronLeft, ChevronRight, X, Settings } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, LogOut, Search, Calendar as CalendarIcon, Star, ChevronLeft, ChevronRight, X, Settings } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
+import { api } from "../../api";
 import "./Trend.css";
-
-// ---------------------------------------------------------
-// [DB 연동 대비] 임시 데이터 및 모의 API 함수
-// 추후 실제 API 엔드포인트(fetch / axios)로 교체하기 쉽게 구성
-// ---------------------------------------------------------
-const mockNewsData = [
-  { 
-    id: 1, type: "경제", title: "셀트리온, 美 소화기학회서 자가면역질환 치료제 '램시마SC' 임상 데이터 공개", date: "12 Dec, 2020", color: "green",
-    body: "셀트리온이 지난 2일부터 5일까지 나흘간 미국 일리노이주 시카고에서 열린 '2026 미국소화기학회(DDW)'에 참가했다고 7일 밝혔다. 자가면역질환 치료제 'CT-P13 SC(램시마SC·미국 제품명 짐펜트라)'의 경쟁력을 알렸다.\n\n셀트리온은 학회 첫날 크론병 환자를 대상으로 일본에서 진행한 CT-P13 SC의 임상 3상 44주 결과가 최초로 공개됐다.",
-    references: ["셀트리온, 미국소화기학회서 짐펜트라 임상 공개", "\"비수기에도\"...셀트리온, 1분기 매출 1.1조 '역대최고'"]
-  },
-  { 
-    id: 2, type: "정치", title: "[속보] 국힘 \"후대통령 '비읍시옷' 발언 경악\"", date: "12 Dec, 2020", color: "pink",
-    body: "정치권 소식 본문입니다. 현재는 DB 연동 전 임시 데이터입니다.",
-    references: ["정치 관련 참고자료 1", "정치 관련 참고자료 2"]
-  },
-  { 
-    id: 3, type: "경제", title: "카카오, 1분기 영업익 2114억원...전년비 66%↑", date: "12 Dec, 2020", color: "green",
-    body: "카카오 실적 발표 본문입니다. 현재는 DB 연동 전 임시 데이터입니다.",
-    references: ["카카오 실적 발표 상세", "IT 기업 1분기 동향"]
-  },
-  { 
-    id: 4, type: "경제", title: "HMM 나무호 예인선 도착...오늘 오전 중 작업 시작", date: "12 Dec, 2020", color: "green",
-    body: "HMM 해운 관련 본문입니다. 현재는 DB 연동 전 임시 데이터입니다.",
-    references: ["HMM 물류 동향", "해운업계 뉴스"]
-  },
-  { 
-    id: 5, type: "정치", title: "국산 전투기 시대 열렸다...KF-21, 전투용 적합 판정", date: "12 Dec, 2020", color: "pink",
-    body: "방산 및 KF-21 관련 본문입니다. 현재는 DB 연동 전 임시 데이터입니다.",
-    references: ["국방부 보도자료", "방산업계 실적 분석"]
-  },
-  { 
-    id: 6, type: "IT/과학", title: "카카오, 에이전틱 AI 속도...\"카톡 내 탐색부터 결제까지\"", date: "12 Dec, 2020", color: "blue",
-    body: "IT/과학 AI 발전 동향 본문입니다. 현재는 DB 연동 전 임시 데이터입니다.",
-    references: ["AI 기술 트렌드 2026", "빅테크 기업들의 AI 경쟁"]
-  },
-  { 
-    id: 7, type: "경제", title: "삼성바이오 노사 갈등 격화...\"불법행위 엄정 대응\" vs \"억지 고소\"", date: "12 Dec, 2020", color: "green",
-    body: "삼성바이오 관련 본문입니다. 현재는 DB 연동 전 임시 데이터입니다.",
-    references: ["제약바이오 업계 노사 동향", "삼성바이오 1분기 실적"]
-  },
-];
-
-const fetchNewsAPI = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockNewsData);
-    }, 300); // 네트워크 지연 시뮬레이션
-  });
-};
 
 export default function NewsArchive() {
   const location = useLocation();
@@ -61,44 +12,61 @@ export default function NewsArchive() {
   // ---------------------------------------------------------
   // State 관리
   // ---------------------------------------------------------
-  const [newsData, setNewsData] = useState([]);
+  const [newsItems, setNewsItems] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, size: 10, totalCount: 0, totalPages: 1 });
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingNewsDetail, setIsLoadingNewsDetail] = useState(false);
   
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedNewsItem, setSelectedNewsItem] = useState(null);
-  const [bucketItems, setBucketItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  
-  const ITEMS_PER_PAGE = 10;
 
-  // DB(API) 연동 시뮬레이션 (컴포넌트 마운트 시 데이터 로드)
+  // API 호출 연동 (카테고리, 검색어, 페이지 변경 시 트리거)
   useEffect(() => {
     setIsLoading(true);
-    fetchNewsAPI().then(data => {
-      setNewsData(data);
-      setIsLoading(false);
-    });
-  }, []);
+    
+    const params = {
+      category: selectedCategory === "전체" ? undefined : selectedCategory,
+      q: searchQuery || undefined,
+      page: currentPage,
+      size: 10,
+      sort: "latest"
+    };
 
-  // 버킷 저장 토글
-  const toggleBucket = (e, id) => {
-    e.stopPropagation();
-    setBucketItems(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    api.trend.getNewsList(params)
+      .then(response => {
+        setNewsItems(response.items || []);
+        setPagination(response.pagination || { page: 1, size: 10, totalCount: 0, totalPages: 1 });
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("뉴스 목록 조회 실패:", err);
+        setIsLoading(false);
+      });
+  }, [selectedCategory, searchQuery, currentPage]);
+
+  // 뉴스 클릭 시 상세 조회 호출
+  const handleNewsClick = (item) => {
+    setIsLoadingNewsDetail(true);
+
+    api.trend.getNewsDetail(item.id)
+      .then(detail => {
+        const colorMap = { "경제": "green", "정치": "pink", "IT/과학": "blue", economy: "green", politics: "pink", it: "blue" };
+        setSelectedNewsItem({
+          title: detail.title,
+          type: item.category || "경제",
+          color: colorMap[item.category] || "green",
+          body: detail.body || "기사 본문이 존재하지 않습니다.",
+          references: detail.tags ? detail.tags : []
+        });
+        setIsLoadingNewsDetail(false);
+      })
+      .catch(err => {
+        console.error("뉴스 상세 로드 실패:", err);
+        setIsLoadingNewsDetail(false);
+      });
   };
-
-  // ---------------------------------------------------------
-  // 파생 데이터 (필터링 및 페이지네이션)
-  // ---------------------------------------------------------
-  const filteredNews = newsData.filter(item => {
-    const matchesCategory = selectedCategory === "전체" || item.type === selectedCategory;
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          item.body.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(filteredNews.length / ITEMS_PER_PAGE));
-  const paginatedNews = filteredNews.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="trend-container">
@@ -144,14 +112,16 @@ export default function NewsArchive() {
           <div className="news-arch-list">
             {isLoading ? (
               <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>데이터를 불러오는 중입니다...</div>
+            ) : newsItems.length === 0 ? (
+              <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>검색 결과가 없습니다.</div>
             ) : (
-              paginatedNews.map(item => (
-                <div key={item.id} onClick={() => setSelectedNewsItem(item)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
+              newsItems.map(item => (
+                <div key={item.id} onClick={() => handleNewsClick(item)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
                   <div className="news-arch-item">
-                    <span className={`news-arch-badge ${item.color}`}>{item.type}</span>
+                    <span className={`news-arch-badge ${item.category === "경제" ? "green" : item.category === "정치" ? "pink" : "blue"}`}>{item.category}</span>
                     <span className="news-arch-title">{item.title}</span>
                     <div className="news-arch-meta">
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CalendarIcon size={14} color="#38bdf8" /> {item.date}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CalendarIcon size={14} color="#38bdf8" /> {item.publishedAt}</span>
                     </div>
                   </div>
                 </div>
@@ -166,12 +136,12 @@ export default function NewsArchive() {
               style={{ cursor: currentPage === 1 ? 'default' : 'pointer' }}
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             />
-            <span style={{ fontSize: 14, fontWeight: 600 }}>{currentPage}</span>
+            <span style={{ fontSize: 14, fontWeight: 600 }}>{currentPage} / {pagination.totalPages}</span>
             <ChevronRight 
               size={16} 
-              color={currentPage >= totalPages ? "#cbd5e1" : "#94a3b8"} 
-              style={{ cursor: currentPage >= totalPages ? 'default' : 'pointer' }}
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              color={currentPage >= pagination.totalPages ? "#cbd5e1" : "#94a3b8"} 
+              style={{ cursor: currentPage >= pagination.totalPages ? 'default' : 'pointer' }}
+              onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
             />
           </div>
         </div>
@@ -179,8 +149,8 @@ export default function NewsArchive() {
 
       {/* Modal Overlay */}
       {selectedNewsItem && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', zIndex: 1000 }}>
-          <div className="news-arch-modal" style={{ top: 80, left: 280, right: 40, bottom: 40, position: 'absolute' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="news-arch-modal" style={{ position: 'relative', top: 'auto', left: 'auto', right: 'auto', bottom: 'auto', width: '900px', height: '80vh', maxWidth: '90%', maxHeight: '90%', margin: 0 }}>
             <div className="news-mod-header">
               <span className={`news-arch-badge ${selectedNewsItem.color}`} style={{ fontSize: 16, padding: '12px 24px' }}>{selectedNewsItem.type}</span>
               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>
@@ -197,9 +167,16 @@ export default function NewsArchive() {
                   <p key={idx}>{paragraph}</p>
                 ))}
               </div>
-
-
             </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Loading Detail Modal */}
+      {isLoadingNewsDetail && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(3px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'white', padding: '20px 40px', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', color: '#0ea5e9', fontWeight: 600 }}>
+            기사 내용을 불러오는 중입니다...
           </div>
         </div>
       )}

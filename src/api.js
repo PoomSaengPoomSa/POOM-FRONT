@@ -163,5 +163,49 @@ export const api = {
     getBranch: (u_id) => api.get(`/kpi/branch${u_id ? `?u_id=${u_id}` : ""}`),
     getSeasonalProducts: () => api.get('/kpi/seasonal-products'),
     getSeasonalProductDetail: (product_id) => api.get(`/kpi/seasonal-products/${product_id}`)
+  },
+
+  // 7. 트렌드 (Trend) API
+  trend: {
+    getDashboard: () => api.get("/trend/dashboard"),
+    getNewsList: (params) => {
+      const { category, q, page, size, from, to, sort } = params || {};
+      let query = "";
+      const queryParams = [];
+      if (category && category !== "전체") queryParams.push(`category=${encodeURIComponent(category)}`);
+      if (q) queryParams.push(`q=${encodeURIComponent(q)}`);
+      if (page) queryParams.push(`page=${page}`);
+      if (size) queryParams.push(`size=${size}`);
+      if (from) queryParams.push(`from=${from}`);
+      if (to) queryParams.push(`to=${to}`);
+      if (sort) queryParams.push(`sort=${sort}`);
+      
+      if (queryParams.length > 0) {
+        query = "?" + queryParams.join("&");
+      }
+      return api.get(`/trend/news${query}`);
+    },
+    getNewsDetail: (newsId) => api.get(`/trend/news/${newsId}`),
+    getIndicatorLatest: (type) => api.get(`/trend/indicators/${encodeURIComponent(type)}/latest`),
+    getIndicatorHistory: (type, params) => {
+      const { from, to, granularity } = params || {};
+      let query = "";
+      const queryParams = [];
+      if (from) queryParams.push(`from=${from}`);
+      if (to) queryParams.push(`to=${to}`);
+      if (granularity) queryParams.push(`granularity=${granularity}`);
+      if (queryParams.length > 0) {
+        query = "?" + queryParams.join("&");
+      }
+      return api.get(`/trend/indicators/${encodeURIComponent(type)}/history${query}`);
+    },
+    getIndicatorPrediction: (type, horizon) => {
+      const query = horizon ? `?horizon=${horizon}` : "";
+      return api.get(`/trend/indicators/${encodeURIComponent(type)}/prediction${query}`);
+    },
+    getIndicatorContribution: (type) => api.get(`/trend/indicators/${encodeURIComponent(type)}/contribution`),
+    getLatestReport: (type) => api.get(`/trend/indicators/${encodeURIComponent(type)}/report/latest`),
+    createReport: (type, body) => api.post(`/trend/indicators/${encodeURIComponent(type)}/report`, body),
+    getReportStatus: (type, reportId) => api.get(`/trend/indicators/${encodeURIComponent(type)}/report/${reportId}/status`),
   }
 };

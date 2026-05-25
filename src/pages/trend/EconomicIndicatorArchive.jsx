@@ -1,57 +1,117 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Calendar, TrendingUp, Users, Bell, LogOut, MoreHorizontal, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 import Sidebar from "../../components/common/Sidebar";
+import { api } from "../../api";
 import "./Trend.css";
 
-// ---------------------------------------------------------
-// [DB 연동 대비] 임시 데이터 및 모의 API 함수
-// ---------------------------------------------------------
-const mockIndicatorData = {
-  "금값": {
-    yesterday: "83", today: "95", tomorrow: "85",
-    todayChange: "▲ +14.5%", todayChangeType: "up",
-    tomorrowChange: "▼ -10.5%", tomorrowChangeType: "down",
-    report: "향후 12개월간 금값은 3,890달러 수준으로 완만한 상승이 예상됩니다. 미 연준의 금리 인하 기조와 지정학적 불안이 주요 상승 요인입니다."
-  },
-  "부동산": {
-    yesterday: "100.4", today: "100.3", tomorrow: "100.2",
-    todayChange: "▼ -0.1%", todayChangeType: "down",
-    tomorrowChange: "▼ -0.1%", tomorrowChangeType: "down",
-    report: "서울 아파트 시장의 회복세를 지지할 것으로 보입니다. 거래량은 점진적으로 증가하고 있으며, 매매수급동향도 호전되고 있습니다."
-  },
-  "금리": {
-    yesterday: "2.0", today: "2.5", tomorrow: "2.0",
-    todayChange: "▲ +0.5", todayChangeType: "up",
-    tomorrowChange: "▼ -0.5", tomorrowChangeType: "down",
-    report: "한국 기준금리는 2.50%까지 단계적 인하가 전망되며, 물가 안정화 추세에 따라 하반기부터 통화정책 전환 가능성이 제기됩니다."
-  }
-};
-
-const fetchIndicatorAPI = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockIndicatorData);
-    }, 300);
-  });
+const tabToType = {
+  "금값": "gold",
+  "부동산": "real_estate",
+  "금리": "base_rate"
 };
 
 export default function EconomicIndicatorArchive() {
-  const location = useLocation();
-  const path = location.pathname;
   const [selectedTab, setSelectedTab] = useState("금값");
-  const [indicatorData, setIndicatorData] = useState(null);
+  const [latestData, setLatestData] = useState(null);
+  const [historyData, setHistoryData] = useState(null);
+  const [contributionData, setContributionData] = useState(null);
+  const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const type = tabToType[selectedTab];
     setIsLoading(true);
-    fetchIndicatorAPI().then(data => {
-      setIndicatorData(data);
-      setIsLoading(false);
-    });
-  }, []);
 
-  const currentData = indicatorData ? indicatorData[selectedTab] : null;
+    const today = new Date();
+    const to = today.toISOString().split('T')[0];
+    const fromObj = new Date();
+    fromObj.setDate(today.getDate() - 30);
+    const from = fromObj.toISOString().split('T')[0];
+
+    Promise.all([
+      api.trend.getIndicatorLatest(type),
+      api.trend.getIndicatorHistory(type, { from, to, granularity: "daily" }),
+      api.trend.getIndicatorContribution(type),
+      api.trend.getLatestReport(type)
+    ])
+      .then(([latest, history, contribution, report]) => {
+        setLatestData(latest);
+        setHistoryData(history);
+        setContributionData(contribution);
+        setReportData(report);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch indicator data from backend:", err);
+        setIsLoading(false);
+      });
+  }, [selectedTab]);
+
+  // Dynamic conic gradient string builder for SHAP contributions
+  const getConicGradient = (contribs) => {
+    if (!contribs || contribs.length === 0) {
+      return "conic-gradient(#cbd5e1 0% 100%)";
+    }
+    const colors = ["#a855f7", "#c084fc", "#22c55e", "#cbd5e1"];
+    let currentPercent = 0;
+    const slices = contribs.map((c, i) => {
+      const color = colors[i % colors.length];
+      const weightPct = c.ratio;
+      const start = currentPercent;
+      currentPercent += weightPct;
+      return `${color} ${start.toFixed(1)}% ${currentPercent.toFixed(1)}%`;
+    });
+    return `conic-gradient(${slices.join(", ")})`;
+  };
+
+  // Dynamic SVG path scaling math
+  const getSvgPaths = () => {
+    if (!historyData || !historyData.series || historyData.series.length === 0) return null;
+
+    const series = historyData.series;
+    const minVal = historyData.stats.min;
+    const maxVal = historyData.stats.max;
+    const range = maxVal - minVal || 1.0;
+
+    // 1. Plot historical points
+    const points = series.map((p, idx) => {
+      const x = (idx / (series.length - 1)) * 300;
+      const y = 150 - ((p.value - minVal) / range) * 110;
+      return { x, y };
+    });
+
+    // Build M ... L ... path
+    let historyPath = "";
+    if (points.length > 0) {
+      historyPath = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)} ` +
+        points.slice(1).map(p => `L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+    }
+
+    // 2. Plot prediction point
+    let predictionPath = "";
+    let todayPoint = points[points.length - 1];
+    let tomorrowPoint = null;
+
+    if (latestData && latestData.tomorrow && latestData.tomorrow.value !== null && todayPoint) {
+      const tomValue = latestData.tomorrow.value;
+      const tomX = 380;
+      const tomY = 150 - ((tomValue - minVal) / range) * 110;
+      tomorrowPoint = { x: tomX, y: tomY };
+      predictionPath = `M ${todayPoint.x.toFixed(1)} ${todayPoint.y.toFixed(1)} L ${tomX.toFixed(1)} ${tomY.toFixed(1)}`;
+    }
+
+    return { points, historyPath, predictionPath, todayPoint, tomorrowPoint };
+  };
+
+  const svgPaths = getSvgPaths();
+  const colors = ["#a855f7", "#c084fc", "#22c55e", "#cbd5e1"];
+
+  const formatChange = (val, dir, type) => {
+    if (!dir || dir === "flat") return "▬ 0.0%";
+    const prefix = dir === "up" ? "▲ +" : "▼ -";
+    const suffix = type === "base_rate" ? "" : "%";
+    return `${prefix}${Math.abs(val)}${suffix}`;
+  };
 
   return (
     <div className="trend-container">
@@ -83,37 +143,98 @@ export default function EconomicIndicatorArchive() {
             <div className="eco-box">
               <div className="eco-box-title">{selectedTab} 추이·예측</div>
               <div style={{ height: 160, position: 'relative', marginTop: 16 }}>
-                <div style={{ position: 'absolute', top: -16, right: 0, fontSize: 10, color: '#94a3b8' }}>ECOS - FRED</div>
-                <svg viewBox="0 40 400 180" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-                  <path d="M 0 200 C 50 150, 100 200, 150 100 S 250 150, 250 150" fill="none" stroke="#0f172a" strokeWidth="2" />
-                  <path d="M 250 150 C 300 150, 350 100, 400 50" fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="4 4" />
-                  <circle cx="250" cy="150" r="4" fill="#0f172a" />
-                  <text x="250" y="130" fontSize="12" fill="#0f172a" textAnchor="middle">오늘</text>
-                </svg>
+                <div style={{ position: 'absolute', top: -16, right: 0, fontSize: 10, color: '#94a3b8' }}>
+                  {historyData?.source || "ECOS - FRED"}
+                </div>
+                {isLoading || !svgPaths ? (
+                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 13 }}>
+                    차트 데이터를 불러오는 중...
+                  </div>
+                ) : (
+                  <svg viewBox="0 20 400 150" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                    {/* Grid Lines */}
+                    <line x1="0" y1="40" x2="400" y2="40" stroke="#f8fafc" strokeWidth="1" />
+                    <line x1="0" y1="95" x2="400" y2="95" stroke="#f8fafc" strokeWidth="1" />
+                    <line x1="0" y1="150" x2="400" y2="150" stroke="#f1f5f9" strokeWidth="1.5" />
+
+                    {/* History Curve */}
+                    <path d={svgPaths.historyPath} fill="none" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+
+                    {/* Prediction dashed line */}
+                    {svgPaths.predictionPath && (
+                      <path d={svgPaths.predictionPath} fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="5 5" />
+                    )}
+
+                    {/* Points */}
+                    {svgPaths.todayPoint && (
+                      <>
+                        <circle cx={svgPaths.todayPoint.x} cy={svgPaths.todayPoint.y} r="5" fill="#0f172a" />
+                        <text x={svgPaths.todayPoint.x} y={svgPaths.todayPoint.y - 12} fontSize="11" fontWeight="700" fill="#0f172a" textAnchor="middle">
+                          {latestData.type === "gold" ? "오늘" : "이번달"}
+                        </text>
+                      </>
+                    )}
+
+                    {svgPaths.tomorrowPoint && (
+                      <>
+                        <circle cx={svgPaths.tomorrowPoint.x} cy={svgPaths.tomorrowPoint.y} r="5" fill="#3b82f6" />
+                        <text x={svgPaths.tomorrowPoint.x} y={svgPaths.tomorrowPoint.y - 12} fontSize="11" fontWeight="700" fill="#3b82f6" textAnchor="middle">
+                          {latestData.type === "gold" ? "내일(예측)" : "다음달(예측)"}
+                        </text>
+                      </>
+                    )}
+                  </svg>
+                )}
               </div>
             </div>
 
             {/* Stats */}
             <div className="eco-box">
-              <div className="eco-box-title">{selectedTab} 추이·예측</div>
+              <div className="eco-box-title">{selectedTab} 주요 가격 지표</div>
               <div className="indicator-stats" style={{ marginTop: 'auto' }}>
-                {isLoading || !currentData ? (
+                {isLoading || !latestData ? (
                   <div style={{ padding: 20, textAlign: 'center', color: '#64748b', width: '100%' }}>로딩 중...</div>
                 ) : (
                   <>
                     <div className="indicator-stat-col">
-                      <span className="indicator-stat-label">어제</span>
-                      <span className="indicator-stat-value">{currentData.yesterday}</span>
+                      <span className="indicator-stat-label">{latestData.type === "gold" ? "어제" : "지난달"}</span>
+                      <span className="indicator-stat-value">{latestData.yesterday.value}</span>
                     </div>
                     <div className="indicator-stat-col">
-                      <span className="indicator-stat-label">오늘</span>
-                      <span className="indicator-stat-value large" style={{ fontSize: 48 }}>{currentData.today}</span>
-                      <span className={`indicator-stat-change ${currentData.todayChangeType}`} style={{ background: currentData.todayChangeType === 'up' ? '#dcfce7' : '#fee2e2', color: currentData.todayChangeType === 'up' ? '#16a34a' : '#ef4444', padding: '2px 8px', borderRadius: 4 }}>{currentData.todayChange}</span>
+                      <span className="indicator-stat-label">{latestData.type === "gold" ? "오늘" : "이번달"}</span>
+                      <span className="indicator-stat-value large" style={{ fontSize: 48 }}>{latestData.today.value}</span>
+                      <span
+                        className={`indicator-stat-change ${latestData.today.direction}`}
+                        style={{
+                          background: latestData.today.direction === 'up' ? '#dcfce7' : latestData.today.direction === 'down' ? '#fee2e2' : '#f1f5f9',
+                          color: latestData.today.direction === 'up' ? '#16a34a' : latestData.today.direction === 'down' ? '#ef4444' : '#64748b',
+                          padding: '2px 8px',
+                          borderRadius: 4,
+                          fontSize: 12,
+                          fontWeight: 700
+                        }}
+                      >
+                        {formatChange(latestData.today.changeRate, latestData.today.direction, latestData.type)}
+                      </span>
                     </div>
                     <div className="indicator-stat-col">
-                      <span className="indicator-stat-label">내일</span>
-                      <span className="indicator-stat-value">{currentData.tomorrow}</span>
-                      <span className={`indicator-stat-change ${currentData.tomorrowChangeType}`} style={{ background: currentData.tomorrowChangeType === 'up' ? '#dcfce7' : '#fee2e2', color: currentData.tomorrowChangeType === 'up' ? '#16a34a' : '#ef4444', padding: '2px 8px', borderRadius: 4 }}>{currentData.tomorrowChange}</span>
+                      <span className="indicator-stat-label">{latestData.type === "gold" ? "내일(예측)" : "다음달(예측)"}</span>
+                      <span className="indicator-stat-value">{latestData.tomorrow.value ?? "-"}</span>
+                      {latestData.tomorrow.value !== null && (
+                        <span
+                          className={`indicator-stat-change ${latestData.tomorrow.direction}`}
+                          style={{
+                            background: latestData.tomorrow.direction === 'up' ? '#dcfce7' : latestData.tomorrow.direction === 'down' ? '#fee2e2' : '#f1f5f9',
+                            color: latestData.tomorrow.direction === 'up' ? '#16a34a' : latestData.tomorrow.direction === 'down' ? '#ef4444' : '#64748b',
+                            padding: '2px 8px',
+                            borderRadius: 4,
+                            fontSize: 12,
+                            fontWeight: 700
+                          }}
+                        >
+                          {formatChange(latestData.tomorrow.changeRate, latestData.tomorrow.direction, latestData.type)}
+                        </span>
+                      )}
                     </div>
                   </>
                 )}
@@ -122,46 +243,67 @@ export default function EconomicIndicatorArchive() {
 
             {/* Pie Chart */}
             <div className="eco-box">
-              <div className="eco-box-title">예측 기여도</div>
+              <div className="eco-box-title">예측 기여도 (SHAP)</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-                <div style={{ width: 120, height: 120, borderRadius: '50%', background: 'conic-gradient(#a855f7 0% 32%, #c084fc 32% 57%, #22c55e 57% 80%, #e2e8f0 80% 100%)', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: '50%',
+                  background: getConicGradient(contributionData?.contributions),
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justify: 'center',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)'
+                }}>
+                  <div style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: '50%',
+                    background: '#f8fafc',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px'
+                  }}>
                     <span style={{ fontSize: 10, color: '#64748b' }}>{selectedTab} 예측</span>
                     <span style={{ fontSize: 11, fontWeight: 700, color: '#0ea5e9' }}>핵심 변수</span>
                   </div>
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#334155' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ width: 12, height: 12, borderRadius: 2, background: '#a855f7' }}></span>달러 인덱스</span>
-                    <span>32%</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#334155' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ width: 12, height: 12, borderRadius: 2, background: '#c084fc' }}></span>인플레이션</span>
-                    <span>25%</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#334155' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ width: 12, height: 12, borderRadius: 2, background: '#22c55e' }}></span>금리</span>
-                    <span>23%</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#334155' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ width: 12, height: 12, borderRadius: 2, background: '#e2e8f0' }}></span>지정학적리스크</span>
-                    <span>20%</span>
-                  </div>
+                  {isLoading || !contributionData?.contributions ? (
+                    <div style={{ color: '#64748b', fontSize: 11 }}>가중치 데이터를 가져오는 중...</div>
+                  ) : (
+                    contributionData.contributions.map((item, idx) => (
+                      <div key={item.feature} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#334155' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ width: 12, height: 12, borderRadius: 2, background: colors[idx % colors.length] }}></span>
+                          {item.label}
+                        </span>
+                        <span style={{ fontWeight: 600 }}>{item.ratio}%</span>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
 
             {/* LLM Report */}
             <div className="eco-box">
-              <div className="eco-box-title">LLM 보고서</div>
-              <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.8, marginBottom: 24 }}>
-                {isLoading || !currentData ? "분석 보고서를 불러오는 중입니다..." : currentData.report} . . .
-                <Link to="/economic-indicator-archive-llm-report" style={{ textDecoration: 'none' }}>
-                  <span style={{ color: '#0284c7', cursor: 'pointer' }}> 더보기</span>
-                </Link>
+              <div className="eco-box-title">LLM 분석 요약 보고서</div>
+              <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.8, marginBottom: 24, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' }}>
+                {isLoading || !reportData ? "분석 보고서를 불러오는 중입니다..." : reportData.summary}
               </div>
-              <div style={{ fontSize: 9, color: '#94a3b8', textAlign: 'right', marginTop: 'auto' }}>
-                생성: 2026-04-27 08:00 | XGBoost+Claude Sonnet 기반 LSTM | ECOS, FRED
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                <Link to="/economic-indicator-archive-llm-report" style={{ textDecoration: 'none' }}>
+                  <span style={{ color: '#0284c7', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>상세 리포트 보기 →</span>
+                </Link>
+                <div style={{ fontSize: 9, color: '#94a3b8', textAlign: 'right' }}>
+                  {reportData ? `생성 모델: ${reportData.modelName} | 출처: ${reportData.dataSources.join(", ")}` : ""}
+                </div>
               </div>
             </div>
           </div>
