@@ -62,8 +62,8 @@ export default function NewsArchiveDetails() {
       </div>
 
       {/* Modal Overlay */}
-      <div className="cust-modal-overlay" style={{ left: 0 }}>
-        <div className="news-arch-modal" style={{ left: '272px' }}>
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="news-arch-modal" style={{ position: 'relative', top: 'auto', left: 'auto', right: 'auto', bottom: 'auto', width: '900px', height: '80vh', maxWidth: '90%', maxHeight: '90%', margin: 0 }}>
           <div className="news-mod-header">
             <span className="news-arch-badge green" style={{ fontSize: 16, padding: '12px 24px' }}>경제</span>
             <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>

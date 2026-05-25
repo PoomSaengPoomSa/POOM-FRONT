@@ -2,52 +2,56 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Calendar, TrendingUp, Users, Bell, LogOut, MoreHorizontal, ChevronDown, Activity, Home, DollarSign, ChevronRight, X, Settings } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
+import { api } from "../../api";
 import "./Trend.css";
-
-// ---------------------------------------------------------
-// [DB 연동 대비] 임시 데이터 및 모의 API 함수
-// ---------------------------------------------------------
-const mockTrendData = {
-  economy: [
-    { title: "코스피 2,700 돌파 — 사상 최고치 3일 연속 경신. 'Sell in May' 격언 유효 여부 주목", type: "경제", color: "green", body: "코스피 상승장 본문 내용입니다. 추후 DB 연동 시 실제 기사 본문이 표시됩니다.", references: ["코스피 관련 참고 1"] },
-    { title: "삼성전자 어닝 서프라이즈 — 1분기 영업이익 57.2조 원(+756%), 주가 장중 23만 원 돌파·신고가", type: "경제", color: "green", body: "삼성전자 실적 본문 내용입니다. 추후 DB 연동 시 실제 기사 본문이 표시됩니다.", references: ["삼성전자 실적 참고 1"] },
-    { title: "반도체 ETF 수익률 폭등 — AI반도체 관련 ETF 4월 한 달간 40-45% 수익률 기록", type: "경제", color: "green", body: "반도체 ETF 본문 내용입니다. 추후 DB 연동 시 실제 기사 본문이 표시됩니다.", references: ["ETF 관련 참고 1"] }
-  ],
-  politics: [
-    { title: "부산 북구갑 3자 구도 확정 — 하정우(민주당) vs 한동훈(무소속) vs 국민의힘 후보", type: "정치", color: "pink", body: "정치 선거 구도 본문 내용입니다. 추후 DB 연동 시 실제 기사 본문이 표시됩니다.", references: ["선거 관련 참고 1"] },
-    { title: "한동훈 \"나와 이재명의 대리전\" — 반이재명 구도 프레임 강조, 지역 공약 부재 지적도", type: "정치", color: "pink", body: "정치 발언 본문 내용입니다. 추후 DB 연동 시 실제 기사 본문이 표시됩니다.", references: ["정치 관련 참고 1"] },
-    { title: "미니 총선 14곳 확정 — 지방선거와 동시 실시, 민주당 우세 지역 12곳", type: "정치", color: "pink", body: "선거 확정 본문 내용입니다. 추후 DB 연동 시 실제 기사 본문이 표시됩니다.", references: ["선거 관련 참고 2"] }
-  ],
-  it: [
-    { title: "스탠퍼드 AI 인덱스 2026 — 생성형 AI가 단순 기술이 아닌 \"지배 인프라\"로 산업·국가 시스템 재편", type: "IT/과학", color: "blue", body: "AI 기술 동향 본문 내용입니다. 추후 DB 연동 시 실제 기사 본문이 표시됩니다.", references: ["AI 관련 참고 1"] },
-    { title: "오픈AI, MS 독점 파트너십 종료 — 아마존 AWS와도 협업 개시, 앤디 재시 CEO 공식 발표", type: "IT/과학", color: "blue", body: "오픈AI 협업 본문 내용입니다. 추후 DB 연동 시 실제 기사 본문이 표시됩니다.", references: ["빅테크 관련 참고 1"] },
-    { title: "LG CNS 1분기 실적 — 매출 1조 3,150억·영업익 942억, AI·클라우드 성장 견인", type: "IT/과학", color: "blue", body: "IT 기업 실적 본문 내용입니다. 추후 DB 연동 시 실제 기사 본문이 표시됩니다.", references: ["IT 실적 참고 1"] }
-  ]
-};
-
-const fetchTrendAPI = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockTrendData);
-    }, 300);
-  });
-};
 
 export default function TrendArchive() {
   const location = useLocation();
   const path = location.pathname;
   
-  const [newsItems, setNewsItems] = useState({ economy: [], politics: [], it: [] });
+  const [dashboardData, setDashboardData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedNewsItem, setSelectedNewsItem] = useState(null);
+  const [isLoadingNewsDetail, setIsLoadingNewsDetail] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
-    fetchTrendAPI().then(data => {
-      setNewsItems(data);
-      setIsLoading(false);
-    });
+    api.trend.getDashboard()
+      .then(data => {
+        setDashboardData(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("트렌드 대시보드 조회 실패:", err);
+        setIsLoading(false);
+      });
   }, []);
+
+  const handleNewsClick = (item) => {
+    setIsLoadingNewsDetail(true);
+
+    api.trend.getNewsDetail(item.id)
+      .then(detail => {
+        const categoryMap = { "경제": "경제", "정치": "정치", "IT/과학": "IT/과학", economy: "경제", politics: "정치", it: "IT/과학", itScience: "IT/과학" };
+        const colorMap = { "경제": "green", "정치": "pink", "IT/과학": "blue", economy: "green", politics: "pink", it: "blue", itScience: "blue" };
+
+        setSelectedNewsItem({
+          title: detail.title,
+          type: categoryMap[detail.category] || "경제",
+          color: colorMap[detail.category] || "green",
+          body: detail.body || "기사 본문이 존재하지 않습니다.",
+          references: detail.tags ? detail.tags : []
+        });
+        setIsLoadingNewsDetail(false);
+      })
+      .catch(err => {
+        console.error("뉴스 상세 로드 실패:", err);
+        setIsLoadingNewsDetail(false);
+      });
+  };
+
+  const newsItems = dashboardData?.news || { economy: [], politics: [], itScience: [], it: [] };
+  const indicators = dashboardData?.indicators || null;
 
   return (
     <div className="trend-container">
@@ -74,21 +78,33 @@ export default function TrendArchive() {
               <>
                 <div className="trend-news-col">
                   <div className="trend-news-col-title">경제 <ChevronDown size={16} color="#cbd5e1" /></div>
-                  {newsItems.economy.map((item, i) => (
-                    <div key={i} className="trend-news-item" onClick={() => setSelectedNewsItem(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
-                  ))}
+                  {newsItems.economy.length === 0 ? (
+                    <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
+                  ) : (
+                    newsItems.economy.map((item, i) => (
+                      <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
+                    ))
+                  )}
                 </div>
                 <div className="trend-news-col">
                   <div className="trend-news-col-title">정치 <ChevronDown size={16} color="#cbd5e1" /></div>
-                  {newsItems.politics.map((item, i) => (
-                    <div key={i} className="trend-news-item" onClick={() => setSelectedNewsItem(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
-                  ))}
+                  {newsItems.politics.length === 0 ? (
+                    <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
+                  ) : (
+                    newsItems.politics.map((item, i) => (
+                      <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
+                    ))
+                  )}
                 </div>
                 <div className="trend-news-col">
                   <div className="trend-news-col-title">IT/과학 <ChevronDown size={16} color="#cbd5e1" /></div>
-                  {newsItems.it.map((item, i) => (
-                    <div key={i} className="trend-news-item" onClick={() => setSelectedNewsItem(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
-                  ))}
+                  {(newsItems.itScience || newsItems.it).length === 0 ? (
+                    <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
+                  ) : (
+                    (newsItems.itScience || newsItems.it).map((item, i) => (
+                      <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
+                    ))
+                  )}
                 </div>
               </>
             )}
@@ -119,17 +135,20 @@ export default function TrendArchive() {
               <div className="indicator-stats">
                 <div className="indicator-stat-col">
                   <span className="indicator-stat-label">어제</span>
-                  <span className="indicator-stat-value">83</span>
+                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.gold?.yesterday ?? "-")}</span>
                 </div>
                 <div className="indicator-stat-col">
                   <span className="indicator-stat-label">오늘</span>
-                  <span className="indicator-stat-value large">95</span>
-                  <span className="indicator-stat-change up">▲ 14.5%</span>
+                  <span className="indicator-stat-value large">{isLoading ? "..." : (indicators?.gold?.today ?? "-")}</span>
+                  {!isLoading && indicators?.gold && (
+                    <span className={`indicator-stat-change ${indicators.gold.changeDirection}`}>
+                      {indicators.gold.changeDirection === 'up' ? '▲' : indicators.gold.changeDirection === 'down' ? '▼' : '▬'} {Math.abs(indicators.gold.changeRate)}%
+                    </span>
+                  )}
                 </div>
                 <div className="indicator-stat-col">
                   <span className="indicator-stat-label">내일</span>
-                  <span className="indicator-stat-value">85</span>
-                  <span className="indicator-stat-change down">▼ -10.5%</span>
+                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.gold?.tomorrow ?? "-")}</span>
                 </div>
               </div>
               <svg viewBox="0 0 100 30" style={{ width: '100%', height: 40, fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
@@ -149,18 +168,21 @@ export default function TrendArchive() {
               </div>
               <div className="indicator-stats">
                 <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">어제</span>
-                  <span className="indicator-stat-value">100.4</span>
+                  <span className="indicator-stat-label">지난 달</span>
+                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.realEstate?.yesterday ?? "-")}</span>
                 </div>
                 <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">오늘</span>
-                  <span className="indicator-stat-value large">100.3</span>
-                  <span className="indicator-stat-change down">▼</span>
+                  <span className="indicator-stat-label">이번 달</span>
+                  <span className="indicator-stat-value large">{isLoading ? "..." : (indicators?.realEstate?.today ?? "-")}</span>
+                  {!isLoading && indicators?.realEstate && (
+                    <span className={`indicator-stat-change ${indicators.realEstate.changeDirection}`}>
+                      {indicators.realEstate.changeDirection === 'up' ? '▲' : indicators.realEstate.changeDirection === 'down' ? '▼' : '▬'} {Math.abs(indicators.realEstate.changeRate)}%
+                    </span>
+                  )}
                 </div>
                 <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">내일</span>
-                  <span className="indicator-stat-value">100.2</span>
-                  <span className="indicator-stat-change down">▼</span>
+                  <span className="indicator-stat-label">다음 달</span>
+                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.realEstate?.tomorrow ?? "-")}</span>
                 </div>
               </div>
               <svg viewBox="0 0 100 30" style={{ width: '100%', height: 40, fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
@@ -181,17 +203,20 @@ export default function TrendArchive() {
               <div className="indicator-stats">
                 <div className="indicator-stat-col">
                   <span className="indicator-stat-label">지난 달</span>
-                  <span className="indicator-stat-value">2.0</span>
+                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.interestRate?.lastMonth ?? "-")}</span>
                 </div>
                 <div className="indicator-stat-col">
                   <span className="indicator-stat-label">이번 달</span>
-                  <span className="indicator-stat-value large">2.5</span>
-                  <span className="indicator-stat-change up">▲</span>
+                  <span className="indicator-stat-value large">{isLoading ? "..." : (indicators?.interestRate?.thisMonth ?? "-")}</span>
+                  {!isLoading && indicators?.interestRate && (
+                    <span className={`indicator-stat-change ${indicators.interestRate.changeDirection}`}>
+                      {indicators.interestRate.changeDirection === 'up' ? '▲' : indicators.interestRate.changeDirection === 'down' ? '▼' : '▬'} {Math.abs(indicators.interestRate.changeRate)}
+                    </span>
+                  )}
                 </div>
                 <div className="indicator-stat-col">
                   <span className="indicator-stat-label">다음 달</span>
-                  <span className="indicator-stat-value">2.0</span>
-                  <span className="indicator-stat-change down">▼</span>
+                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.interestRate?.nextMonth ?? "-")}</span>
                 </div>
               </div>
               <svg viewBox="0 0 100 30" style={{ width: '100%', height: 40, fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
@@ -206,8 +231,8 @@ export default function TrendArchive() {
 
       {/* Modal Overlay */}
       {selectedNewsItem && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(8px)', zIndex: 1000 }}>
-          <div className="news-arch-modal" style={{ left: '272px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="news-arch-modal" style={{ position: 'relative', top: 'auto', left: 'auto', right: 'auto', bottom: 'auto', width: '900px', height: '80vh', maxWidth: '90%', maxHeight: '90%', margin: 0 }}>
             <div className="news-mod-header">
               <span className={`news-arch-badge ${selectedNewsItem.color}`} style={{ fontSize: 16, padding: '12px 24px' }}>{selectedNewsItem.type}</span>
               <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0f172a', lineHeight: 1.4 }}>
@@ -224,9 +249,16 @@ export default function TrendArchive() {
                   <p key={idx}>{paragraph}</p>
                 ))}
               </div>
-
-
             </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Loading Detail Modal */}
+      {isLoadingNewsDetail && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(3px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'white', padding: '20px 40px', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', color: '#0ea5e9', fontWeight: 600 }}>
+            기사 내용을 불러오는 중입니다...
           </div>
         </div>
       )}

@@ -18,6 +18,19 @@ const BRANCHES = [
   { name: "제주지점", region: "제주" }
 ];
 
+const BRANCH_REGIONS = {
+  "강남역금융센터": "서울",
+  "종로금융센터": "서울",
+  "여의도중앙지점": "서울",
+  "분당금융센터": "경기",
+  "송도스마트밸리지점": "인천",
+  "부산중앙지점": "부산",
+  "대구지점": "대구",
+  "대전지점": "대전",
+  "광주지점": "광주",
+  "제주지점": "제주"
+};
+
 export default function SignUpNew() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
@@ -42,6 +55,8 @@ export default function SignUpNew() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const handleRegionChange = (selectedRegion) => {
     setRegion(selectedRegion);
@@ -104,6 +119,7 @@ export default function SignUpNew() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       await api.auth.signup({
         id,
@@ -117,11 +133,13 @@ export default function SignUpNew() {
         branch,
       });
 
+      setIsSubmitting(false);
       setSuccess("회원가입이 완료되었습니다! 잠시 후 로그인 페이지로 이동합니다.");
       setTimeout(() => {
         navigate("/login");
       }, 2000);
     } catch (err) {
+      setIsSubmitting(false);
       setError(err.message || "회원가입 처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
     }
   };
@@ -132,11 +150,11 @@ export default function SignUpNew() {
     <div className="auth-new-layout">
       <div className="auth-new-card auth-signup-card">
         {/* Form Section */}
-        <div className="auth-new-form-section">
-          <div className="auth-new-logo-area">
+        <div className="auth-new-form-section" style={{ padding: "32px 30px" }}>
+          <div className="auth-new-logo-area" style={{ marginBottom: "16px" }}>
             {/* High-Fidelity POOM Smiley Logo */}
-            <img src="/poom-logo.png" alt="POOM Logo" style={{ height: "50px", marginBottom: "8px", objectFit: "contain" }} />
-            <h1 className="auth-new-title">Sign Up</h1>
+            <img src="/poom-logo.png" alt="POOM Logo" style={{ height: "45px", marginBottom: "4px", objectFit: "contain" }} />
+            <h1 className="auth-new-title" style={{ fontSize: "20px" }}>Sign Up</h1>
           </div>
 
           <form onSubmit={handleSignUp} style={{ width: "100%" }}>
@@ -151,14 +169,14 @@ export default function SignUpNew() {
                   backgroundColor: "#fef2f2",
                   border: "1px solid #fee2e2",
                   color: "#ef4444",
-                  padding: "12px",
+                  padding: "10px 12px",
                   borderRadius: "8px",
-                  fontSize: "12px",
-                  marginBottom: "16px",
+                  fontSize: "11px",
+                  marginBottom: "12px",
                   lineHeight: "1.4"
                 }}
               >
-                <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                <AlertCircle size={14} style={{ flexShrink: 0 }} />
                 <span>{error}</span>
               </div>
             )}
@@ -173,14 +191,14 @@ export default function SignUpNew() {
                   backgroundColor: "#f0fdf4",
                   border: "1px solid #dcfce7",
                   color: "#15803d",
-                  padding: "12px",
+                  padding: "10px 12px",
                   borderRadius: "8px",
-                  fontSize: "12px",
-                  marginBottom: "16px",
+                  fontSize: "11px",
+                  marginBottom: "12px",
                   lineHeight: "1.4"
                 }}
               >
-                <CheckCircle size={16} style={{ flexShrink: 0 }} />
+                <CheckCircle size={14} style={{ flexShrink: 0 }} />
                 <span>{success}</span>
               </div>
             )}
@@ -361,15 +379,15 @@ export default function SignUpNew() {
                 checked={agreeTerms}
                 onChange={(e) => setAgreeTerms(e.target.checked)}
               />
-              <label htmlFor="signup-agree" className="auth-new-options-text" style={{ cursor: "pointer", userSelect: "none" }}>
+              <label htmlFor="signup-agree" className="auth-new-options-text" style={{ cursor: "pointer", userSelect: "none", fontSize: "11px" }}>
                 By creating an account you agree to the <Link to="#" className="auth-new-link">terms of use</Link> and our <Link to="#" className="auth-new-link">privacy policy.</Link>
               </label>
             </div>
 
             {/* Centered Create Account Button with fixed elegant width */}
             <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-              <button type="submit" className="auth-new-btn" style={{ marginTop: "12px", width: "320px" }}>
-                Create account
+              <button type="submit" className="auth-new-btn" style={{ marginTop: "12px", width: "320px" }} disabled={isSubmitting}>
+                {isSubmitting ? "Creating account..." : "Create account"}
               </button>
             </div>
           </form>
