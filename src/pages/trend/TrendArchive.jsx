@@ -123,8 +123,8 @@ export default function TrendArchive() {
           </Link>
 
           <div className="trend-indicator-grid">
-            {/* Gold */}
-            <div className="indicator-card">
+            {/* Gold (이중 분류 - 상승/하락) */}
+            <div className="indicator-card" style={{ display: 'flex', flexDirection: 'column' }}>
               <div className="indicator-title">
                 <div className="indicator-icon"><Activity size={20} color="#0f172a" /></div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -132,33 +132,34 @@ export default function TrendArchive() {
                   <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>Gold Price</span>
                 </div>
               </div>
-              <div className="indicator-stats">
-                <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">어제</span>
-                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.gold?.yesterday ?? "-")}</span>
+              <div style={{ margin: '8px 0 8px 0', fontSize: 12, color: 'var(--trend-text-muted)', fontWeight: 600 }}>내일 예측</div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                {/* 상승 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>상승</span>
+                  <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
+                    <div style={{ width: '73%', height: '100%', background: '#ef4444', borderRadius: 3 }}></div>
+                  </div>
+                  <span style={{ fontWeight: 700, color: '#ef4444', width: 28, textAlign: 'right' }}>73%</span>
                 </div>
-                <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">오늘</span>
-                  <span className="indicator-stat-value large">{isLoading ? "..." : (indicators?.gold?.today ?? "-")}</span>
-                  {!isLoading && indicators?.gold && (
-                    <span className={`indicator-stat-change ${indicators.gold.changeDirection}`}>
-                      {indicators.gold.changeDirection === 'up' ? '▲' : indicators.gold.changeDirection === 'down' ? '▼' : '▬'} {Math.abs(indicators.gold.changeRate)}%
-                    </span>
-                  )}
-                </div>
-                <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">내일</span>
-                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.gold?.tomorrow ?? "-")}</span>
+                {/* 하락 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>하락</span>
+                  <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
+                    <div style={{ width: '27%', height: '100%', background: '#3b82f6', borderRadius: 3 }}></div>
+                  </div>
+                  <span style={{ fontWeight: 700, color: '#3b82f6', width: 28, textAlign: 'right' }}>27%</span>
                 </div>
               </div>
-              <svg viewBox="0 0 100 30" style={{ width: '100%', height: 40, fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
-                <path d="M 0 20 Q 25 30 50 20 T 100 10" />
-                <circle cx="50" cy="20" r="3" fill="#3b82f6" />
-              </svg>
+              
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--trend-text-main)', borderTop: '1px solid var(--trend-border)', paddingTop: 8, marginTop: 'auto' }}>
+                예측: <span style={{ color: '#ef4444' }}>상승 가능성 높음</span>
+              </div>
             </div>
 
-            {/* Real Estate */}
-            <div className="indicator-card">
+            {/* Real Estate (회귀 - 시계열) */}
+            <div className="indicator-card" style={{ display: 'flex', flexDirection: 'column' }}>
               <div className="indicator-title">
                 <div className="indicator-icon"><Home size={20} color="#0f172a" /></div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -166,33 +167,43 @@ export default function TrendArchive() {
                   <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>Real Estate Price</span>
                 </div>
               </div>
-              <div className="indicator-stats">
-                <div className="indicator-stat-col">
+              <div style={{ margin: '8px 0 8px 0', fontSize: 12, color: 'var(--trend-text-muted)', fontWeight: 600 }}>다음달 예측</div>
+              
+              <div className="indicator-stats" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <span className="indicator-stat-label">지난 달</span>
-                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.realEstate?.yesterday ?? "-")}</span>
+                  <span className="indicator-stat-value" style={{ fontSize: 13, color: 'var(--trend-text-muted)', fontWeight: 500 }}>{isLoading ? "..." : (indicators?.realEstate?.yesterday ?? "-")}</span>
                 </div>
-                <div className="indicator-stat-col">
+                <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <span className="indicator-stat-label">이번 달</span>
-                  <span className="indicator-stat-value large">{isLoading ? "..." : (indicators?.realEstate?.today ?? "-")}</span>
-                  {!isLoading && indicators?.realEstate && (
-                    <span className={`indicator-stat-change ${indicators.realEstate.changeDirection}`}>
-                      {indicators.realEstate.changeDirection === 'up' ? '▲' : indicators.realEstate.changeDirection === 'down' ? '▼' : '▬'} {Math.abs(indicators.realEstate.changeRate)}%
+                  <span className="indicator-stat-value" style={{ fontSize: 13, color: 'var(--trend-text-muted)', fontWeight: 500 }}>{isLoading ? "..." : (indicators?.realEstate?.today ?? "-")}</span>
+                </div>
+                <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+                  <span className="indicator-stat-label" style={{ color: '#3b82f6', fontWeight: 700 }}>다음 달</span>
+                  <span className="indicator-stat-value large" style={{ fontSize: 36, fontWeight: 700, lineHeight: 1, color: '#3b82f6' }}>{isLoading ? "..." : (indicators?.realEstate?.tomorrow ?? "-")}</span>
+                  {!isLoading && indicators?.realEstate && indicators.realEstate.changeRate !== undefined && indicators.realEstate.changeDirection && (
+                    <span className={`indicator-stat-change ${indicators.realEstate.changeDirection}`} style={{
+                      position: 'absolute', bottom: -18, 
+                      background: indicators.realEstate.changeDirection === 'up' ? '#dcfce7' : indicators.realEstate.changeDirection === 'down' ? '#fee2e2' : '#f1f5f9',
+                      color: indicators.realEstate.changeDirection === 'up' ? '#16a34a' : indicators.realEstate.changeDirection === 'down' ? '#ef4444' : '#64748b',
+                      padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 700
+                    }}>
+                      {indicators.realEstate.changeDirection === 'up' ? '▲ +' : indicators.realEstate.changeDirection === 'down' ? '▼ -' : '▬ '}
+                      {Math.abs(indicators.realEstate.changeRate)}%
                     </span>
                   )}
                 </div>
-                <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">다음 달</span>
-                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.realEstate?.tomorrow ?? "-")}</span>
-                </div>
               </div>
-              <svg viewBox="0 0 100 30" style={{ width: '100%', height: 40, fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
-                <path d="M 0 15 Q 25 15 50 25 T 100 20" />
-                <circle cx="50" cy="25" r="3" fill="#3b82f6" />
-              </svg>
+              <div style={{ height: 40, marginTop: 'auto' }}>
+                <svg viewBox="0 0 100 30" style={{ width: '100%', height: '100%', fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
+                  <path d="M 0 15 Q 25 15 50 25 T 100 20" />
+                  <circle cx="50" cy="25" r="3" fill="#3b82f6" />
+                </svg>
+              </div>
             </div>
 
-            {/* Base Rate */}
-            <div className="indicator-card">
+            {/* Base Rate (다중 분류 - 인하/동결/인상) */}
+            <div className="indicator-card" style={{ display: 'flex', flexDirection: 'column' }}>
               <div className="indicator-title">
                 <div className="indicator-icon"><DollarSign size={20} color="#0f172a" /></div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -200,29 +211,38 @@ export default function TrendArchive() {
                   <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>Base Rate</span>
                 </div>
               </div>
-              <div className="indicator-stats">
-                <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">지난 달</span>
-                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.interestRate?.lastMonth ?? "-")}</span>
+              <div style={{ margin: '8px 0 8px 0', fontSize: 12, color: 'var(--trend-text-muted)', fontWeight: 600 }}>다음달 예측</div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                {/* 인하 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>인하</span>
+                  <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
+                    <div style={{ width: '45%', height: '100%', background: '#3b82f6', borderRadius: 3 }}></div>
+                  </div>
+                  <span style={{ fontWeight: 700, color: '#3b82f6', width: 28, textAlign: 'right' }}>45%</span>
                 </div>
-                <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">이번 달</span>
-                  <span className="indicator-stat-value large">{isLoading ? "..." : (indicators?.interestRate?.thisMonth ?? "-")}</span>
-                  {!isLoading && indicators?.interestRate && (
-                    <span className={`indicator-stat-change ${indicators.interestRate.changeDirection}`}>
-                      {indicators.interestRate.changeDirection === 'up' ? '▲' : indicators.interestRate.changeDirection === 'down' ? '▼' : '▬'} {Math.abs(indicators.interestRate.changeRate)}
-                    </span>
-                  )}
+                {/* 동결 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>동결</span>
+                  <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
+                    <div style={{ width: '38%', height: '100%', background: '#94a3b8', borderRadius: 3 }}></div>
+                  </div>
+                  <span style={{ fontWeight: 700, color: 'var(--trend-text-muted)', width: 28, textAlign: 'right' }}>38%</span>
                 </div>
-                <div className="indicator-stat-col">
-                  <span className="indicator-stat-label">다음 달</span>
-                  <span className="indicator-stat-value">{isLoading ? "..." : (indicators?.interestRate?.nextMonth ?? "-")}</span>
+                {/* 인상 */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>인상</span>
+                  <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
+                    <div style={{ width: '17%', height: '100%', background: '#ef4444', borderRadius: 3 }}></div>
+                  </div>
+                  <span style={{ fontWeight: 700, color: '#ef4444', width: 28, textAlign: 'right' }}>17%</span>
                 </div>
               </div>
-              <svg viewBox="0 0 100 30" style={{ width: '100%', height: 40, fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
-                <path d="M 0 25 L 45 25 L 50 15 L 100 15" />
-                <circle cx="50" cy="15" r="3" fill="#3b82f6" />
-              </svg>
+              
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--trend-text-main)', borderTop: '1px solid var(--trend-border)', paddingTop: 8, marginTop: 'auto' }}>
+                예측: <span style={{ color: '#3b82f6' }}>인하 가능성 높음</span>
+              </div>
             </div>
           </div>
         </div>
