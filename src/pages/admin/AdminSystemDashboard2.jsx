@@ -1,23 +1,14 @@
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { LogOut } from "lucide-react";
+import { api } from "../../api";
 import "./Admin.css";
 
 const pieData = [
-  { name: "트렌드 아카이브", value: 45, color: "#6366f1" },
-  { name: "고객 관리", value: 35, color: "#fbbf24" },
-  { name: "캘린더", value: 20, color: "#fb923c" },
-];
-
-const transactionLogs = [
-  { time: "09:14:22", path: "/api/ai/chat/completions", ms: "1,243 ms", status: 200 },
-  { time: "09:14:22", path: "/api/archive/economic-indicators", ms: "88 ms", status: 200 },
-  { time: "09:14:22", path: "/api/archive/news?date=2026-05-07", ms: "124 ms", status: 200 },
-  { time: "09:14:22", path: "/api/ai/chat/completions", ms: "5,003 ms", status: 500 },
-  { time: "09:14:22", path: "/api/report/generate", ms: "2,310 ms", status: 200 },
-  { time: "09:14:22", path: "/api/report/generate", ms: "132 ms", status: 200 },
-  { time: "09:14:22", path: "/api/market/rates?type=exchange", ms: "54 ms", status: 200 },
-  { time: "09:14:22", path: "/api/ai/chat/completions", ms: "988 ms", status: 200 },
+  { name: "고객 관리", value: 45, color: "#22c55e" },
+  { name: "트렌드 아카이브", value: 35, color: "#6366f1" },
+  { name: "캘린더", value: 20, color: "#f97316" },
 ];
 
 const AdminTabs = () => {
@@ -70,6 +61,34 @@ const AdminHeader = ({ title }) => {
 };
 
 export default function AdminSystemDashboard2() {
+  const [logFilter, setLogFilter] = useState('전체');
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchLogs(silent = false) {
+      if (!silent) setLoading(true);
+      try {
+        const data = await api.admin.getSystemLogs(logFilter === "오류만" ? "오류만" : "all");
+        if (data && data.logs) {
+          setLogs(data.logs);
+        }
+      } catch (err) {
+        console.error("Failed to fetch logs:", err);
+      } finally {
+        if (!silent) setLoading(false);
+      }
+    }
+    
+    fetchLogs();
+    
+    const intervalId = setInterval(() => {
+      fetchLogs(true);
+    }, 5000);
+    
+    return () => clearInterval(intervalId);
+  }, [logFilter]);
+
   return (
     <div className="admin-container">
       <AdminHeader title="관리자 - 시스템 대시보드-2" />
@@ -80,38 +99,29 @@ export default function AdminSystemDashboard2() {
           <div className="admin-bars-section">
             <div className="admin-bar-item">
               <div className="bar-label">
-                <span>트렌드 아카이브</span>
-                <span>2,341회 <small>28%</small></span>
+                <span>고객관리</span>
+                <span>1,887회 <small>50%</small></span>
               </div>
               <div className="bar-track">
-                <div className="bar-fill" style={{ width: '75%', backgroundColor: '#6366f1' }}></div>
+                <div className="bar-fill" style={{ width: '80%', backgroundColor: '#22c55e' }}></div>
               </div>
             </div>
             <div className="admin-bar-item">
               <div className="bar-label">
-                <span>고객관리</span>
-                <span>1,887회 <small>28%</small></span>
+                <span>트렌드 아카이브</span>
+                <span>2,341회 <small>30%</small></span>
               </div>
               <div className="bar-track">
-                <div className="bar-fill" style={{ width: '60%', backgroundColor: '#22c55e' }}></div>
+                <div className="bar-fill" style={{ width: '60%', backgroundColor: '#6366f1' }}></div>
               </div>
             </div>
             <div className="admin-bar-item">
               <div className="bar-label">
                 <span>캘린더</span>
-                <span>1,254회 <small>28%</small></span>
+                <span>1,254회 <small>20%</small></span>
               </div>
               <div className="bar-track">
-                <div className="bar-fill" style={{ width: '40%', backgroundColor: '#f97316' }}></div>
-              </div>
-            </div>
-            <div className="admin-bar-item">
-              <div className="bar-label">
-                <span>뉴스 버킷</span>
-                <span>987회 <small>28%</small></span>
-              </div>
-              <div className="bar-track">
-                <div className="bar-fill" style={{ width: '30%', backgroundColor: '#a855f7' }}></div>
+                <div className="bar-fill" style={{ width: '35%', backgroundColor: '#f97316' }}></div>
               </div>
             </div>
           </div>
@@ -140,8 +150,8 @@ export default function AdminSystemDashboard2() {
               </ResponsiveContainer>
             </div>
             <div className="pie-legend">
+              <span className="legend-item"><span className="dot" style={{backgroundColor: '#22c55e'}}></span> 고객 관리</span>
               <span className="legend-item"><span className="dot" style={{backgroundColor: '#6366f1'}}></span> 트렌드 아카이브</span>
-              <span className="legend-item"><span className="dot" style={{backgroundColor: '#fbbf24'}}></span> 고객 관리</span>
               <span className="legend-item"><span className="dot" style={{backgroundColor: '#f97316'}}></span> 캘린더</span>
             </div>
           </div>
@@ -152,25 +162,53 @@ export default function AdminSystemDashboard2() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 className="admin-chart-title" style={{ margin: 0 }}>트랜잭션 로그 (DB 적재)</h3>
             <div className="pie-filters">
-              <button className="active">전체</button>
-              <button style={{ color: '#ef4444', backgroundColor: '#fee2e2' }}>오류만</button>
+              <button 
+                className={logFilter === '전체' ? 'active' : ''} 
+                onClick={() => setLogFilter('전체')}
+              >
+                전체
+              </button>
+              <button 
+                className={logFilter === '오류만' ? 'active' : ''}
+                style={{ 
+                  color: logFilter === '오류만' ? '#fff' : '#ef4444', 
+                  backgroundColor: logFilter === '오류만' ? '#ef4444' : '#fee2e2' 
+                }}
+                onClick={() => setLogFilter('오류만')}
+              >
+                오류만
+              </button>
             </div>
           </div>
           
           <table className="admin-list-table">
             <tbody>
-              {transactionLogs.map((log, i) => (
-                <tr key={i}>
-                  <td style={{ color: '#6b7280' }}>{log.time}</td>
-                  <td>{log.path}</td>
-                  <td style={{ textAlign: 'right', color: '#6b7280' }}>{log.ms}</td>
-                  <td style={{ textAlign: 'right', width: '80px' }}>
-                    <span className={`status-badge ${log.status === 200 ? 'success' : 'error'}`}>
-                      {log.status}
-                    </span>
+              {loading ? (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
+                    로그를 불러오는 중입니다...
                   </td>
                 </tr>
-              ))}
+              ) : logs.length === 0 ? (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
+                    로그 내역이 없습니다.
+                  </td>
+                </tr>
+              ) : (
+                logs.map((log, i) => (
+                  <tr key={i}>
+                    <td style={{ color: '#6b7280' }}>{log.time}</td>
+                    <td>{log.path}</td>
+                    <td style={{ textAlign: 'right', color: '#6b7280' }}>{log.ms}</td>
+                    <td style={{ textAlign: 'right', width: '80px' }}>
+                      <span className={`status-badge ${log.status === '200' ? 'success' : 'error'}`}>
+                        {log.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

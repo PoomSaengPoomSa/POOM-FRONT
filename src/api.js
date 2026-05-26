@@ -205,7 +205,32 @@ export const api = {
     },
     getIndicatorContribution: (type) => api.get(`/trend/indicators/${encodeURIComponent(type)}/contribution`),
     getLatestReport: (type) => api.get(`/trend/indicators/${encodeURIComponent(type)}/report/latest`),
-    createReport: (type, body) => api.post(`/trend/indicators/${encodeURIComponent(type)}/report`, body),
     getReportStatus: (type, reportId) => api.get(`/trend/indicators/${encodeURIComponent(type)}/report/${reportId}/status`),
+  },
+
+  // 8. 관리자 (Admin) API
+  admin: {
+    getSystemLogs: (filter = "all") => {
+      const query = filter && filter !== "all" ? `?filter=${encodeURIComponent(filter)}` : "";
+      return api.get(`/admin/system/dashboard/logs${query}`);
+    },
+    getEmployeeDashboard: () => api.get("/admin/employees/dashboard"),
+    getBranchStats: () => api.get("/admin/employees/dashboard/branch-stats"),
+    getWeeklyTrend: () => api.get("/admin/employees/dashboard/weekly-trend"),
+    getEmployeeUsage: () => api.get("/admin/employees/dashboard/usage"),
+    getPermissions: (search = "", branch = "") => {
+      const queryParams = [];
+      if (search) queryParams.push(`search=${encodeURIComponent(search)}`);
+      if (branch && branch !== "전체지점") queryParams.push(`branch=${encodeURIComponent(branch)}`);
+      const query = queryParams.length > 0 ? "?" + queryParams.join("&") : "";
+      return api.get(`/admin/permissions${query}`);
+    },
+    getAvailableReceivers: (u_id) => api.get(`/admin/employees/${u_id}/available-receivers`),
+    getHandovers: (search = "") => {
+      const query = search ? `?search=${encodeURIComponent(search)}` : "";
+      return api.get(`/admin/handovers${query}`);
+    },
+    getEmployeeCustomers: (u_id) => api.get(`/admin/employees/${u_id}/customers`),
+    transferCustomers: (u_id, body) => api.post(`/admin/employees/${u_id}/transfer`, body)
   }
 };

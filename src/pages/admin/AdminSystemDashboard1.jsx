@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { LogOut } from "lucide-react";
+import { api } from "../../api";
 import "./Admin.css"; 
 
 const tokenData = [
@@ -18,44 +19,38 @@ const tokenData = [
 const statsData = {
   '전체': {
     bars: [
-      { name: '트렌드 아카이브', count: '12,341회', pct: '32%', width: '75%', color: '#6366f1' },
-      { name: '고객관리', count: '10,887회', pct: '28%', width: '60%', color: '#22c55e' },
-      { name: '캘린더', count: '8,254회', pct: '21%', width: '40%', color: '#f97316' },
-      { name: '뉴스 버킷', count: '6,987회', pct: '19%', width: '30%', color: '#a855f7' }
+      { name: '고객관리', count: '10,887회', pct: '45%', width: '85%', color: '#22c55e' },
+      { name: '트렌드 아카이브', count: '12,341회', pct: '35%', width: '75%', color: '#6366f1' },
+      { name: '캘린더', count: '8,254회', pct: '20%', width: '40%', color: '#f97316' }
     ],
     pie: [
-      { name: "트렌드 아카이브", value: 32, color: "#6366f1" },
-      { name: "고객 관리", value: 28, color: "#fbbf24" },
-      { name: "캘린더", value: 21, color: "#f97316" },
-      { name: "뉴스 버킷", value: 19, color: "#a855f7" }
+      { name: "고객 관리", value: 45, color: "#22c55e" },
+      { name: "트렌드 아카이브", value: 35, color: "#6366f1" },
+      { name: "캘린더", value: 20, color: "#f97316" }
     ]
   },
   '이번 주': {
     bars: [
-      { name: '트렌드 아카이브', count: '2,341회', pct: '28%', width: '70%', color: '#6366f1' },
-      { name: '고객관리', count: '1,887회', pct: '23%', width: '55%', color: '#22c55e' },
-      { name: '캘린더', count: '1,254회', pct: '20%', width: '35%', color: '#f97316' },
-      { name: '뉴스 버킷', count: '987회', pct: '28%', width: '25%', color: '#a855f7' }
+      { name: '고객관리', count: '1,887회', pct: '50%', width: '80%', color: '#22c55e' },
+      { name: '트렌드 아카이브', count: '2,341회', pct: '30%', width: '60%', color: '#6366f1' },
+      { name: '캘린더', count: '1,254회', pct: '20%', width: '35%', color: '#f97316' }
     ],
     pie: [
-      { name: "트렌드 아카이브", value: 28, color: "#6366f1" },
-      { name: "고객 관리", value: 23, color: "#fbbf24" },
-      { name: "캘린더", value: 20, color: "#f97316" },
-      { name: "뉴스 버킷", value: 28, color: "#a855f7" }
+      { name: "고객 관리", value: 50, color: "#22c55e" },
+      { name: "트렌드 아카이브", value: 30, color: "#6366f1" },
+      { name: "캘린더", value: 20, color: "#f97316" }
     ]
   },
   '이번 달': {
     bars: [
+      { name: '고객관리', count: '4,887회', pct: '45%', width: '75%', color: '#22c55e' },
       { name: '트렌드 아카이브', count: '5,341회', pct: '35%', width: '85%', color: '#6366f1' },
-      { name: '고객관리', count: '4,887회', pct: '30%', width: '70%', color: '#22c55e' },
-      { name: '캘린더', count: '3,254회', pct: '20%', width: '50%', color: '#f97316' },
-      { name: '뉴스 버킷', count: '2,987회', pct: '15%', width: '40%', color: '#a855f7' }
+      { name: '캘린더', count: '3,254회', pct: '20%', width: '50%', color: '#f97316' }
     ],
     pie: [
+      { name: "고객 관리", value: 45, color: "#22c55e" },
       { name: "트렌드 아카이브", value: 35, color: "#6366f1" },
-      { name: "고객 관리", value: 30, color: "#fbbf24" },
-      { name: "캘린더", value: 20, color: "#f97316" },
-      { name: "뉴스 버킷", value: 15, color: "#a855f7" }
+      { name: "캘린더", value: 20, color: "#f97316" }
     ]
   }
 };
@@ -123,11 +118,35 @@ const AdminHeader = ({ title }) => {
 export default function AdminSystemDashboard1() {
   const [filter, setFilter] = useState('이번 주');
   const [logFilter, setLogFilter] = useState('전체');
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchLogs(silent = false) {
+      if (!silent) setLoading(true);
+      try {
+        const data = await api.admin.getSystemLogs(logFilter === "오류만" ? "오류만" : "all");
+        if (data && data.logs) {
+          setLogs(data.logs);
+        }
+      } catch (err) {
+        console.error("Failed to fetch logs:", err);
+      } finally {
+        if (!silent) setLoading(false);
+      }
+    }
+    
+    fetchLogs();
+    
+    const intervalId = setInterval(() => {
+      fetchLogs(true);
+    }, 5000);
+    
+    return () => clearInterval(intervalId);
+  }, [logFilter]);
 
   const currentData = statsData[filter];
-  const filteredLogs = logFilter === '오류만' 
-    ? transactionLogsData.filter(log => log.status !== '200')
-    : transactionLogsData;
+  const filteredLogs = logs;
 
   return (
     <div className="admin-container">
@@ -280,14 +299,28 @@ export default function AdminSystemDashboard1() {
           
           <table className="log-table">
             <tbody>
-              {filteredLogs.map((log, i) => (
-                <tr key={i}>
-                  <td className="log-time">{log.time}</td>
-                  <td className="log-api">{log.api}</td>
-                  <td className="log-ms">{log.ms}</td>
-                  <td className={`log-status ${log.status === '200' ? 'success' : 'error'}`}>{log.status}</td>
+              {loading ? (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
+                    로그를 불러오는 중입니다...
+                  </td>
                 </tr>
-              ))}
+              ) : filteredLogs.length === 0 ? (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
+                    로그 내역이 없습니다.
+                  </td>
+                </tr>
+              ) : (
+                filteredLogs.map((log, i) => (
+                  <tr key={i}>
+                    <td className="log-time">{log.time}</td>
+                    <td className="log-api">{log.api}</td>
+                    <td className="log-ms">{log.ms}</td>
+                    <td className={`log-status ${log.status === '200' ? 'success' : 'error'}`}>{log.status}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
