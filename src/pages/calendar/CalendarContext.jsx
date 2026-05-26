@@ -296,14 +296,43 @@ export function CalendarProvider({ children }) {
       return;
     }
 
+    // date가 유효한 Date 객체이면 YYYY-MM-DD 포맷 문자열로 변환
+    let targetDateStr = null;
+    if (date && !isNaN(date.getTime())) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      targetDateStr = `${yyyy}-${mm}-${dd}`;
+    }
+
     // 1차 시간대 겹침(중복) 검사
     const overlappingTodo = checkedTodos.find(todo => {
-      const todoStart = new Date(todo.executionDate);
+      let todoStart = new Date(todo.executionDate);
+      
+      // targetDateStr이 있을 경우 날짜(YYYY-MM-DD) 부분을 targetDateStr로 교체하여 로컬 Date 객체로 재생성
+      if (targetDateStr) {
+        let timePart = "10:00:00";
+        if (todo.executionDate && todo.executionDate.includes('T')) {
+          timePart = todo.executionDate.split('T')[1].substring(0, 8);
+        } else if (todo.executionDate && todo.executionDate.includes(' ')) {
+          timePart = todo.executionDate.split(' ')[1].substring(0, 8);
+        } else {
+          const parsed = new Date(todo.executionDate);
+          if (!isNaN(parsed.getTime())) {
+            timePart = String(parsed.getHours()).padStart(2, '0') + ':' + String(parsed.getMinutes()).padStart(2, '0') + ':00';
+          }
+        }
+        
+        // 'YYYY-MM-DDTHH:mm:ss' 포맷으로 생성
+        todoStart = new Date(`${targetDateStr}T${timePart}`);
+      }
+
       const todoEnd = new Date(todoStart.getTime() + 60 * 60 * 1000); // 시작 시간 + 1시간
 
       return events.some(e => {
-        const eStart = new Date(e.startTime);
-        const eEnd = new Date(e.endTime);
+        // e.startTime은 "2026-05-22 10:00" 형식이다. 브라우저 안전한 파싱을 위해 replace(' ', 'T') 처리
+        const eStart = new Date(e.startTime.replace(' ', 'T'));
+        const eEnd = new Date(e.endTime.replace(' ', 'T'));
         return todoStart < eEnd && todoEnd > eStart;
       });
     });
@@ -320,10 +349,17 @@ export function CalendarProvider({ children }) {
       if (!u_id) return;
 
       const at_ids = checkedTodos.map(t => t.id);
-      await api.aiTodo.confirm(u_id, at_ids);
+      
+      // target_date를 포함하여 백엔드 API 호출
+      await api.aiTodo.confirm(u_id, at_ids, targetDateStr);
 
       await fetchCalendarData();
-      showToast(`My To Do에 ${checkedTodos.length}개의 일정이 등록되었습니다!`);
+      
+      const formattedDate = targetDateStr 
+        ? `${date.getMonth() + 1}월 ${date.getDate()}일`
+        : "선택하신 날짜";
+        
+      showToast(`${formattedDate}의 My To Do에 ${checkedTodos.length}개의 일정이 등록되었습니다!`);
     } catch (error) {
       console.error("AI To Do 일정 등록 실패:", error);
       showToast("일정 승인 등록에 실패했습니다.");

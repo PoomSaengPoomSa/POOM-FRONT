@@ -147,7 +147,7 @@ export const api = {
   // 4. AI 투두 (AI To-Do) API
   aiTodo: {
     getList: (u_id) => api.get(`/ai-todo/${u_id ? `?u_id=${u_id}` : ""}`),
-    confirm: (u_id, at_ids) => api.post("/ai-todo/confirm", { u_id, at_ids }),
+    confirm: (u_id, at_ids, target_date) => api.post("/ai-todo/confirm", { u_id, at_ids, target_date }),
     unconfirm: (at_id) => api.patch(`/ai-todo/${at_id}/unconfirm`),
   },
 
