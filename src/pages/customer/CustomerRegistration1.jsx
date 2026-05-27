@@ -245,45 +245,55 @@ export default function CustomerRegistration1() {
       return;
     }
     
-    const fetchDetail = async () => {
-      try {
-        const detail = await api.customer.getDetail(selectedCustomer.id);
-        setFullCustomerDetail(detail);
-      } catch (error) {
-        console.error("고객 상세 정보 조회 실패:", error);
-      }
+    const fetchDetail = () => {
+      // 1. Fetch main detail independently
+      api.customer.getDetail(selectedCustomer.id)
+        .then(detail => {
+          setFullCustomerDetail(detail);
+        })
+        .catch(error => {
+          console.error("고객 상세 정보 조회 실패:", error);
+        });
 
-      try {
-        const stats = await api.customer.getVisitStats(selectedCustomer.id);
-        setVisitStats(stats);
-      } catch (error) {
-        console.error("방문 주기 조회 실패:", error);
-        setVisitStats(null);
-      }
+      // 2. Fetch visit stats independently
+      api.customer.getVisitStats(selectedCustomer.id)
+        .then(stats => {
+          setVisitStats(stats);
+        })
+        .catch(error => {
+          console.error("방문 주기 조회 실패:", error);
+          setVisitStats(null);
+        });
 
-      try {
-        const risk = await api.customer.getChurnRisk(selectedCustomer.id);
-        setChurnRisk(risk);
-      } catch (error) {
-        console.error("이탈 위험 조회 실패:", error);
-        setChurnRisk(null);
-      }
+      // 3. Fetch churn risk independently
+      api.customer.getChurnRisk(selectedCustomer.id)
+        .then(risk => {
+          setChurnRisk(risk);
+        })
+        .catch(error => {
+          console.error("이탈 위험 조회 실패:", error);
+          setChurnRisk(null);
+        });
 
-      try {
-        const features = await api.customer.getFeatures(selectedCustomer.id);
-        setCustomerFeatures(features);
-      } catch (error) {
-        console.error("고객 특징 조회 실패:", error);
-        setCustomerFeatures(null);
-      }
+      // 4. Fetch features independently
+      api.customer.getFeatures(selectedCustomer.id)
+        .then(features => {
+          setCustomerFeatures(features);
+        })
+        .catch(error => {
+          console.error("고객 특징 조회 실패:", error);
+          setCustomerFeatures(null);
+        });
 
-      try {
-        const matches = await api.customer.getProductMatch(selectedCustomer.id);
-        setProductMatches(matches);
-      } catch (error) {
-        console.error("주력 상품 매칭 조회 실패:", error);
-        setProductMatches(null);
-      }
+      // 5. Fetch product matches independently
+      api.customer.getProductMatch(selectedCustomer.id)
+        .then(matches => {
+          setProductMatches(matches);
+        })
+        .catch(error => {
+          console.error("주력 상품 매칭 조회 실패:", error);
+          setProductMatches(null);
+        });
     };
     
     fetchDetail();

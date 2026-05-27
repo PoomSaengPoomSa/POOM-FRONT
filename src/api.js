@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000/api/v1";
+const BASE_URL = "http://127.0.0.1:8000/api/v1";
 
 // JWT 토큰 파싱 헬퍼 함수
 export function parseJwt(token) {

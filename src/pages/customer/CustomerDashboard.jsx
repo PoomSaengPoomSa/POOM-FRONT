@@ -72,29 +72,35 @@ export default function CustomerDashboard() {
       setSelectedCustomer(found);
     }
     
-    const fetchDetail = async () => {
-      try {
-        const detail = await api.customer.getDetail(selectedCustomerId);
-        setFullCustomerDetail(detail);
+    const fetchDetail = () => {
+      // 1. Fetch main detail independently
+      api.customer.getDetail(selectedCustomerId)
+        .then(detail => {
+          setFullCustomerDetail(detail);
+        })
+        .catch(error => {
+          console.error("상세 정보 조회 실패:", error);
+        });
 
-        try {
-          const stats = await api.customer.getVisitStats(selectedCustomerId);
+      // 2. Fetch visit stats independently
+      api.customer.getVisitStats(selectedCustomerId)
+        .then(stats => {
           setVisitStats(stats);
-        } catch (err) {
+        })
+        .catch(err => {
           console.error("방문 주기 조회 실패:", err);
           setVisitStats(null);
-        }
+        });
 
-        try {
-          const risk = await api.customer.getChurnRisk(selectedCustomerId);
+      // 3. Fetch churn risk independently
+      api.customer.getChurnRisk(selectedCustomerId)
+        .then(risk => {
           setChurnRisk(risk);
-        } catch (err) {
+        })
+        .catch(err => {
           console.error("이탈 위험 조회 실패:", err);
           setChurnRisk(null);
-        }
-      } catch (error) {
-        console.error("상세 정보 조회 실패:", error);
-      }
+        });
     };
     fetchDetail();
   }, [selectedCustomerId, customersList]);

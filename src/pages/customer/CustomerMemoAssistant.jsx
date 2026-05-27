@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
-import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, PenLine, Check, Settings, ArrowUp } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, PenLine, Check, Settings, ArrowUp, UserCircle } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
 import { api } from "../../api";
 import "./Customer.css";
@@ -78,10 +78,11 @@ export default function CustomerMemoAssistant() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeListTab, setActiveListTab] = useState("오늘 방문");
+  const [activeListTab, setActiveListTab] = useState("전체 고객");
   const [allCustomersList, setAllCustomersList] = useState([]);
   const [todayCustomersList, setTodayCustomersList] = useState([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const pendingSelectedCustomerIdRef = useRef(null);
   const [fullCustomerDetail, setFullCustomerDetail] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedTimelineId, setExpandedTimelineId] = useState(null);
@@ -111,15 +112,16 @@ export default function CustomerMemoAssistant() {
       const tabParam = activeListTab === '전체 고객' ? 'all' : 'today';
       const response = await api.customer.getList(tabParam);
       
-      const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
       const mapped = response.map((c) => {
         const char = c.name ? c.name[0] : "고";
+        const avatarColor = c.gender === "F" ? "pink" : "blue";
         return {
           id: c.c_id,
           name: c.name,
           email: c.email || `${c.c_id}@poom.com`,
           phone: c.phone || "010-0000-0000",
-          color: colors[c.c_id % colors.length],
+          color: avatarColor,
+          gender: c.gender,
           initial: char,
           time: c.c_id % 2 === 0 ? "10:00 AM" : "14:30 PM",
         };
@@ -131,11 +133,9 @@ export default function CustomerMemoAssistant() {
         setTodayCustomersList(mapped);
       }
       
-      const exists = mapped.some(c => c.id === selectedCustomerId);
-      if (exists) {
-        // Keep the current selection
-      } else if (mapped.length > 0) {
-        setSelectedCustomerId(mapped[0].id);
+      if (pendingSelectedCustomerIdRef.current) {
+        setSelectedCustomerId(pendingSelectedCustomerIdRef.current);
+        pendingSelectedCustomerIdRef.current = null;
       } else {
         setSelectedCustomerId(null);
       }
@@ -277,6 +277,7 @@ export default function CustomerMemoAssistant() {
   const [activeTab, setActiveTab] = useState("memo"); // "memo" or "simulator"
   const [listWidth, setListWidth] = useState(320);
   const [isDragging, setIsDragging] = useState(false);
+  const isNarrow = listWidth < 220;
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -416,54 +417,58 @@ export default function CustomerMemoAssistant() {
       <div className={`cust-main ${isDragging ? 'dragging' : ''}`}>
 
         {/* Left Panel */}
-        <div className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''}`} style={{ width: listWidth, flexShrink: 0 }}>
-          <div className="cust-list-header">
-            <h2 className="cust-list-title">나의 고객</h2>
+        <div className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''} ${isNarrow ? 'narrow' : ''}`} style={{ width: listWidth, flexShrink: 0, padding: isNarrow ? '20px 10px' : '24px' }}>
+          <div className="cust-list-header" style={{ marginBottom: isNarrow ? '16px' : '24px' }}>
+            <h2 className="cust-list-title" style={{ fontSize: isNarrow ? '15px' : '18px' }}>나의 고객</h2>
             <button className="cust-add-btn" onClick={() => setIsModalOpen(true)}><Plus size={16} /></button>
           </div>
           
-          <div className="cust-search">
-            <Search size={16} className="cust-search-icon" />
+          <div className="cust-search" style={{ marginBottom: isNarrow ? '16px' : '24px' }}>
+            <Search size={16} className="cust-search-icon" style={{ left: isNarrow ? '10px' : '12px' }} />
             <input 
               type="text" 
               className="cust-search-input" 
-              placeholder="Search" 
+              placeholder={isNarrow ? "" : "Search"} 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ paddingLeft: isNarrow ? '32px' : '40px', paddingRight: isNarrow ? '8px' : '16px' }}
             />
           </div>
 
-          <div className="cust-list-tabs">
-            <div 
-              className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} 
-              onClick={() => { 
-                setActiveListTab('전체 고객'); 
-              }} 
-              style={{ cursor: 'pointer', flex: 1 }}
-            >
-              전체 고객
+          <div className="cust-list-tabs" style={{ marginBottom: isNarrow ? '12px' : '16px' }}>
+            <div className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} onClick={() => { setActiveListTab('전체 고객'); }} style={{ cursor: 'pointer', padding: isNarrow ? '8px 0' : '12px 0', fontSize: isNarrow ? '12px' : '14px' }}>
+              {isNarrow ? '전체' : '전체 고객'}
             </div>
-            <div 
-              className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} 
-              onClick={() => { 
-                setActiveListTab('오늘 방문'); 
-              }} 
-              style={{ cursor: 'pointer', flex: 1 }}
-            >
-              오늘 방문
+            <div className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} onClick={() => { setActiveListTab('오늘 방문'); }} style={{ cursor: 'pointer', padding: isNarrow ? '8px 0' : '12px 0', fontSize: isNarrow ? '12px' : '14px' }}>
+              {isNarrow ? '오늘' : '오늘 방문'}
             </div>
           </div>
 
           <div className="cust-list-items">
             {filteredCustomers.map(c => (
-              <div className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomerId(c.id)} style={{ cursor: 'pointer' }}>
+              <div 
+                className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} 
+                key={c.id} 
+                onClick={() => setSelectedCustomerId(c.id)} 
+                style={{ 
+                  cursor: 'pointer',
+                  padding: isNarrow ? '10px 8px' : '12px 16px',
+                  gap: isNarrow ? '10px' : '16px'
+                }}
+              >
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
-                <div className="cust-item-info">
-                  <span className="cust-item-name">{c.name}</span>
-                  <span className="cust-item-sub">{c.email}</span>
-                  <span className="cust-item-sub">{c.phone}</span>
-                </div>
-                <div className="cust-item-time">{c.time}</div>
+                {!isNarrow ? (
+                  <div className="cust-item-info">
+                    <span className="cust-item-name">{c.name}</span>
+                    <span className="cust-item-sub">{c.email}</span>
+                    <span className="cust-item-sub">{c.phone}</span>
+                  </div>
+                ) : (
+                  <div className="cust-item-info" style={{ justifyContent: 'center' }}>
+                    <span className="cust-item-name" style={{ fontSize: '14px' }}>{c.name}</span>
+                  </div>
+                )}
+                {c.time && !isNarrow && <div className="cust-item-time">{c.time}</div>}
               </div>
             ))}
           </div>
@@ -473,14 +478,16 @@ export default function CustomerMemoAssistant() {
         <div className={`cust-resizer ${isDragging ? 'dragging' : ''}`} onMouseDown={handleMouseDown} />
 
         {/* Right Detail Panel */}
-        <div key={selectedCustomerId} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
-          <div className="cust-detail-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '24px' }}>
-            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div className="cust-detail-profile">
-                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
-                <h2>{selectedCustomer.name}</h2>
-              </div>
-            </div>
+        <div key={selectedCustomerId || 'empty'} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
+          {selectedCustomerId ? (
+            <>
+              <div className="cust-detail-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '24px' }}>
+                <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div className="cust-detail-profile">
+                    <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
+                    <h2>{selectedCustomer.name}</h2>
+                  </div>
+                </div>
             <div className="cust-detail-tabs" style={{ margin: 0 }}>
               <button 
                 className={`cust-detail-tab ${activeTab === 'memo' ? 'active' : ''}`}
@@ -992,6 +999,25 @@ export default function CustomerMemoAssistant() {
               </div>
             </div>
           )}
+            </>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#64748b', textAlign: 'center', flex: 1 }}>
+              {activeListTab === '전체 고객' ? (
+                <div style={{ width: 100, height: 100, borderRadius: '50%', background: '#e0f2fe', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+                  <UserCircle size={48} color="#0284c7" strokeWidth={1.5} />
+                </div>
+              ) : (
+                <div style={{ width: 100, height: 100, borderRadius: '50%', background: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+                  <Calendar size={48} color="#ffffff" strokeWidth={1.5} />
+                </div>
+              )}
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>{activeListTab === '전체 고객' ? '전체 고객 목록' : '오늘 방문 고객'}</h2>
+              <p style={{ fontSize: 15, lineHeight: 1.6, marginBottom: 40, whiteSpace: 'pre-wrap', color: '#94a3b8' }}>
+                {activeListTab === '전체 고객' ? '왼쪽 목록에서 고객을 선택하면\n상세 정보를 확인할 수 있어요.' : '왼쪽에서 오늘 방문 고객을 선택하면\n상세 정보를 확인할 수 있어요.'}
+              </p>
+              {activeListTab === '전체 고객' && <p style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>고객 이름을 클릭해 메모 어시스턴트와 시뮬레이터를 확인하세요</p>}
+            </div>
+          )}
         </div>
       <CustomerRegistrationModal 
         isOpen={isModalOpen} 
@@ -1010,19 +1036,21 @@ export default function CustomerMemoAssistant() {
               gender: newData.gender || "M",
             });
 
+            pendingSelectedCustomerIdRef.current = created.c_id;
             setActiveListTab("전체 고객");
 
             // Fetch refreshed list to update the client state
             const response = await api.customer.getList("all");
-            const colors = ["pink", "purple", "red", "green", "blue", "yellow", "gray"];
             const mapped = response.map((c) => {
               const char = c.name ? c.name[0] : "고";
+              const avatarColor = c.gender === "F" ? "pink" : "blue";
               return {
                 id: c.c_id,
                 name: c.name,
                 email: c.email || `${c.c_id}@poom.com`,
                 phone: c.phone || "010-0000-0000",
-                color: colors[c.c_id % colors.length],
+                color: avatarColor,
+                gender: c.gender,
                 initial: char,
                 time: c.c_id % 2 === 0 ? "10:00 AM" : "14:30 PM",
               };
