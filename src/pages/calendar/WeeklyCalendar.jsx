@@ -502,6 +502,7 @@ export default function WeeklyCalendar() {
                               const heightPx = (durationMins / 60) * 60;
                               
                               const styleColors = colorMap[event.color] || colorMap.blue;
+                              const isShort = heightPx < 25;
                               
                               return (
                                 <div 
@@ -513,7 +514,16 @@ export default function WeeklyCalendar() {
                                     cursor: 'pointer',
                                     background: styleColors.bg,
                                     border: `1px solid ${styleColors.border}`,
-                                    color: styleColors.text
+                                    color: styleColors.text,
+                                    fontSize: isShort ? '10px' : '11px',
+                                    padding: isShort ? '0 2px' : '2px 4px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    overflow: 'hidden',
+                                    whiteSpace: 'nowrap',
+                                    textOverflow: 'ellipsis',
+                                    boxSizing: 'border-box',
+                                    lineHeight: 1
                                   }} 
                                   onClick={() => openDetailModal(event)}
                                 >

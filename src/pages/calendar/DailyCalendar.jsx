@@ -470,6 +470,42 @@ export default function DailyCalendar() {
                     const heightPx = (durationMins / 60) * 80;
                     
                     const styleColors = colorMap[event.color] || colorMap.blue;
+                    const isShortEvent = heightPx < 40;
+                    
+                    if (isShortEvent) {
+                      return (
+                        <div 
+                          key={event.id}
+                          onClick={() => openDetailModal(event)}
+                          style={{ 
+                            cursor: 'pointer', 
+                            position: 'absolute', 
+                            top: topPos, 
+                            left: 24, 
+                            right: 24, 
+                            height: heightPx, 
+                            background: styleColors.bg, 
+                            borderRadius: 6, 
+                            display: 'flex', 
+                            alignItems: 'center',
+                            padding: '0 12px',
+                            border: `1px solid ${styleColors.border}`,
+                            boxSizing: 'border-box',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <span style={{ fontSize: 11, fontWeight: 700, color: styleColors.text, marginRight: 8, whiteSpace: 'nowrap' }}>
+                            [{timePartStart}]
+                          </span>
+                          <span style={{ fontSize: 11, fontWeight: 600, color: styleColors.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: 12 }}>
+                            {event.title}
+                          </span>
+                          <span style={{ fontSize: 11, color: styleColors.timeText, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: 0.8 }}>
+                            {event.memo}
+                          </span>
+                        </div>
+                      );
+                    }
                     
                     return (
                       <div 
