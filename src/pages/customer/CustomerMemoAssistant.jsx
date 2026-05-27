@@ -7,73 +7,6 @@ import { api } from "../../api";
 import "./Customer.css";
 
 
-const allCustomers = [
-  { id: 101, name: "강OO", email: "dohyun@naver.com", phone: "010-7134-2353", color: "yellow", initial: "강" },
-  { id: 102, name: "강OO", email: "lsjshid@gmail.com", phone: "010-4563-2364", color: "green", initial: "강" },
-  { id: 103, name: "고OO", email: "shiho@gmail.com", phone: "010-9291-1342", color: "red", initial: "고" },
-  { id: 104, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김" },
-  { id: 105, name: "김OO", email: "kim1004@gmail.com", phone: "010-4333-1245", color: "blue", initial: "김" },
-  { id: 106, name: "김OO", email: "kimvils@naver.com", phone: "010-2214-3621", color: "gray", initial: "김" },
-  { id: 107, name: "김OO", email: "ppjisd@naver.com", phone: "010-6335-2365", color: "purple", initial: "김" },
-];
-
-const customers = [
-  { id: 1, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김", time: "10:00 AM" },
-  { id: 2, name: "박OO", email: "erlkgjldfjgkld@gmail.com", phone: "010-1234-5678", color: "purple", initial: "박", time: "13:30 PM" },
-  { id: 3, name: "이OO", email: "lgkesdl@gmail.com", phone: "010-9876-5432", color: "red", initial: "이", time: "15:00 PM" },
-];
-
-const timelineData = [
-  {
-    id: 1,
-    type: '리츠',
-    date: '2026.04.27',
-    text: '달러 약세로 해외자산 비중 조정 논의. 국내 리츠 관심 표명.',
-    originalMemo: '달러 자산 줄이고 싶다고.\n국내 리츠 관심.\n다음달 초 재방문.\n총 자산 32억 1,234만',
-    aiSummary: {
-      '주요 니즈': '달러 비중 축소/리츠 편입',
-      '후속 조치': '리츠 비교안 준비',
-      '차기 상담': '2026.05 초순'
-    }
-  },
-  {
-    id: 2,
-    type: '채권',
-    date: '2026.03.15',
-    text: '1분기 수익률 점검. 채권 비중 확대 제안 수락.',
-    originalMemo: '1분기 수익률 양호. 채권 편입 비중 10% 확대 제안.\n고객 수락함.',
-    aiSummary: {
-      '주요 니즈': '안정적 수익 추구/채권 편입',
-      '후속 조치': '채권 상품 제안서 발송',
-      '차기 상담': '2026.04 중순'
-    }
-  },
-  {
-    id: 3,
-    type: '리밸',
-    date: '2026.01.08',
-    text: '연초 포트폴리오 리밸런싱. 국내주식 5% 추가 편입.',
-    originalMemo: '연초 포트폴리오 조정 논의.\n국내주식 저평가 구간 판단, 5% 추가 편입 결정.',
-    aiSummary: {
-      '주요 니즈': '국내주식 비중 확대',
-      '후속 조치': '주식 매수 실행',
-      '차기 상담': '2026.02 중순'
-    }
-  },
-  {
-    id: 4,
-    type: '절세',
-    date: '2025.11.20',
-    text: '절세 계획 상담. ISA 계좌 추가 납입 결정.',
-    originalMemo: '연말 절세 방안 상담.\n중개형 ISA 한도 2천만원 추가 납입 결정.',
-    aiSummary: {
-      '주요 니즈': '연말 절세/ISA 활용',
-      '후속 조치': 'ISA 입금 안내',
-      '차기 상담': '2026.01 초순'
-    }
-  }
-];
-
 export default function CustomerMemoAssistant() {
   const location = useLocation();
   const path = location.pathname;
@@ -300,18 +233,10 @@ export default function CustomerMemoAssistant() {
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
   };
-  const [additionalNotes, setAdditionalNotes] = useState({
-    1: "내년 초 부동산 매도 예정, 포트폴리오 다각화 니즈 강함",
-    2: "",
-    3: ""
-  });
+  const [additionalNotes, setAdditionalNotes] = useState({});
   const [showNotesSaveToast, setShowNotesSaveToast] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState("");
-  const [chatMessages, setChatMessages] = useState({
-    1: [],
-    2: [],
-    3: []
-  });
+  const [chatMessages, setChatMessages] = useState({});
   const [isTyping, setIsTyping] = useState(false);
 
   const messagesEndRef = useRef(null);
@@ -335,18 +260,20 @@ export default function CustomerMemoAssistant() {
   const selectedSimDetails = {
     name: selectedCustomer ? `${selectedCustomer.name} (${fullCustomerDetail?.grade || "VIP"})` : "로딩중...",
     assets: formatAssets(fullCustomerDetail?.total_assets),
-    assetsRaw: fullCustomerDetail?.total_assets !== undefined ? (fullCustomerDetail.total_assets / 100000000) : 32.1234, // in 100M units
+    assetsRaw: fullCustomerDetail?.total_assets !== undefined ? (fullCustomerDetail.total_assets / 100000000) : 0, // in 100M units
     needs: fullCustomerDetail?.llm_insight ? 
       (fullCustomerDetail.llm_insight.length > 30 ? fullCustomerDetail.llm_insight.slice(0, 30) + "..." : fullCustomerDetail.llm_insight) 
-      : "포트폴리오 다각화 및 절세",
+      : "등록된 주요 니즈가 없습니다.",
     risk: fullCustomerDetail?.tendency || "위험 중립형",
     products: fullCustomerDetail ? [
       fullCustomerDetail.deposit > 0 ? "예적금" : null,
       fullCustomerDetail.investment > 0 ? "투자상품" : null,
       fullCustomerDetail.pension > 0 ? "연금보험" : null,
-    ].filter(Boolean).join(" + ") || "예적금 + 투자상품" : "예적금 + 투자상품",
-    lastCounsel: "2026.05.12",
-    nextCounsel: "2026.06 중순"
+    ].filter(Boolean).join(" + ") || "보유 상품 없음" : "보유 상품 없음",
+    lastCounsel: timelineList.length > 0 ? timelineList[0].date : "상담 이력 없음",
+    nextCounsel: (timelineList.length > 0 && timelineDetails[timelineList[0].timelineId]?.content?.next_consult) 
+      ? timelineDetails[timelineList[0].timelineId].content.next_consult 
+      : "미정"
   };
 
   const handleNotesChange = (id, val) => {

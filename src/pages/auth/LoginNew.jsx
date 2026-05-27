@@ -4,15 +4,7 @@ import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { api } from "../../api";
 import "./AuthNew.css";
 
-// Mock Database for Users and Roles (백엔드 통신 실패 시를 위한 안전 폴백용으로 남겨둠)
-const MOCK_USERS = [
-  { id: "admin", password: "admin", role: "admin", name: "관리자" },
-  { id: "developer", password: "admin", role: "admin", name: "개발자" },
-  { id: "admin@poom.com", password: "admin", role: "admin", name: "어드민" },
-  { id: "WPB-012890", password: "user123", role: "user", name: "김재욱" },
-  { id: "user", password: "user", role: "user", name: "홍길동" },
-  { id: "user123", password: "user", role: "user", name: "사용자" }
-];
+
 
 export default function LoginNew() {
   const navigate = useNavigate();
