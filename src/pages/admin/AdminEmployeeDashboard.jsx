@@ -1,27 +1,9 @@
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { LogOut } from "lucide-react";
+import { api } from "../../api";
 import "./Admin.css";
-
-const deptData = [
-  { name: "WM영업1팀", value: 80 },
-  { name: "WM영업2팀", value: 71 },
-  { name: "리테일PB팀", value: 68 },
-];
-
-const trendData = [
-  { name: "4주전", value: 61 },
-  { name: "3주전", value: 67 },
-  { name: "2주전", value: 70 },
-  { name: "지난주", value: 75 },
-];
-
-const employees = [
-  { id: "100089", name: "이홍혁", branch: "강남지점", stat1: "34회", stat2: "28회", stat3: "47회", stat4: "12회", stat5: "9회", total: "130회", status: "접속 중", statusClass: "status-online" },
-  { id: "100021", name: "이수현", branch: "강남지점", stat1: "41회", stat2: "19회", stat3: "31회", stat4: "18회", stat5: "6회", total: "115회", status: "접속 중", statusClass: "status-online" },
-  { id: "100088", name: "김수빈", branch: "여의도지점", stat1: "22회", stat2: "38회", stat3: "14회", stat4: "5회", stat5: "11회", total: "90회", status: "1시간 전", statusClass: "status-away" },
-  { id: "100102", name: "이주리", branch: "압구정지점", stat1: "—", stat2: "—", stat3: "—", stat4: "—", stat5: "—", total: "—", status: "14일 미접속", statusClass: "status-offline" },
-];
 
 const AdminTabs = () => {
   const location = useLocation();
@@ -73,6 +55,45 @@ const AdminHeader = ({ title }) => {
 };
 
 export default function AdminEmployeeDashboard() {
+  const [metrics, setMetrics] = useState({ active_count: 0, total_count: 0, access_rate: "0%", avg_session_time: "0분" });
+  const [deptData, setDeptData] = useState([]);
+  const [trendData, setTrendData] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDashboardData() {
+      setLoading(true);
+      try {
+        const [dashData, branchData, weeklyData, usageData] = await Promise.all([
+          api.admin.getEmployeeDashboard(),
+          api.admin.getBranchStats(),
+          api.admin.getWeeklyTrend(),
+          api.admin.getEmployeeUsage(),
+        ]);
+
+        if (dashData) setMetrics(dashData);
+        if (branchData && branchData.stats) {
+          setDeptData(branchData.stats.map(s => ({
+            name: s.branch_name,
+            value: s.access_rate
+          })));
+        }
+        if (weeklyData && weeklyData.trends) {
+          setTrendData(weeklyData.trends);
+        }
+        if (usageData && usageData.usage) {
+          setEmployees(usageData.usage);
+        }
+      } catch (err) {
+        console.error("Failed to load employee dashboard data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDashboardData();
+  }, []);
+
   return (
     <div className="admin-container">
       <AdminHeader title="관리자 - 직원 대시보드" />
@@ -82,22 +103,22 @@ export default function AdminEmployeeDashboard() {
         <div className="admin-stats-grid">
           <div className="admin-stat-card">
             <div className="admin-stat-title">오늘 접속 직원</div>
-            <div className="admin-stat-value">42명</div>
-            <div className="admin-stat-sub">전체 52명 중</div>
+            <div className="admin-stat-value">{loading ? "—" : `${metrics.active_count}명`}</div>
+            <div className="admin-stat-sub">{loading ? "—" : `전체 ${metrics.total_count}명 중`}</div>
           </div>
           <div className="admin-stat-card">
             <div className="admin-stat-title">접속률</div>
-            <div className="admin-stat-value">75%</div>
+            <div className="admin-stat-value">{loading ? "—" : metrics.access_rate}</div>
             <div className="admin-stat-sub">전주 +8%</div>
           </div>
           <div className="admin-stat-card">
-            <div className="admin-stat-title">오늘 접속 직원</div>
-            <div className="admin-stat-value">00명</div>
-            <div className="admin-stat-sub">전체 52명 중</div>
+            <div className="admin-stat-title">오늘 미접속 직원</div>
+            <div className="admin-stat-value">{loading ? "—" : `${metrics.total_count - metrics.active_count}명`}</div>
+            <div className="admin-stat-sub">{loading ? "—" : `전체 ${metrics.total_count}명 중`}</div>
           </div>
           <div className="admin-stat-card">
             <div className="admin-stat-title">평균 세션 시간</div>
-            <div className="admin-stat-value">24분</div>
+            <div className="admin-stat-value">{loading ? "—" : metrics.avg_session_time}</div>
             <div className="admin-stat-sub">전일 21분</div>
           </div>
         </div>
@@ -107,30 +128,42 @@ export default function AdminEmployeeDashboard() {
           <div className="admin-chart-card">
             <h3 className="admin-chart-title">부서별 접속률</h3>
             <div style={{ height: "250px" }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={deptData} barSize={60}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={(val) => `${val}%`} />
-                  <Tooltip cursor={{fill: 'transparent'}} />
-                  <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {loading ? (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#6b7280' }}>로딩 중...</div>
+              ) : deptData.length === 0 ? (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#6b7280' }}>지점 데이터가 없습니다.</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={deptData} barSize={60}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                    <YAxis axisLine={false} tickLine={false} ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={(val) => `${val}%`} />
+                    <Tooltip cursor={{fill: 'transparent'}} />
+                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
           <div className="admin-chart-card">
             <h3 className="admin-chart-title">주간 접속률 추이</h3>
             <div style={{ height: "250px" }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={trendData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} domain={[50, 90]} ticks={[50, 55, 60, 65, 70, 75, 80, 85, 90]} tickFormatter={(val) => `${val}%`} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={{r: 5, fill: '#3b82f6'}} />
-                </LineChart>
-              </ResponsiveContainer>
+              {loading ? (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#6b7280' }}>로딩 중...</div>
+              ) : trendData.length === 0 ? (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#6b7280' }}>트렌드 데이터가 없습니다.</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={trendData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                    <YAxis axisLine={false} tickLine={false} domain={[50, 90]} ticks={[50, 55, 60, 65, 70, 75, 80, 85, 90]} tickFormatter={(val) => `${val}%`} />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={{r: 5, fill: '#3b82f6'}} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </div>
@@ -158,30 +191,40 @@ export default function AdminEmployeeDashboard() {
               </tr>
             </thead>
             <tbody>
-              {employees.map((emp, i) => (
-                <tr key={i}>
-                  <td style={{ color: '#6b7280' }}>{emp.id}</td>
-                  <td>
-                    <div className="employee-name-cell">
-                      <div className="employee-avatar" style={{
-                        background: i % 2 === 0 ? '#e0e7ff' : '#fee2e2',
-                        color: i % 2 === 0 ? '#4f46e5' : '#ef4444'
-                      }}>
-                        {emp.name.charAt(0)}
-                      </div>
-                      {emp.name}
-                    </div>
-                  </td>
-                  <td style={{ color: '#6b7280' }}>{emp.branch}</td>
-                  <td>{emp.stat1}</td>
-                  <td>{emp.stat2}</td>
-                  <td>{emp.stat3}</td>
-                  <td>{emp.stat4}</td>
-                  <td>{emp.stat5}</td>
-                  <td style={{ fontWeight: 500 }}>{emp.total}</td>
-                  <td className={emp.statusClass} style={{ fontWeight: 500 }}>{emp.status}</td>
+              {loading ? (
+                <tr>
+                  <td colSpan={10} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>직원 사용 현황을 불러오는 중입니다...</td>
                 </tr>
-              ))}
+              ) : employees.length === 0 ? (
+                <tr>
+                  <td colSpan={10} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>등록된 직원이 없습니다.</td>
+                </tr>
+              ) : (
+                employees.map((emp, i) => (
+                  <tr key={i}>
+                    <td style={{ color: '#6b7280' }}>{emp.id}</td>
+                    <td>
+                      <div className="employee-name-cell">
+                        <div className="employee-avatar" style={{
+                          background: i % 2 === 0 ? '#e0e7ff' : '#fee2e2',
+                          color: i % 2 === 0 ? '#4f46e5' : '#ef4444'
+                        }}>
+                          {emp.name.charAt(0)}
+                        </div>
+                        {emp.name}
+                      </div>
+                    </td>
+                    <td style={{ color: '#6b7280' }}>{emp.branch}</td>
+                    <td>{emp.stat1}</td>
+                    <td>{emp.stat2}</td>
+                    <td>{emp.stat3}</td>
+                    <td>{emp.stat4}</td>
+                    <td>{emp.stat5}</td>
+                    <td style={{ fontWeight: 500 }}>{emp.total}</td>
+                    <td className={emp.statusClass} style={{ fontWeight: 500 }}>{emp.status}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

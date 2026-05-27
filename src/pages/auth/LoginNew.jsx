@@ -4,7 +4,7 @@ import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { api } from "../../api";
 import "./AuthNew.css";
 
-// Mock Database for Users and Roles
+// Mock Database for Users and Roles (백엔드 통신 실패 시를 위한 안전 폴백용으로 남겨둠)
 const MOCK_USERS = [
   { id: "admin", password: "admin", role: "admin", name: "관리자" },
   { id: "developer", password: "admin", role: "admin", name: "개발자" },
@@ -21,6 +21,7 @@ export default function LoginNew() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -39,9 +40,11 @@ export default function LoginNew() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       // 실제 백엔드 API 연동
       const user = await api.auth.login(id.trim(), password);
+      setIsSubmitting(false);
 
       if (user.role === "admin") {
         navigate("/admin-system-dashboard-1");
@@ -49,6 +52,7 @@ export default function LoginNew() {
         navigate("/daily-calendar");
       }
     } catch (err) {
+      setIsSubmitting(false);
       setError(err.message || "아이디 또는 비밀번호가 일치하지 않습니다.");
     }
   };
@@ -95,7 +99,7 @@ export default function LoginNew() {
                 <input 
                   type="text" 
                   className="auth-new-input" 
-                  placeholder="WPB-012890" 
+                  placeholder="user1" 
                   value={id}
                   onChange={(e) => setId(e.target.value)}
                 />
@@ -135,12 +139,37 @@ export default function LoginNew() {
               </label>
             </div>
 
-            <button type="submit" className="auth-new-btn" style={{ marginTop: "16px", width: "100%" }}>
-              Log in
+            <button type="submit" className="auth-new-btn" style={{ marginTop: "8px", width: "100%" }} disabled={isSubmitting}>
+              {isSubmitting ? "Logging in..." : "Log in"}
             </button>
           </form>
 
-          <div className="auth-new-footer" style={{ marginTop: "32px" }}>
+          {/* Test Account Helper Grid */}
+          <div 
+            className="auth-test-helper"
+            style={{
+              marginTop: "16px",
+              padding: "12px",
+              backgroundColor: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              fontSize: "11px"
+            }}
+          >
+            <div style={{ fontWeight: "600", color: "#475569", marginBottom: "6px" }}>🔑 테스트 계정 안내</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", color: "#64748b" }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>사용자(PB): <strong>user1</strong></span>
+                <span>비밀번호: <strong>passwd1</strong></span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>관리자(Admin): <strong>admin1</strong></span>
+                <span>비밀번호: <strong>adminpasswd1</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <div className="auth-new-footer" style={{ marginTop: "24px" }}>
             Don't have account yet? <Link to="/sign-up" className="auth-new-link">New Account</Link>
           </div>
         </div>

@@ -147,7 +147,7 @@ export const api = {
   // 4. AI 투두 (AI To-Do) API
   aiTodo: {
     getList: (u_id) => api.get(`/ai-todo/${u_id ? `?u_id=${u_id}` : ""}`),
-    confirm: (u_id, at_ids) => api.post("/ai-todo/confirm", { u_id, at_ids }),
+    confirm: (u_id, at_ids, target_date) => api.post("/ai-todo/confirm", { u_id, at_ids, target_date }),
     unconfirm: (at_id) => api.patch(`/ai-todo/${at_id}/unconfirm`),
   },
 
@@ -163,5 +163,74 @@ export const api = {
     getBranch: (u_id) => api.get(`/kpi/branch${u_id ? `?u_id=${u_id}` : ""}`),
     getSeasonalProducts: () => api.get('/kpi/seasonal-products'),
     getSeasonalProductDetail: (product_id) => api.get(`/kpi/seasonal-products/${product_id}`)
+  },
+
+  // 7. 트렌드 (Trend) API
+  trend: {
+    getDashboard: () => api.get("/trend/dashboard"),
+    getNewsList: (params) => {
+      const { category, q, page, size, from, to, sort } = params || {};
+      let query = "";
+      const queryParams = [];
+      if (category && category !== "전체") queryParams.push(`category=${encodeURIComponent(category)}`);
+      if (q) queryParams.push(`q=${encodeURIComponent(q)}`);
+      if (page) queryParams.push(`page=${page}`);
+      if (size) queryParams.push(`size=${size}`);
+      if (from) queryParams.push(`from=${from}`);
+      if (to) queryParams.push(`to=${to}`);
+      if (sort) queryParams.push(`sort=${sort}`);
+      
+      if (queryParams.length > 0) {
+        query = "?" + queryParams.join("&");
+      }
+      return api.get(`/trend/news${query}`);
+    },
+    getNewsDetail: (newsId) => api.get(`/trend/news/${newsId}`),
+    getIndicatorLatest: (type) => api.get(`/trend/indicators/${encodeURIComponent(type)}/latest`),
+    getIndicatorHistory: (type, params) => {
+      const { from, to, granularity } = params || {};
+      let query = "";
+      const queryParams = [];
+      if (from) queryParams.push(`from=${from}`);
+      if (to) queryParams.push(`to=${to}`);
+      if (granularity) queryParams.push(`granularity=${granularity}`);
+      if (queryParams.length > 0) {
+        query = "?" + queryParams.join("&");
+      }
+      return api.get(`/trend/indicators/${encodeURIComponent(type)}/history${query}`);
+    },
+    getIndicatorPrediction: (type, horizon) => {
+      const query = horizon ? `?horizon=${horizon}` : "";
+      return api.get(`/trend/indicators/${encodeURIComponent(type)}/prediction${query}`);
+    },
+    getIndicatorContribution: (type) => api.get(`/trend/indicators/${encodeURIComponent(type)}/contribution`),
+    getLatestReport: (type) => api.get(`/trend/indicators/${encodeURIComponent(type)}/report/latest`),
+    getReportStatus: (type, reportId) => api.get(`/trend/indicators/${encodeURIComponent(type)}/report/${reportId}/status`),
+  },
+
+  // 8. 관리자 (Admin) API
+  admin: {
+    getSystemLogs: (filter = "all") => {
+      const query = filter && filter !== "all" ? `?filter=${encodeURIComponent(filter)}` : "";
+      return api.get(`/admin/system/dashboard/logs${query}`);
+    },
+    getEmployeeDashboard: () => api.get("/admin/employees/dashboard"),
+    getBranchStats: () => api.get("/admin/employees/dashboard/branch-stats"),
+    getWeeklyTrend: () => api.get("/admin/employees/dashboard/weekly-trend"),
+    getEmployeeUsage: () => api.get("/admin/employees/dashboard/usage"),
+    getPermissions: (search = "", branch = "") => {
+      const queryParams = [];
+      if (search) queryParams.push(`search=${encodeURIComponent(search)}`);
+      if (branch && branch !== "전체지점") queryParams.push(`branch=${encodeURIComponent(branch)}`);
+      const query = queryParams.length > 0 ? "?" + queryParams.join("&") : "";
+      return api.get(`/admin/permissions${query}`);
+    },
+    getAvailableReceivers: (u_id) => api.get(`/admin/employees/${u_id}/available-receivers`),
+    getHandovers: (search = "") => {
+      const query = search ? `?search=${encodeURIComponent(search)}` : "";
+      return api.get(`/admin/handovers${query}`);
+    },
+    getEmployeeCustomers: (u_id) => api.get(`/admin/employees/${u_id}/customers`),
+    transferCustomers: (u_id, body) => api.post(`/admin/employees/${u_id}/transfer`, body)
   }
 };

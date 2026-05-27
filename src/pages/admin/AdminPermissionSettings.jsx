@@ -1,21 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LogOut, Search, X } from "lucide-react";
+import { api } from "../../api";
 import "./Admin.css";
-
-const employees = [
-  { id: "100021", name: "이수현", branch: "강남지점", clients: "18명", pending: false },
-  { id: "100089", name: "이종혁", branch: "강남지점", clients: "41명", pending: false },
-  { id: "100088", name: "김수빈", branch: "여의도지점", clients: "19명", pending: false },
-  { id: "100102", name: "이주리", branch: "강남지점", branchNote: "발령 대기 강남 → 압구정", clients: "5명", pending: true },
-  { id: "100118", name: "유채린", branch: "여의도지점", clients: "32명", pending: false },
-];
-
-const historyLogs = [
-  { id: "1", name: "김동환", title: "김동환 압구정 → 강남지점", desc: "고객 23명 → 조성은 2025.03.10" },
-  { id: "2", name: "서지혜", title: "서지혜 여의도 → 서초지점", desc: "고객 19명 → 김수빈 2024.09.02" },
-  { id: "3", name: "이종혁", title: "이종혁 서초 → 강남지점", desc: "고객 18명 재배정 → 김수빈 2022.03.15" },
-];
 
 const AdminTabs = () => {
   const location = useLocation();
@@ -67,62 +54,89 @@ const AdminHeader = ({ title }) => {
 };
 
 export default function AdminPermissionSettings() {
-  const [employeeData, setEmployeeData] = useState(employees);
-  const [historyData, setHistoryData] = useState(historyLogs);
+  const [employeeData, setEmployeeData] = useState([]);
+  const [historyData, setHistoryData] = useState([]);
+  const [availableReplacements, setAvailableReplacements] = useState([]);
   const [sortConfig, setSortConfig] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStep, setModalStep] = useState(2);
-  const [selectedReplacement, setSelectedReplacement] = useState('100021');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [branchFilter, setBranchFilter] = useState('전체지점');
+  const [selectedReplacement, setSelectedReplacement] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [branchFilter, setBranchFilter] = useState("전체지점");
   const [showToast, setShowToast] = useState(false);
   const [currentCustomerList, setCurrentCustomerList] = useState([]);
   const [selectedCustomers, setSelectedCustomers] = useState(new Set());
   const [transferEmp, setTransferEmp] = useState(null);
-  const [targetBranch, setTargetBranch] = useState('압구정 지점');
+  const [targetBranch, setTargetBranch] = useState("압구정 지점");
+  const [loading, setLoading] = useState(true);
 
-  const isSameBranch = (e, targetBranchStr) => {
-    if (!e || !targetBranchStr) return false;
-    const nb1 = (e.branch || '').replace('지점', '');
-    const nb2 = targetBranchStr.replace('지점', '');
-
-    if (nb1.includes(nb2) || nb2.includes(nb1)) return true;
-
-    // 발령 대기 중인 직원이 이동할 목적지 지점이 타겟 지점과 같다면 인수가능 직원에 포함
-    if (e.branchNote && e.branchNote.includes(nb2)) {
-      return true;
+  // Load employees and handover logs from database
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [permData, handData] = await Promise.all([
+        api.admin.getPermissions(searchTerm, branchFilter === "전체지점" ? "" : branchFilter),
+        api.admin.getHandovers()
+      ]);
+      if (permData && permData.employees) {
+        setEmployeeData(permData.employees);
+      }
+      if (handData && handData.handovers) {
+        setHistoryData(handData.handovers);
+      }
+    } catch (err) {
+      console.error("Failed to load permissions and handovers:", err);
+    } finally {
+      setLoading(false);
     }
-    return false;
   };
 
-  const handleTransferClick = (emp) => {
+  useEffect(() => {
+    loadData();
+  }, [searchTerm, branchFilter]);
+
+  const handleTransferClick = async (emp) => {
     setTransferEmp(emp);
 
     // Set target branch if pending
-    let initialTarget = '강남 지점';
-    if (emp.branchNote && emp.branchNote.includes('→')) {
-      const parts = emp.branchNote.split('→');
-      initialTarget = parts[1].trim() + ' 지점';
+    let initialTarget = "강남 지점";
+    if (emp.branchNote && emp.branchNote.includes("→")) {
+      const parts = emp.branchNote.split("→");
+      initialTarget = parts[1].trim() + " 지점";
+    } else {
+      initialTarget = "압구정 지점"; // 기본값
     }
     setTargetBranch(initialTarget);
 
-    // Set available replacements
-    const avail = employeeData.filter(e => e.id !== emp.id && isSameBranch(e, emp.branch));
-    setSelectedReplacement(avail.length > 0 ? avail[0].id : '');
+    setLoading(true);
+    try {
+      // 1. 인수 가능 직원 조회 (동일 지점)
+      const receiversData = await api.admin.getAvailableReceivers(emp.id);
+      let replacements = [];
+      if (receiversData && receiversData.receivers) {
+        replacements = receiversData.receivers;
+      }
+      setAvailableReplacements(replacements);
+      setSelectedReplacement(replacements.length > 0 ? replacements[0].id : "");
 
-    // Generate mock customer list based on count
-    const count = parseInt(emp.clients.replace('명', '')) || 0;
-    const newCustomers = Array.from({ length: count }, (_, i) => ({
-      id: `c${i + 1}`,
-      name: `고객${i + 1}`,
-      assets: ['VVIP · 자산 50억', 'VIP · 자산 12억', '일반 · 자산 5억', '일반 · 자산 1억'][i % 4]
-    }));
+      // 2. 담당 고객 목록 조회
+      const customersData = await api.admin.getEmployeeCustomers(emp.id);
+      let newCustomers = [];
+      if (customersData && customersData.customers) {
+        newCustomers = customersData.customers;
+      }
 
-    setCurrentCustomerList(newCustomers);
-    setSelectedCustomers(new Set(newCustomers.map(c => c.id)));
+      setCurrentCustomerList(newCustomers);
+      setSelectedCustomers(new Set(newCustomers.map(c => c.id)));
 
-    setModalStep(2);
-    setIsModalOpen(true);
+      setModalStep(2);
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error("Failed to prepare transfer modal:", err);
+      alert("인수인계 정보 로드에 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const closeModal = () => {
@@ -155,54 +169,52 @@ export default function AdminPermissionSettings() {
     }
   };
 
-  const handleComplete = () => {
+  // Perform actual DB-backed personnel transfer
+  const handleComplete = async () => {
     if (!transferEmp) return;
 
-    const replacementEmpData = employeeData.find(e => e.id === selectedReplacement);
-    const replacementName = replacementEmpData ? replacementEmpData.name : '';
-
-    // Update employee list and history
-    setEmployeeData(prev => prev.map(emp => {
-      if (emp.id === transferEmp.id) {
-        const oldClients = parseInt(emp.clients.replace('명', ''));
-        const newClients = Math.max(0, oldClients - selectedCustomers.size);
-
-        // 발령 완료(고객 수 0명) 시점에만 지점 변경 적용
-        let newBranch = emp.branch;
-        let isPending = emp.pending;
-        if (newClients === 0) {
-          newBranch = targetBranch.replace(' ', '');
-          isPending = false;
-        }
-
-        return { ...emp, branch: newBranch, pending: isPending, clients: `${newClients}명` };
-      }
-      if (emp.id === selectedReplacement) {
-        const oldClients = parseInt(emp.clients.replace('명', ''));
-        const newClients = oldClients + selectedCustomers.size;
-        return { ...emp, clients: `${newClients}명` };
-      }
-      return emp;
-    }));
-
-    const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '.');
-    const newHistory = {
-      id: Date.now().toString(),
-      name: transferEmp.name,
-      title: `${transferEmp.name} ${transferEmp.branch.replace('지점', '')} → ${targetBranch.replace(' ', '')}`,
-      desc: `고객 ${selectedCustomers.size}명 재배정 → ${replacementName} ${dateStr}`
+    // 지점 명칭 -> DB b_id 매핑
+    const branchMapping = {
+      "강남 지점": 1,
+      "강남지점": 1,
+      "여의도 지점": 2,
+      "여의도지점": 2,
+      "압구정 지점": 3,
+      "압구정지점": 3,
+      "서초 지점": 4,
+      "서초지점": 4
     };
-    setHistoryData(prev => [newHistory, ...prev]);
 
-    setIsModalOpen(false);
-    setShowToast(true);
-    setTimeout(() => {
-      setShowToast(false);
-    }, 3000);
+    const targetBranchId = branchMapping[targetBranch] || 3;
+
+    const payload = {
+      receiver_u_id: selectedReplacement,
+      customer_ids: Array.from(selectedCustomers).map(id => parseInt(id)),
+      target_branch: targetBranchId
+    };
+
+    setLoading(true);
+    try {
+      const response = await api.admin.transferCustomers(transferEmp.id, payload);
+      if (response && response.success) {
+        setIsModalOpen(false);
+        setShowToast(true);
+        // Refresh logs and accounts list from database
+        await loadData();
+        setTimeout(() => {
+          setShowToast(false);
+        }, 3000);
+      }
+    } catch (err) {
+      console.error("Failed to complete transfer:", err);
+      alert(err.message || "이관 처리에 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const replacementEmp = employeeData.find(e => e.id === selectedReplacement);
-  const replacementName = replacementEmp ? replacementEmp.name : '';
+  const replacementEmp = availableReplacements.find(e => e.id === selectedReplacement);
+  const replacementName = replacementEmp ? replacementEmp.name : "";
 
   const sortedEmployees = React.useMemo(() => {
     let sortableItems = [...employeeData];
@@ -210,8 +222,8 @@ export default function AdminPermissionSettings() {
       sortableItems.sort((a, b) => {
         let aVal, bVal;
         if (sortConfig.key === 'id') {
-          aVal = parseInt(a.id);
-          bVal = parseInt(b.id);
+          aVal = parseInt(a.id) || 0;
+          bVal = parseInt(b.id) || 0;
           if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
           if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
           return 0;
@@ -233,12 +245,6 @@ export default function AdminPermissionSettings() {
     }
     setSortConfig({ key, direction });
   };
-
-  const filteredEmployees = sortedEmployees.filter(emp => {
-    const matchSearch = emp.name.includes(searchTerm) || emp.id.includes(searchTerm);
-    const matchBranch = branchFilter === '전체지점' || emp.branch.includes(branchFilter.replace('지점', ''));
-    return matchSearch && matchBranch;
-  });
 
   return (
     <div className="admin-container">
@@ -275,7 +281,9 @@ export default function AdminPermissionSettings() {
           <div className="permission-table-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h3 className="admin-chart-title" style={{ margin: 0 }}>직원 계정 목록</h3>
-              <span style={{ fontSize: '13px', color: '#0284c7', fontWeight: 500 }}>총 직원수 5명</span>
+              <span style={{ fontSize: '13px', color: '#0284c7', fontWeight: 500 }}>
+                {loading ? "조회 중..." : `총 직원수 ${employeeData.length}명`}
+              </span>
             </div>
 
             <table className="permission-table">
@@ -292,36 +300,50 @@ export default function AdminPermissionSettings() {
                 </tr>
               </thead>
               <tbody>
-                {filteredEmployees.map((emp, i) => (
-                  <tr key={i} style={{ background: i % 2 === 0 ? '#f8fafc' : 'transparent', borderBottom: i % 2 === 0 ? 'none' : '1px solid var(--admin-border)' }}>
-                    <td style={{ textAlign: 'left', color: '#6b7280', borderBottom: 'none' }}>{emp.id}</td>
-                    <td style={{ textAlign: 'left', borderBottom: 'none' }}>
-                      <div className="employee-name-cell" style={{ justifyContent: 'flex-start' }}>
-                        <div className="employee-avatar" style={{
-                          background: i === 0 ? '#fef3c7' :
-                            i === 1 ? '#ede9fe' :
-                              i === 2 ? '#fce7f3' :
-                                i === 3 ? '#e2e8f0' : '#dbeafe',
-                          color: '#475569'
-                        }}>
-                          {emp.name.charAt(0)}
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <span style={{ fontWeight: 600 }}>{emp.name}</span>
-                          {emp.pending ? (
-                            <span style={{ fontSize: '12px', color: '#ef4444' }}>{emp.branchNote}</span>
-                          ) : (
-                            <span style={{ fontSize: '12px', color: '#6b7280' }}>{emp.branch}</span>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ borderBottom: 'none' }}>{emp.clients}</td>
-                    <td style={{ borderBottom: 'none' }}>
-                      <button className="btn-action" onClick={() => handleTransferClick(emp)}>발령처리</button>
-                    </td>
+                {loading && employeeData.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>직원 목록을 로드하는 중입니다...</td>
                   </tr>
-                ))}
+                ) : employeeData.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>해당하는 직원이 없습니다.</td>
+                  </tr>
+                ) : (
+                  sortedEmployees.filter(emp => {
+                    const matchSearch = emp.name.includes(searchTerm) || emp.id.includes(searchTerm);
+                    const matchBranch = branchFilter === '전체지점' || emp.branch.includes(branchFilter.replace('지점', ''));
+                    return matchSearch && matchBranch;
+                  }).map((emp, i) => (
+                    <tr key={i} style={{ background: i % 2 === 0 ? '#f8fafc' : 'transparent', borderBottom: i % 2 === 0 ? 'none' : '1px solid var(--admin-border)' }}>
+                      <td style={{ textAlign: 'left', color: '#6b7280', borderBottom: 'none' }}>{emp.id}</td>
+                      <td style={{ textAlign: 'left', borderBottom: 'none' }}>
+                        <div className="employee-name-cell" style={{ justifyContent: 'flex-start' }}>
+                          <div className="employee-avatar" style={{
+                            background: i === 0 ? '#fef3c7' :
+                              i === 1 ? '#ede9fe' :
+                                i === 2 ? '#fce7f3' :
+                                  i === 3 ? '#e2e8f0' : '#dbeafe',
+                            color: '#475569'
+                          }}>
+                            {emp.name.charAt(0)}
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontWeight: 600 }}>{emp.name}</span>
+                            {emp.pending ? (
+                              <span style={{ fontSize: '12px', color: '#ef4444' }}>{emp.branchNote}</span>
+                            ) : (
+                              <span style={{ fontSize: '12px', color: '#6b7280' }}>{emp.branch}</span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ borderBottom: 'none' }}>{emp.clients}</td>
+                      <td style={{ borderBottom: 'none' }}>
+                        <button className="btn-action" onClick={() => handleTransferClick(emp)}>발령처리</button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -334,19 +356,25 @@ export default function AdminPermissionSettings() {
           </div>
 
           <div className="history-list">
-            {historyData.map((log, i) => (
-              <div className="history-item" key={i}>
-                <div className="history-icon" style={{
-                  background: i === 1 ? '#ecfccb' : i === 2 ? '#e0e7ff' : '#f1f5f9'
-                }}>
-                  {log.name.charAt(0)}
+            {loading && historyData.length === 0 ? (
+              <div style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', padding: '20px' }}>이력을 불러오는 중...</div>
+            ) : historyData.length === 0 ? (
+              <div style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', padding: '20px' }}>이력이 존재하지 않습니다.</div>
+            ) : (
+              historyData.map((log, i) => (
+                <div className="history-item" key={i}>
+                  <div className="history-icon" style={{
+                    background: i === 1 ? '#ecfccb' : i === 2 ? '#e0e7ff' : '#f1f5f9'
+                  }}>
+                    {log.name.charAt(0)}
+                  </div>
+                  <div className="history-content">
+                    <span className="history-title">{log.title}</span>
+                    <span className="history-desc">{log.desc}</span>
+                  </div>
                 </div>
-                <div className="history-content">
-                  <span className="history-title">{log.title}</span>
-                  <span className="history-desc">{log.desc}</span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -379,7 +407,7 @@ export default function AdminPermissionSettings() {
                 <div className="modal-subtitle">인수 가능 직원 (같은 지점)</div>
 
                 <div className="replacement-list">
-                  {employeeData.filter(e => e.id !== transferEmp.id && isSameBranch(e, transferEmp.branch)).map(emp => (
+                  {availableReplacements.map(emp => (
                     <div
                       key={emp.id}
                       className={`replacement-item ${selectedReplacement === emp.id ? 'selected' : ''}`}
@@ -390,11 +418,11 @@ export default function AdminPermissionSettings() {
                       </div>
                       <div className="replacement-info">
                         <span className="replacement-name">{emp.name}</span>
-                        <span className="replacement-clients">현재 {emp.clients} 담당</span>
+                        <span className="replacement-clients">{emp.clients}</span>
                       </div>
                     </div>
                   ))}
-                  {employeeData.filter(e => e.id !== transferEmp.id && isSameBranch(e, transferEmp.branch)).length === 0 && (
+                  {availableReplacements.length === 0 && (
                     <div style={{ color: '#9ca3af', fontSize: 14, textAlign: 'center', padding: '16px' }}>동일 지점에 인수가능한 직원이 없습니다.</div>
                   )}
                 </div>
@@ -480,7 +508,7 @@ export default function AdminPermissionSettings() {
               )}
 
               {modalStep < 4 ? (
-                <button className="btn-next" onClick={handleNextStep}>다음</button>
+                <button className="btn-next" disabled={modalStep === 2 && availableReplacements.length === 0} onClick={handleNextStep}>다음</button>
               ) : (
                 <button className="btn-next" onClick={handleComplete}>완료</button>
               )}
