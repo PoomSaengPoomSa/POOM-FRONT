@@ -334,7 +334,7 @@
 .report-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; font-size: 12px; }
 .report-table th, .report-table td { padding: 12px; border-bottom: 1px solid var(--cust-border); text-align: left; }
 .report-table th { font-weight: 600; color: var(--cust-text-muted); width: 80px; }
-.report-table td { color: var(--cust-text-main); font-weight: 500; }
+.report-table td { color: var(--cust-text-main); font-weight: 500; white-space: pre-wrap; }
 .report-actions { display: flex; gap: 8px; margin-top: 16px; }
 .report-btn { padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; }
 .report-btn-primary { background: var(--cust-primary); color: white; }

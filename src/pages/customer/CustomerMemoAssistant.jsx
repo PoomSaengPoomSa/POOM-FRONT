@@ -24,7 +24,7 @@ export default function CustomerMemoAssistant() {
   const [timelineDetails, setTimelineDetails] = useState({});
   const [generatedReport, setGeneratedReport] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [memoText, setMemoText] = useState("달러 자산 줄이고 싶다고. 국내 리츠 관심. 다음달 초 재방문.");
+  const [memoText, setMemoText] = useState("");
 
   const formatAssets = (assetVal) => {
     if (assetVal === undefined || assetVal === null) return "32억 1,234만";
@@ -146,7 +146,7 @@ export default function CustomerMemoAssistant() {
 
   useEffect(() => {
     setGeneratedReport(null);
-    setMemoText("달러 자산 줄이고 싶다고. 국내 리츠 관심. 다음달 초 재방문.");
+    setMemoText("");
   }, [selectedCustomerId]);
 
   const handleGenerateReport = async () => {
@@ -175,22 +175,21 @@ export default function CustomerMemoAssistant() {
   };
 
   const handleSaveReport = async () => {
-    if (!selectedCustomerId || !memoText.trim()) return;
+    if (!selectedCustomerId || !memoText.trim() || !generatedReport?.cm_id) {
+      alert("AI 보고서를 먼저 생성한 후에 저장할 수 있습니다.");
+      return;
+    }
     
     const reportContent = {
-      key_needs: generatedReport ? generatedReport.key_needs : (fullCustomerDetail?.llm_insight || "달러 자산 비중 축소/국내 리츠 편입 검토"),
-      follow_up: generatedReport ? generatedReport.follow_up : "리츠 상품 비교안 준비",
-      next_consult: generatedReport ? generatedReport.next_consult : "2026.05 초순"
+      main_content: generatedReport.main_content,
+      special_remarks: generatedReport.special_remarks,
+      follow_up: generatedReport.follow_up,
+      summary: generatedReport.summary || ""
     };
 
     try {
-      const date = new Date();
-      const pad = (n) => n.toString().padStart(2, '0');
-      const formattedDate = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-
       await api.customer.saveReport(selectedCustomerId, {
-        memo: memoText,
-        consult_date: formattedDate,
+        cm_id: generatedReport.cm_id,
         content: reportContent
       });
 
@@ -439,7 +438,7 @@ export default function CustomerMemoAssistant() {
               <div className="memo-box-title">메모 입력</div>
               <textarea 
                 className="memo-textarea" 
-                placeholder="달러 자산 줄이고 싶다고. 국내 리츠 관심. 다음달 초 재방문."
+                placeholder="상담 내용을 이곳에 메모하세요."
                 value={memoText}
                 onChange={(e) => setMemoText(e.target.value)}
                 style={{ minHeight: '200px', flex: 1, marginBottom: '16px', resize: 'none' }}
@@ -471,22 +470,6 @@ export default function CustomerMemoAssistant() {
             <div className="memo-box">
               <div className="memo-box-title">
                 AI 상담 보고서
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#22c55e', fontWeight: 500 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e' }}></span> 누적 1건
-                </div>
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 12 }}>
-                {generatedReport ? (
-                  <>
-                    {generatedReport.date} <span style={{ fontWeight: 400, color: '#94a3b8', marginLeft: 8 }}>
-                      {generatedReport.key_needs.length > 15 ? generatedReport.key_needs.slice(0, 15) + "..." : generatedReport.key_needs}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    2026.04.30 <span style={{ fontWeight: 400, color: '#94a3b8', marginLeft: 8 }}>달러 자산 비중 축소</span>
-                  </>
-                )}
               </div>
               
               <table className="report-table">
@@ -495,29 +478,29 @@ export default function CustomerMemoAssistant() {
                     <th>고객명</th>
                     <td>
                       {generatedReport ? (
-                        `${generatedReport.customer_name} (${generatedReport.grade})`
+                        generatedReport.customer_name
                       ) : (
-                        `${selectedCustomer.name} (${fullCustomerDetail?.grade || "VIP"})`
+                        selectedCustomer.name || "-"
                       )}
                     </td>
                   </tr>
                   <tr>
-                    <th>총자산</th>
+                    <th>주요 내용</th>
                     <td>
                       {generatedReport ? (
-                        generatedReport.total_assets
+                        generatedReport.main_content
                       ) : (
-                        formatAssets(fullCustomerDetail?.total_assets)
+                        "-"
                       )}
                     </td>
                   </tr>
                   <tr>
-                    <th>주요 니즈</th>
+                    <th>특이사항</th>
                     <td>
                       {generatedReport ? (
-                        generatedReport.key_needs
+                        generatedReport.special_remarks
                       ) : (
-                        fullCustomerDetail?.llm_insight || "달러 자산 비중 축소/국내 리츠 편입 검토"
+                        "-"
                       )}
                     </td>
                   </tr>
@@ -527,45 +510,50 @@ export default function CustomerMemoAssistant() {
                       {generatedReport ? (
                         generatedReport.follow_up
                       ) : (
-                        "리츠 상품 비교안 준비"
+                        "-"
                       )}
                     </td>
                   </tr>
                   <tr>
-                    <th>차기 상담</th>
+                    <th>요약</th>
                     <td>
                       {generatedReport ? (
-                        generatedReport.next_consult
+                        generatedReport.summary
                       ) : (
-                        "2026.05 초순"
+                        "-"
                       )}
                     </td>
                   </tr>
                 </tbody>
               </table>
 
-              <div className="report-actions" style={{ justifyContent: 'flex-end', position: 'relative' }}>
-                {showSaveToast && (
-                  <div style={{
-                    position: 'absolute', right: '80px', top: '50%', transform: 'translateY(-50%)',
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    background: '#334155', color: 'white',
-                    padding: '8px 16px', borderRadius: 20,
-                    fontSize: 14, fontWeight: 500,
-                    whiteSpace: 'nowrap'
-                  }}>
-                    <div style={{ width: 18, height: 18, background: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Check size={12} color="white" strokeWidth={3} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px', marginTop: '16px' }}>
+                <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  ⚠️ AI를 통해 생성한 결과물에는 실수가 포함될 수 있습니다.
+                </div>
+                <div className="report-actions" style={{ justifyContent: 'flex-end', position: 'relative', width: '100%', margin: 0 }}>
+                  {showSaveToast && (
+                    <div style={{
+                      position: 'absolute', right: '80px', top: '50%', transform: 'translateY(-50%)',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      background: '#334155', color: 'white',
+                      padding: '8px 16px', borderRadius: 20,
+                      fontSize: 14, fontWeight: 500,
+                      whiteSpace: 'nowrap'
+                    }}>
+                      <div style={{ width: 18, height: 18, background: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Check size={12} color="white" strokeWidth={3} />
+                      </div>
+                      저장완료
                     </div>
-                    저장완료
-                  </div>
-                )}
-                <button 
-                  className="report-btn report-btn-primary"
-                  onClick={handleSaveReport}
-                >
-                  저장
-                </button>
+                  )}
+                  <button 
+                    className="report-btn report-btn-primary"
+                    onClick={handleSaveReport}
+                  >
+                    저장
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -601,7 +589,6 @@ export default function CustomerMemoAssistant() {
                       borderWidth: '2px',
                       color: isExpanded ? '#0f172a' : '#0284c7',
                     }}>
-                      상담
                     </div>
                     {!isLast && (
                       <div className="timeline-line" style={{
@@ -615,8 +602,8 @@ export default function CustomerMemoAssistant() {
                     )}
                     <div className="timeline-content" style={{ paddingLeft: isExpanded ? '8px' : '0' }}>
                       <span className="timeline-date">{item.date}</span>
-                      <span className="timeline-text" style={{ color: isExpanded ? '#0f172a' : '#475569' }}>
-                        {isExpanded ? (timelineDetails[item.timelineId]?.title || item.memo) : item.memo}
+                      <span className="timeline-text" style={{ color: isExpanded ? '#0f172a' : '#475569', fontWeight: isExpanded ? '600' : 'normal' }}>
+                        {item.content?.summary || item.memo}
                       </span>
                       
                       {isExpanded && (
@@ -640,21 +627,27 @@ export default function CustomerMemoAssistant() {
                               <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
                                 <tbody>
                                   <tr>
-                                    <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>주요 니즈</td>
-                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600' }}>
-                                      {timelineDetails[item.timelineId].content.key_needs || "-"}
+                                    <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>주요 내용</td>
+                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600', whiteSpace: 'pre-wrap' }}>
+                                      {timelineDetails[item.timelineId].content.main_content || "-"}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>특이사항</td>
+                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600', whiteSpace: 'pre-wrap' }}>
+                                      {timelineDetails[item.timelineId].content.special_remarks || "-"}
                                     </td>
                                   </tr>
                                   <tr>
                                     <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>후속 조치</td>
-                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600' }}>
+                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600', whiteSpace: 'pre-wrap' }}>
                                       {timelineDetails[item.timelineId].content.follow_up || "-"}
                                     </td>
                                   </tr>
                                   <tr>
-                                    <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>차기 상담</td>
-                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600' }}>
-                                      {timelineDetails[item.timelineId].content.next_consult || "-"}
+                                    <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>요약</td>
+                                    <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600', whiteSpace: 'pre-wrap' }}>
+                                      {timelineDetails[item.timelineId].content.summary || "-"}
                                     </td>
                                   </tr>
                                 </tbody>
