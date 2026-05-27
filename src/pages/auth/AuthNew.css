@@ -1,5 +1,6 @@
 :root {
-  --auth-primary: #0284c7; /* POOM Signature Blue */
+  --auth-primary: #0284c7;
+  /* POOM Signature Blue */
   --auth-primary-hover: #0369a1;
   --auth-bg-light: #f8fafc;
   --auth-card-bg: #ffffff;
@@ -27,7 +28,7 @@
 
 .auth-new-card {
   width: 100%;
-  max-width: 500px; /* Highly optimized card width for better readability and vertical balance */
+  max-width: 420px; /* Perfectly snug and centered single-column premium layout */
   background-color: var(--auth-card-bg);
   border-radius: 20px;
   box-shadow: var(--auth-shadow);
@@ -40,7 +41,7 @@
 }
 
 .auth-new-card.auth-signup-card {
-  max-width: 800px; /* Wider card to fit the dual-column layout beautifully */
+  max-width: 560px; /* Perfectly snug compact width to prevent stretched input fields */
 }
 
 .auth-new-card:hover {
@@ -50,7 +51,8 @@
 
 .auth-new-form-section {
   width: 100%;
-  padding: 56px 48px; /* Sophisticated padding optimized for screen space and visual rhythm */
+  padding: 56px 48px;
+  /* Sophisticated padding optimized for screen space and visual rhythm */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -66,7 +68,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 36px;
+  margin-bottom: 48px;
 }
 
 /* Interactive SVG Logo Animation */
@@ -97,7 +99,7 @@
 
 /* Form Groups */
 .auth-new-form-group {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   text-align: left;
 }
 
@@ -106,7 +108,7 @@
   font-size: 13px;
   font-weight: 600;
   color: #334155;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
   letter-spacing: -0.1px;
 }
 
@@ -117,7 +119,8 @@
 .auth-new-input {
   width: 100%;
   padding: 12px 16px;
-  background-color: #f3f4f6; /* Soft premium gray fill matching the screenshot */
+  background-color: #f3f4f6;
+  /* Soft premium gray fill matching the screenshot */
   border: 1px solid transparent;
   border-radius: 10px;
   font-size: 14px;
@@ -149,7 +152,8 @@
 
 .auth-new-select {
   width: 100%;
-  padding: 12px 40px 12px 16px; /* Extra padding on the right for the chevron */
+  padding: 12px 40px 12px 16px;
+  /* Extra padding on the right for the chevron */
   background-color: #f3f4f6;
   border: 1px solid transparent;
   border-radius: 10px;
@@ -180,7 +184,8 @@
   top: 50%;
   transform: translateY(-50%);
   color: #64748b;
-  pointer-events: none; /* Let click pass through to the select */
+  pointer-events: none;
+  /* Let click pass through to the select */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -253,7 +258,7 @@
 /* Premium Colored Button */
 .auth-new-btn {
   width: 100%;
-  padding: 13px;
+  padding: 15px 16px;
   background-color: var(--auth-primary);
   color: #ffffff;
   border: none;
@@ -300,7 +305,8 @@
 }
 
 /* Premium Customizations for Alerts */
-.auth-error-alert, .auth-success-alert {
+.auth-error-alert,
+.auth-success-alert {
   animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -309,6 +315,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -319,18 +326,23 @@
 @media (max-width: 640px) {
   .auth-new-layout {
     padding: 16px;
-    background: #f1f5f9; /* Flat light background for mobile devices to maximize speed & visual clarity */
+    background: #f1f5f9;
+    /* Flat light background for mobile devices to maximize speed & visual clarity */
   }
+
   .auth-new-card {
     border-radius: 16px;
     box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
   }
+
   .auth-new-form-section {
     padding: 32px 20px;
   }
+
   .auth-new-logo-area {
     margin-bottom: 20px;
   }
+
   .auth-new-title {
     font-size: 20px;
   }
@@ -341,22 +353,28 @@
   .auth-new-layout {
     padding: 16px;
   }
+
   .auth-new-form-section {
     padding-top: 28px;
     padding-bottom: 28px;
   }
+
   .auth-new-logo-area {
     margin-bottom: 16px;
   }
+
   .auth-new-logo-area svg {
     margin-bottom: 4px !important;
   }
+
   .auth-new-form-group {
     margin-bottom: 12px;
   }
+
   .auth-new-options {
     margin-bottom: 16px;
   }
+
   .auth-test-helper {
     margin-top: 12px;
     padding: 10px;
@@ -370,9 +388,59 @@
     padding-bottom: 20px;
   }
   .auth-new-form-group {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
   .auth-new-options {
     margin-bottom: 12px;
   }
+}
+
+/* ========================================================================= */
+/* 회원가입 카드(auth-signup-card)에 특화된 동적 콤팩트 비율 조절             */
+/* ========================================================================= */
+.auth-signup-card .auth-new-form-section {
+  padding: 24px 30px !important; /* 내부 패딩 추가 압축 */
+}
+
+.auth-signup-card .auth-new-logo-area {
+  margin-bottom: 12px !important; /* 로고 하단 여백 대폭 축소 */
+}
+
+.auth-signup-card .auth-new-logo-area img {
+  margin-bottom: 4px !important; /* 로고 이미지 아래 마진 축소 */
+}
+
+.auth-signup-card .auth-signup-grid {
+  row-gap: 12px !important; /* 행 간격 대폭 축소 (24px -> 12px) */
+  column-gap: 18px !important; /* 열 간격 미세 조정 */
+  margin-bottom: 16px !important; /* 그리드 아래 마진 축소 (28px -> 16px) */
+}
+
+.auth-signup-card .auth-new-form-group {
+  margin-bottom: 0px !important; /* 그리드 갭으로 간격 제어하므로 마진 0 처리 */
+}
+
+.auth-signup-card .auth-new-input,
+.auth-signup-card .auth-new-select {
+  padding: 10px 14px !important; /* 입력 상자 패딩 및 높이 축소로 전체 높이 압축 */
+  font-size: 13px !important; /* 콤팩트 폰트 적용 */
+}
+
+.auth-signup-card .auth-new-label {
+  margin-bottom: 5px !important; /* 라벨과 인풋 간격 초밀착 */
+}
+
+.auth-signup-card .auth-new-options {
+  margin-top: 10px !important; /* 동의 약관 상단 여백 축소 */
+  margin-bottom: 12px !important;
+}
+
+.auth-signup-card .auth-new-btn {
+  margin-top: 10px !important;
+  padding: 11px 16px !important; /* 회원가입 실행 버튼 높이 축소 */
+  font-size: 14px !important;
+}
+
+.auth-signup-card .auth-new-footer {
+  margin-top: 16px !important; /* 푸터 여백 축소 */
 }

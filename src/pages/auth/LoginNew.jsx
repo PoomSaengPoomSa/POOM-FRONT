@@ -65,14 +65,14 @@ export default function LoginNew() {
         <div className="auth-new-form-section">
           <div className="auth-new-logo-area">
             {/* High-Fidelity POOM Smiley Logo */}
-            <img src="/poom-logo.png" alt="POOM Logo" style={{ height: "50px", marginBottom: "8px", objectFit: "contain" }} />
+            <img src="/poom-logo.png" alt="POOM Logo" style={{ height: "50px", marginBottom: "16px", objectFit: "contain" }} />
             <h1 className="auth-new-title">Log in</h1>
           </div>
 
           <form onSubmit={handleLogin} style={{ width: "100%" }}>
             {/* Elegant Alert for Errors */}
             {error && (
-              <div 
+              <div
                 className="auth-error-alert"
                 style={{
                   display: "flex",
@@ -96,10 +96,10 @@ export default function LoginNew() {
             <div className="auth-new-form-group">
               <label className="auth-new-label">아이디</label>
               <div className="auth-new-input-wrap">
-                <input 
-                  type="text" 
-                  className="auth-new-input" 
-                  placeholder="user1" 
+                <input
+                  type="text"
+                  className="auth-new-input"
+                  placeholder="user1"
                   value={id}
                   onChange={(e) => setId(e.target.value)}
                 />
@@ -109,15 +109,15 @@ export default function LoginNew() {
             <div className="auth-new-form-group">
               <label className="auth-new-label">비밀번호</label>
               <div className="auth-new-input-wrap">
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  className="auth-new-input" 
-                  placeholder="••••••••" 
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="auth-new-input"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <div 
-                  className="auth-new-icon" 
+                <div
+                  className="auth-new-icon"
                   onClick={() => setShowPassword(!showPassword)}
                   style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                 >
@@ -126,11 +126,11 @@ export default function LoginNew() {
               </div>
             </div>
 
-            <div className="auth-new-options" style={{ marginTop: "24px" }}>
-              <input 
-                type="checkbox" 
+            <div className="auth-new-options" style={{ marginTop: "32px" }}>
+              <input
+                type="checkbox"
                 id="agree-terms"
-                className="auth-new-checkbox" 
+                className="auth-new-checkbox"
                 checked={agreeTerms}
                 onChange={(e) => setAgreeTerms(e.target.checked)}
               />
@@ -139,37 +139,12 @@ export default function LoginNew() {
               </label>
             </div>
 
-            <button type="submit" className="auth-new-btn" style={{ marginTop: "8px", width: "100%" }} disabled={isSubmitting}>
+            <button type="submit" className="auth-new-btn" style={{ marginTop: "20px", width: "100%" }} disabled={isSubmitting}>
               {isSubmitting ? "Logging in..." : "Log in"}
             </button>
           </form>
 
-          {/* Test Account Helper Grid */}
-          <div 
-            className="auth-test-helper"
-            style={{
-              marginTop: "16px",
-              padding: "12px",
-              backgroundColor: "#f8fafc",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
-              fontSize: "11px"
-            }}
-          >
-            <div style={{ fontWeight: "600", color: "#475569", marginBottom: "6px" }}>🔑 테스트 계정 안내</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", color: "#64748b" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>사용자(PB): <strong>user1</strong></span>
-                <span>비밀번호: <strong>passwd1</strong></span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>관리자(Admin): <strong>admin1</strong></span>
-                <span>비밀번호: <strong>adminpasswd1</strong></span>
-              </div>
-            </div>
-          </div>
-
-          <div className="auth-new-footer" style={{ marginTop: "24px" }}>
+          <div className="auth-new-footer" style={{ marginTop: "36px" }}>
             Don't have account yet? <Link to="/sign-up" className="auth-new-link">New Account</Link>
           </div>
         </div>
