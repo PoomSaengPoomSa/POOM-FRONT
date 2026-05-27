@@ -32,8 +32,8 @@ export default function TrendArchive() {
 
     api.trend.getNewsDetail(item.id)
       .then(detail => {
-        const categoryMap = { "경제": "경제", "정치": "정치", "IT/과학": "IT/과학", economy: "경제", politics: "정치", it: "IT/과학", itScience: "IT/과학" };
-        const colorMap = { "경제": "green", "정치": "pink", "IT/과학": "blue", economy: "green", politics: "pink", it: "blue", itScience: "blue" };
+        const categoryMap = { "경제": "경제", "정치": "정치", "사회": "사회", economy: "경제", politics: "정치", it: "사회", itScience: "사회", "IT/과학": "사회" };
+        const colorMap = { "경제": "green", "정치": "pink", "사회": "blue", economy: "green", politics: "pink", it: "blue", itScience: "blue", "IT/과학": "blue" };
 
         setSelectedNewsItem({
           title: detail.title,
@@ -97,7 +97,7 @@ export default function TrendArchive() {
                   )}
                 </div>
                 <div className="trend-news-col">
-                  <div className="trend-news-col-title">IT/과학 <ChevronDown size={16} color="#cbd5e1" /></div>
+                  <div className="trend-news-col-title">사회 <ChevronDown size={16} color="#cbd5e1" /></div>
                   {(newsItems.itScience || newsItems.it).length === 0 ? (
                     <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
                   ) : (
