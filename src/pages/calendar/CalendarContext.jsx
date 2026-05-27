@@ -10,6 +10,7 @@ export function useCalendar() {
 
 export function CalendarProvider({ children }) {
   const [events, setEvents] = useState([]);
+  const [allAiTodos, setAllAiTodos] = useState([]);
   const [aiTodos, setAiTodos] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [toast, setToast] = useState({ show: false, message: '' });
@@ -131,7 +132,7 @@ export function CalendarProvider({ children }) {
         };
       });
 
-      setAiTodos(mappedAiTodos.filter(t => !t.checked));
+      setAllAiTodos(mappedAiTodos.filter(t => !t.checked));
 
       // 3. 일정 페치 및 포맷팅
       const dbSchedules = await api.schedule.getList();
@@ -286,8 +287,23 @@ export function CalendarProvider({ children }) {
   };
 
   const toggleAiTodo = (id) => {
-    setAiTodos(prev => prev.map(t => t.id === id ? { ...t, checked: !t.checked } : t));
+    setAllAiTodos(prev => prev.map(t => t.id === id ? { ...t, checked: !t.checked } : t));
   };
+
+  // AI To-Do는 언제나 실제 '오늘' 날짜를 기준으로 고정하여 노출합니다.
+  // (어차피 전날 등록 안 한 중요 추천은 AI 에이전트가 오늘 자로 다시 끌어올려 추천해주기 때문)
+  useEffect(() => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    
+    const filtered = allAiTodos.filter(todo => 
+      todo.executionDate && todo.executionDate.startsWith(todayStr)
+    );
+    setAiTodos(filtered);
+  }, [allAiTodos]);
 
   const transferCheckedAiTodos = async (date) => {
     const checkedTodos = aiTodos.filter(t => t.checked);
