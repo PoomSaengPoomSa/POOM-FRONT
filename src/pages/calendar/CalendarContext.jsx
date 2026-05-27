@@ -343,7 +343,9 @@ export function CalendarProvider({ children }) {
         todoStart = new Date(`${targetDateStr}T${timePart}`);
       }
 
-      const todoEnd = new Date(todoStart.getTime() + 60 * 60 * 1000); // 시작 시간 + 1시간
+      // 안부 연락은 15분으로 가볍게 매칭, 나머지는 1시간 심층 매칭하여 일정 충돌 최소화
+      const durationMs = todo.category === '안부 연락 제안' ? 15 * 60 * 1000 : 60 * 60 * 1000;
+      const todoEnd = new Date(todoStart.getTime() + durationMs);
 
       return events.some(e => {
         // e.startTime은 "2026-05-22 10:00" 형식이다. 브라우저 안전한 파싱을 위해 replace(' ', 'T') 처리
