@@ -141,8 +141,8 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
       ? productMatches.items.map(item => ({
           productName: item.product_name,
           productDesc: item.product_explanation,
-          status: item.is_suitable ? "적합" : "부적합",
-          statusColor: item.is_suitable ? "#10b981" : "#ef4444",
+          status: item.is_owned ? "보유 중" : (item.is_suitable ? "적합" : "부적합"),
+          statusColor: item.is_owned ? "#3b82f6" : (item.is_suitable ? "#10b981" : "#ef4444"),
           matchingDesc: item.reason
         }))
       : []
