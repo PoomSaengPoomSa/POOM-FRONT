@@ -21,7 +21,6 @@ export default function NewsArchive() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedNewsItem, setSelectedNewsItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-
   // API 호출 연동 (카테고리, 검색어, 페이지 변경 시 트리거)
   useEffect(() => {
     setIsLoading(true);
@@ -52,7 +51,7 @@ export default function NewsArchive() {
 
     api.trend.getNewsDetail(item.id)
       .then(detail => {
-        const colorMap = { "경제": "green", "정치": "pink", "IT/과학": "blue", economy: "green", politics: "pink", it: "blue" };
+        const colorMap = { "경제": "green", "정치": "pink", "사회": "blue", economy: "green", politics: "pink", it: "blue", "IT/과학": "blue" };
         setSelectedNewsItem({
           title: detail.title,
           type: item.category || "경제",
@@ -80,7 +79,7 @@ export default function NewsArchive() {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
             <div className="trend-tabs" style={{ marginBottom: 0 }}>
-              {["전체", "경제", "정치", "IT/과학"].map(category => (
+              {["전체", "경제", "정치", "사회"].map(category => (
                 <button 
                   key={category}
                   className={`trend-tab ${selectedCategory === category ? 'active' : ''}`}
