@@ -324,6 +324,7 @@ body {
   border-bottom: 1px solid var(--admin-border);
   font-size: 13px;
   color: var(--admin-text-main);
+  white-space: nowrap; /* 줄바꿈 금지 */
 }
 
 .admin-list-table th {
@@ -411,6 +412,9 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
+  align-self: flex-start; /* 요소 크기에 맞춰 배경 높이 동적 조절 */
+  max-height: 790px; /* 직원계정 목록(permission-main)의 하단 높이와 맞닿을 시 스크롤 */
+  box-sizing: border-box;
 }
 
 .search-bar {
@@ -458,6 +462,7 @@ body {
   text-align: center;
   border-bottom: 1px solid var(--admin-border);
   font-size: 14px;
+  white-space: nowrap; /* 줄바꿈 금지 */
 }
 
 .permission-table th {
@@ -508,11 +513,17 @@ body {
 .history-title {
   font-weight: 600;
   font-size: 14px;
+  white-space: nowrap; /* 한줄 출력 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 말줄임표 */
 }
 
 .history-desc {
   font-size: 12px;
   color: var(--admin-text-muted);
+  white-space: nowrap; /* 한줄 출력 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 말줄임표 */
 }
 
 /* Modal */
@@ -702,11 +713,17 @@ body {
 .history-title {
   font-weight: 600;
   font-size: 14px;
+  white-space: nowrap; /* 한줄 출력 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 말줄임표 */
 }
 
 .history-desc {
   font-size: 12px;
   color: var(--admin-text-muted);
+  white-space: nowrap; /* 한줄 출력 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 말줄임표 */
 }
 
 /* Modal */
