@@ -92,6 +92,22 @@ export default function AdminPermissionSettings() {
   };
 
   useEffect(() => {
+    document.documentElement.style.backgroundColor = "#f3f4f6";
+    document.body.style.backgroundColor = "#f3f4f6";
+    const rootEl = document.getElementById("root");
+    if (rootEl) {
+      rootEl.style.backgroundColor = "#f3f4f6";
+    }
+    return () => {
+      document.documentElement.style.backgroundColor = "";
+      document.body.style.backgroundColor = "";
+      if (rootEl) {
+        rootEl.style.backgroundColor = "";
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     loadData();
   }, [searchTerm, branchFilter]);
 
@@ -286,66 +302,68 @@ export default function AdminPermissionSettings() {
               </span>
             </div>
 
-            <table className="permission-table">
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', cursor: 'pointer', userSelect: 'none' }} onClick={() => requestSort('id')}>
-                    사번 {sortConfig?.key === 'id' && sortConfig.direction === 'desc' ? '▼' : '▲'}
-                  </th>
-                  <th style={{ textAlign: 'left', cursor: 'pointer', userSelect: 'none' }} onClick={() => requestSort('nameBranch')}>
-                    이름 / 지점 {sortConfig?.key === 'nameBranch' && sortConfig.direction === 'desc' ? '▼' : '▲'}
-                  </th>
-                  <th>담당 고객 수</th>
-                  <th>발령 처리</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading && employeeData.length === 0 ? (
+            <div className="admin-scrollable-container">
+              <table className="permission-table">
+                <thead>
                   <tr>
-                    <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>직원 목록을 로드하는 중입니다...</td>
+                    <th style={{ textAlign: 'left', cursor: 'pointer', userSelect: 'none' }} onClick={() => requestSort('id')}>
+                      사번 {sortConfig?.key === 'id' && sortConfig.direction === 'desc' ? '▼' : '▲'}
+                    </th>
+                    <th style={{ textAlign: 'left', cursor: 'pointer', userSelect: 'none' }} onClick={() => requestSort('nameBranch')}>
+                      이름 / 지점 {sortConfig?.key === 'nameBranch' && sortConfig.direction === 'desc' ? '▼' : '▲'}
+                    </th>
+                    <th>담당 고객 수</th>
+                    <th>발령 처리</th>
                   </tr>
-                ) : employeeData.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>해당하는 직원이 없습니다.</td>
-                  </tr>
-                ) : (
-                  sortedEmployees.filter(emp => {
-                    const matchSearch = emp.name.includes(searchTerm) || emp.id.includes(searchTerm);
-                    const matchBranch = branchFilter === '전체지점' || emp.branch.includes(branchFilter.replace('지점', ''));
-                    return matchSearch && matchBranch;
-                  }).map((emp, i) => (
-                    <tr key={i} style={{ background: i % 2 === 0 ? '#f8fafc' : 'transparent', borderBottom: i % 2 === 0 ? 'none' : '1px solid var(--admin-border)' }}>
-                      <td style={{ textAlign: 'left', color: '#6b7280', borderBottom: 'none' }}>{emp.id}</td>
-                      <td style={{ textAlign: 'left', borderBottom: 'none' }}>
-                        <div className="employee-name-cell" style={{ justifyContent: 'flex-start' }}>
-                          <div className="employee-avatar" style={{
-                            background: i === 0 ? '#fef3c7' :
-                              i === 1 ? '#ede9fe' :
-                                i === 2 ? '#fce7f3' :
-                                  i === 3 ? '#e2e8f0' : '#dbeafe',
-                            color: '#475569'
-                          }}>
-                            {emp.name.charAt(0)}
-                          </div>
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ fontWeight: 600 }}>{emp.name}</span>
-                            {emp.pending ? (
-                              <span style={{ fontSize: '12px', color: '#ef4444' }}>{emp.branchNote}</span>
-                            ) : (
-                              <span style={{ fontSize: '12px', color: '#6b7280' }}>{emp.branch}</span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ borderBottom: 'none' }}>{emp.clients}</td>
-                      <td style={{ borderBottom: 'none' }}>
-                        <button className="btn-action" onClick={() => handleTransferClick(emp)}>발령처리</button>
-                      </td>
+                </thead>
+                <tbody>
+                  {loading && employeeData.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>직원 목록을 로드하는 중입니다...</td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : employeeData.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>해당하는 직원이 없습니다.</td>
+                    </tr>
+                  ) : (
+                    sortedEmployees.filter(emp => {
+                      const matchSearch = emp.name.includes(searchTerm) || emp.id.includes(searchTerm);
+                      const matchBranch = branchFilter === '전체지점' || emp.branch.includes(branchFilter.replace('지점', ''));
+                      return matchSearch && matchBranch;
+                    }).map((emp, i) => (
+                      <tr key={i} style={{ background: i % 2 === 0 ? '#f8fafc' : 'transparent', borderBottom: i % 2 === 0 ? 'none' : '1px solid var(--admin-border)' }}>
+                        <td style={{ textAlign: 'left', color: '#6b7280', borderBottom: 'none' }}>{emp.id}</td>
+                        <td style={{ textAlign: 'left', borderBottom: 'none' }}>
+                          <div className="employee-name-cell" style={{ justifyContent: 'flex-start' }}>
+                            <div className="employee-avatar" style={{
+                              background: i === 0 ? '#fef3c7' :
+                                i === 1 ? '#ede9fe' :
+                                  i === 2 ? '#fce7f3' :
+                                    i === 3 ? '#e2e8f0' : '#dbeafe',
+                              color: '#475569'
+                            }}>
+                              {emp.name.charAt(0)}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <span style={{ fontWeight: 600 }}>{emp.name}</span>
+                              {emp.pending ? (
+                                <span style={{ fontSize: '12px', color: '#ef4444' }}>{emp.branchNote}</span>
+                              ) : (
+                                <span style={{ fontSize: '12px', color: '#6b7280' }}>{emp.branch}</span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ borderBottom: 'none' }}>{emp.clients}</td>
+                        <td style={{ borderBottom: 'none' }}>
+                          <button className="btn-action" onClick={() => handleTransferClick(emp)}>발령처리</button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 

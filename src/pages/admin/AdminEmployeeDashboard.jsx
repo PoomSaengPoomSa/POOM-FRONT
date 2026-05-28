@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { LogOut } from "lucide-react";
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { LogOut, Users, Activity, CheckSquare, Calendar, ChevronUp, ShieldAlert } from "lucide-react";
 import { api } from "../../api";
 import "./Admin.css";
 
@@ -54,16 +54,58 @@ const AdminHeader = ({ title }) => {
   );
 };
 
+// Avatar 색상 유틸리티
+const getAvatarStyle = (name) => {
+  const firstChar = name.charAt(0);
+  if (firstChar === '김') {
+    return { backgroundColor: '#fee2e2', color: '#ef4444' };
+  } else if (firstChar === '이') {
+    return { backgroundColor: '#e0e7ff', color: '#4f46e5' };
+  } else if (firstChar === '박') {
+    return { backgroundColor: '#ecfdf5', color: '#10b981' };
+  } else {
+    return { backgroundColor: '#fef3c7', color: '#d97706' };
+  }
+};
+
 export default function AdminEmployeeDashboard() {
-  const [metrics, setMetrics] = useState({ active_count: 0, total_count: 0, access_rate: "0%", avg_session_time: "0분" });
+  const [metrics, setMetrics] = useState({
+    total_employees: 128,
+    total_employees_change: "▲ 5(전월 대비)",
+    active_employees: 82,
+    active_employees_sub: "실시간",
+    todo_approved_month: 120,
+    todo_approved_month_total: 150,
+    todo_approved_today: 20,
+    todo_approved_today_total: 25
+  });
   const [deptData, setDeptData] = useState([]);
   const [trendData, setTrendData] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [esStatus, setEsStatus] = useState("정상");
 
   useEffect(() => {
-    async function loadDashboardData() {
-      setLoading(true);
+    document.documentElement.style.backgroundColor = "#f3f4f6";
+    document.body.style.backgroundColor = "#f3f4f6";
+    const rootEl = document.getElementById("root");
+    if (rootEl) {
+      rootEl.style.backgroundColor = "#f3f4f6";
+    }
+    return () => {
+      document.documentElement.style.backgroundColor = "";
+      document.body.style.backgroundColor = "";
+      if (rootEl) {
+        rootEl.style.backgroundColor = "";
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    async function loadDashboardData(silent = false) {
+      if (!silent) setLoading(true);
       try {
         const [dashData, branchData, weeklyData, usageData] = await Promise.all([
           api.admin.getEmployeeDashboard(),
@@ -72,7 +114,13 @@ export default function AdminEmployeeDashboard() {
           api.admin.getEmployeeUsage(),
         ]);
 
-        if (dashData) setMetrics(dashData);
+        if (dashData) {
+          setMetrics(dashData);
+          if (dashData.es_status) {
+            setEsStatus(dashData.es_status);
+          }
+          setError(null);
+        }
         if (branchData && branchData.stats) {
           setDeptData(branchData.stats.map(s => ({
             name: s.branch_name,
@@ -82,152 +130,368 @@ export default function AdminEmployeeDashboard() {
         if (weeklyData && weeklyData.trends) {
           setTrendData(weeklyData.trends);
         }
-        if (usageData && usageData.usage) {
-          setEmployees(usageData.usage);
+        if (usageData) {
+          if (usageData.usage) {
+            setEmployees(usageData.usage);
+          }
+          if (usageData.recent_activities) {
+            setActivities(usageData.recent_activities);
+          }
+          if (usageData.es_status === "오류") {
+            setEsStatus("오류");
+          }
         }
       } catch (err) {
         console.error("Failed to load employee dashboard data:", err);
+        setError("데이터 연동 실패");
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
     }
+    
     loadDashboardData();
+
+    // 5초 간격 실시간 모니터링 폴링 동작 설정
+    const intervalId = setInterval(() => {
+      loadDashboardData(true);
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, []);
+
+  if (error && employees.length === 0) {
+    return (
+      <div className="admin-container">
+        <AdminHeader title="관리자 - 직원 대시보드" />
+        <div className="admin-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            padding: '48px 40px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+            textAlign: 'center',
+            maxWidth: '520px',
+            border: '1px solid #fee2e2'
+          }}>
+            <ShieldAlert size={64} style={{ color: '#ef4444', margin: '0 auto 16px' }} />
+            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#1f2937', marginBottom: '12px' }}>대시보드 데이터 연동 실패</h2>
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6', marginBottom: '28px' }}>
+              백엔드 서버 또는 대시보드 API와의 연결에 실패했습니다. <br />
+              로그인 세션 만료 여부 및 슈퍼 어드민 계정의 권한 점검이 필요합니다.
+            </p>
+            <button 
+              onClick={() => { setError(null); setLoading(true); window.location.reload(); }}
+              style={{
+                background: '#0284c7',
+                color: '#fff',
+                border: 'none',
+                padding: '12px 28px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                boxShadow: '0 2px 4px rgba(2, 132, 199, 0.2)'
+              }}
+              onMouseEnter={(e) => e.target.style.background = '#0369a1'}
+              onMouseLeave={(e) => e.target.style.background = '#0284c7'}
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading && employees.length === 0) {
+    return (
+      <div className="admin-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div style={{ textAlign: 'center', color: '#6b7280' }}>
+          <Activity className="animate-spin" size={48} style={{ margin: '0 auto 16px', color: '#0284c7' }} />
+          <h3>직원 대시보드를 로딩 중입니다...</h3>
+          <p style={{ fontSize: '13px', marginTop: '8px' }}>데이터베이스 및 최근 활동 내역 집계 중</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-container">
       <AdminHeader title="관리자 - 직원 대시보드" />
       
-      <div className="admin-content">
-        {/* Stat Cards */}
-        <div className="admin-stats-grid">
-          <div className="admin-stat-card">
-            <div className="admin-stat-title">오늘 접속 직원</div>
-            <div className="admin-stat-value">{loading ? "—" : `${metrics.active_count}명`}</div>
-            <div className="admin-stat-sub">{loading ? "—" : `전체 ${metrics.total_count}명 중`}</div>
+      <div className="admin-content" style={{ gap: '28px' }}>
+        
+        {/* ========================================================
+            1. TOP CARDS (Mockup Design Aligned)
+           ======================================================== */}
+        <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+          
+          {/* Card 1: 전체 직원 수 */}
+          <div className="admin-stat-card" style={{ padding: '24px 20px', borderLeft: '4px solid #1f2937' }}>
+            <div className="admin-stat-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+              <Users size={16} style={{ color: '#4b5563' }} />
+              전체 직원 수
+            </div>
+            <div className="admin-stat-value" style={{ fontSize: '36px', fontWeight: '800', marginTop: '12px', color: '#1f2937' }}>
+              {metrics.total_employees}명
+            </div>
+            <div className="admin-stat-sub" style={{ marginTop: '8px', fontSize: '13px', color: '#3b82f6', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '2px' }}>
+              <ChevronUp size={14} />
+              {metrics.total_employees_change}
+            </div>
           </div>
-          <div className="admin-stat-card">
-            <div className="admin-stat-title">접속률</div>
-            <div className="admin-stat-value">{loading ? "—" : metrics.access_rate}</div>
-            <div className="admin-stat-sub">전주 +8%</div>
+
+          {/* Card 2: 현재 접속 직원 */}
+          <div className="admin-stat-card" style={{ padding: '24px 20px', borderLeft: `4px solid ${esStatus === "오류" ? '#f59e0b' : '#10b981'}` }}>
+            <div className="admin-stat-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+              <Activity size={16} style={{ color: esStatus === "오류" ? '#f59e0b' : '#10b981' }} />
+              현재 접속 직원
+            </div>
+            <div className="admin-stat-value" style={{ 
+              fontSize: esStatus === "오류" ? '26px' : '36px', 
+              fontWeight: '800', 
+              marginTop: esStatus === "오류" ? '20px' : '12px', 
+              color: esStatus === "오류" ? '#ef4444' : '#1f2937' 
+            }}>
+              {esStatus === "오류" ? "연결 끊김" : `${metrics.active_employees}명`}
+            </div>
+            <div className="admin-stat-sub" style={{ marginTop: '8px', fontSize: '13px', color: esStatus === "오류" ? '#ef4444' : '#10b981', fontWeight: '600' }}>
+              {esStatus === "오류" ? "실시간 집계 불가 (ES 확인)" : metrics.active_employees_sub}
+            </div>
           </div>
-          <div className="admin-stat-card">
-            <div className="admin-stat-title">오늘 미접속 직원</div>
-            <div className="admin-stat-value">{loading ? "—" : `${metrics.total_count - metrics.active_count}명`}</div>
-            <div className="admin-stat-sub">{loading ? "—" : `전체 ${metrics.total_count}명 중`}</div>
+
+          {/* Card 3: 이번 달 AI TODO 승인 건수 */}
+          <div className="admin-stat-card" style={{ padding: '24px 20px', borderLeft: `4px solid ${esStatus === "오류" ? '#9ca3af' : '#4f46e5'}` }}>
+            <div className="admin-stat-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+              <CheckSquare size={16} style={{ color: esStatus === "오류" ? '#9ca3af' : '#4f46e5' }} />
+              이번 달 AI TODO 승인 건수
+            </div>
+            <div className="admin-stat-value" style={{ 
+              fontSize: esStatus === "오류" ? '26px' : '36px', 
+              fontWeight: '800', 
+              marginTop: esStatus === "오류" ? '20px' : '12px', 
+              color: esStatus === "오류" ? '#ef4444' : '#1f2937' 
+            }}>
+              {esStatus === "오류" ? "연결 끊김" : `${metrics.todo_approved_month}건`}
+            </div>
+            <div className="admin-stat-sub" style={{ marginTop: '8px', fontSize: '13px', color: esStatus === "오류" ? '#ef4444' : '#6b7280' }}>
+              {esStatus === "오류" ? "실시간 집계 불가 (ES 확인)" : `전체 ${metrics.todo_approved_month_total}건 중`}
+            </div>
           </div>
-          <div className="admin-stat-card">
-            <div className="admin-stat-title">평균 세션 시간</div>
-            <div className="admin-stat-value">{loading ? "—" : metrics.avg_session_time}</div>
-            <div className="admin-stat-sub">전일 21분</div>
+
+          {/* Card 4: 오늘 AI TODO 승인 건수 */}
+          <div className="admin-stat-card" style={{ padding: '24px 20px', borderLeft: `4px solid ${esStatus === "오류" ? '#9ca3af' : '#f59e0b'}` }}>
+            <div className="admin-stat-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+              <Calendar size={16} style={{ color: esStatus === "오류" ? '#9ca3af' : '#f59e0b' }} />
+              오늘 AI TODO 승인 건수
+            </div>
+            <div className="admin-stat-value" style={{ 
+              fontSize: esStatus === "오류" ? '26px' : '36px', 
+              fontWeight: '800', 
+              marginTop: esStatus === "오류" ? '20px' : '12px', 
+              color: esStatus === "오류" ? '#ef4444' : '#1f2937' 
+            }}>
+              {esStatus === "오류" ? "연결 끊김" : `${metrics.todo_approved_today}건`}
+            </div>
+            <div className="admin-stat-sub" style={{ marginTop: '8px', fontSize: '13px', color: esStatus === "오류" ? '#ef4444' : '#6b7280' }}>
+              {esStatus === "오류" ? "실시간 집계 불가 (ES 확인)" : `전체 ${metrics.todo_approved_today_total}건`}
+            </div>
           </div>
+
         </div>
 
-        {/* Charts Row */}
-        <div className="admin-charts-row">
-          <div className="admin-chart-card">
-            <h3 className="admin-chart-title">부서별 접속률</h3>
-            <div style={{ height: "250px" }}>
-              {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#6b7280' }}>로딩 중...</div>
-              ) : deptData.length === 0 ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#6b7280' }}>지점 데이터가 없습니다.</div>
-              ) : (
+        {/* ========================================================
+            2. CHARTS SECTION (Bar and Line Chart)
+           ======================================================== */}
+        <div className="admin-charts-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          
+          {/* 지점별 접속률 */}
+          <div className="admin-chart-card" style={{ padding: '24px', position: 'relative' }}>
+            <h3 className="admin-chart-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>지점별 접속률</h3>
+            {esStatus === "오류" ? (
+              <div style={{ height: "240px", display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb', textAlign: 'center', padding: '10px' }}>
+                <ShieldAlert size={32} style={{ color: '#ef4444', marginBottom: '10px' }} />
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563' }}>Elasticsearch 연결 오프라인</span>
+                <span style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>실시간 지점별 접속률 집계 불가</span>
+              </div>
+            ) : (
+              <div style={{ height: "240px", width: "100%" }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={deptData} barSize={60}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={(val) => `${val}%`} />
-                    <Tooltip cursor={{fill: 'transparent'}} />
-                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <BarChart data={deptData} barSize={48}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                    <YAxis axisLine={false} tickLine={false} domain={[0, 100]} ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={(val) => `${val}%`} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                    <Tooltip 
+                      cursor={{fill: 'rgba(243, 244, 246, 0.3)'}}
+                      contentStyle={{ background: '#333', border: 'none', borderRadius: '6px', color: '#fff', fontSize: 12 }}
+                    />
+                    <Bar dataKey="value" fill="#d0e1fd" radius={[6, 6, 0, 0]}>
+                      {deptData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={index === 0 ? "#0284c7" : "#a8cafd"} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
-          <div className="admin-chart-card">
-            <h3 className="admin-chart-title">주간 접속률 추이</h3>
-            <div style={{ height: "250px" }}>
-              {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#6b7280' }}>로딩 중...</div>
-              ) : trendData.length === 0 ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#6b7280' }}>트렌드 데이터가 없습니다.</div>
-              ) : (
+          {/* 주간 접속률 추이 */}
+          <div className="admin-chart-card" style={{ padding: '24px', position: 'relative' }}>
+            <h3 className="admin-chart-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>주간 접속률 추이</h3>
+            {esStatus === "오류" ? (
+              <div style={{ height: "240px", display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb', textAlign: 'center', padding: '10px' }}>
+                <ShieldAlert size={32} style={{ color: '#ef4444', marginBottom: '10px' }} />
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563' }}>Elasticsearch 연결 오프라인</span>
+                <span style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>주간 접속률 추이 조회 불가</span>
+              </div>
+            ) : (
+              <div style={{ height: "240px", width: "100%" }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={trendData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} domain={[50, 90]} ticks={[50, 55, 60, 65, 70, 75, 80, 85, 90]} tickFormatter={(val) => `${val}%`} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} dot={{r: 5, fill: '#3b82f6'}} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                    <YAxis axisLine={false} tickLine={false} domain={[50, 90]} ticks={[50, 55, 60, 65, 70, 75, 80, 85, 90]} tickFormatter={(val) => `${val}%`} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                    <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: 12 }} />
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#3b82f6" 
+                      strokeWidth={3} 
+                      dot={{ r: 5, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }}
+                      activeDot={{ r: 7 }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
-              )}
-            </div>
+              </div>
+            )}
           </div>
+
         </div>
 
-        {/* Table */}
-        <div className="employee-table-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3 className="admin-chart-title" style={{ margin: 0 }}>직원별 기능 사용 현황</h3>
-            <span style={{ fontSize: '13px', color: '#6b7280' }}>오늘 기준</span>
-          </div>
+        {/* ========================================================
+            3. TABLES SECTION (Employee Status & Activity Logs)
+           ======================================================== */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px', alignItems: 'stretch' }}>
           
-          <table className="employee-table">
-            <thead>
-              <tr>
-                <th>사번</th>
-                <th>이름</th>
-                <th>지점</th>
-                <th>경제지표</th>
-                <th>뉴스 아카이브</th>
-                <th>AI 메모</th>
-                <th>리포트</th>
-                <th>포트폴리오</th>
-                <th>총 사용</th>
-                <th>접속 상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={10} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>직원 사용 현황을 불러오는 중입니다...</td>
-                </tr>
-              ) : employees.length === 0 ? (
-                <tr>
-                  <td colSpan={10} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>등록된 직원이 없습니다.</td>
-                </tr>
-              ) : (
-                employees.map((emp, i) => (
-                  <tr key={i}>
-                    <td style={{ color: '#6b7280' }}>{emp.id}</td>
-                    <td>
-                      <div className="employee-name-cell">
-                        <div className="employee-avatar" style={{
-                          background: i % 2 === 0 ? '#e0e7ff' : '#fee2e2',
-                          color: i % 2 === 0 ? '#4f46e5' : '#ef4444'
-                        }}>
-                          {emp.name.charAt(0)}
-                        </div>
-                        {emp.name}
-                      </div>
-                    </td>
-                    <td style={{ color: '#6b7280' }}>{emp.branch}</td>
-                    <td>{emp.stat1}</td>
-                    <td>{emp.stat2}</td>
-                    <td>{emp.stat3}</td>
-                    <td>{emp.stat4}</td>
-                    <td>{emp.stat5}</td>
-                    <td style={{ fontWeight: 500 }}>{emp.total}</td>
-                    <td className={emp.statusClass} style={{ fontWeight: 500 }}>{emp.status}</td>
+          {/* Left Table: 직원 현황 */}
+          <div className="admin-chart-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px' }}>
+            <h3 className="admin-chart-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>직원 현황</h3>
+            <div className="admin-scrollable-container" style={{ flex: 1 }}>
+              <table className="admin-list-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: '#f9fafb' }}>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>사번</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>이름</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>지점</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>이메일</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>접속 상태</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {employees.map((emp, index) => (
+                    <tr key={index} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background-color 0.2s' }}>
+                      <td style={{ padding: '14px 16px', fontSize: '13px', color: '#6b7280' }}>{emp.id}</td>
+                      <td style={{ padding: '14px 16px', fontSize: '13px', fontWeight: '500', color: '#1f2937' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            ...getAvatarStyle(emp.name)
+                          }}>
+                            {emp.name.charAt(0)}
+                          </div>
+                          <span style={{ fontWeight: '600' }}>{emp.name}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '14px 16px', fontSize: '13px', color: '#4b5563' }}>{emp.branch}</td>
+                      <td style={{ padding: '14px 16px', fontSize: '13px', color: '#6b7280' }}>{emp.email}</td>
+                      <td style={{ padding: '14px 16px', fontSize: '13px', textAlign: 'center', fontWeight: '700' }}>
+                        <span style={{ 
+                          color: emp.statusClass === 'status-online' ? '#10b981' : '#f43f5e'
+                        }}>
+                          {emp.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Right Table: 최근 활동 로그 */}
+          <div className="admin-chart-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '24px', position: 'relative' }}>
+            <h3 className="admin-chart-title" style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>최근 활동 로그</h3>
+            {esStatus === "오류" ? (
+              <div style={{ flex: 1, minHeight: '260px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb', textAlign: 'center', padding: '10px' }}>
+                <ShieldAlert size={36} style={{ color: '#ef4444', marginBottom: '12px' }} />
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563' }}>Elasticsearch 연결 오프라인</span>
+                <span style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>최근 활동 로그 조회 불가</span>
+              </div>
+            ) : (
+              <div className="admin-scrollable-container" style={{ flex: 1 }}>
+                <table className="admin-list-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#f9fafb' }}>
+                      <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>시간</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>이름</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>지점</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>기능</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activities.map((act, index) => (
+                      <tr key={index} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background-color 0.2s' }}>
+                        <td style={{ padding: '14px 16px', fontSize: '13px', color: '#6b7280' }}>{act.time}</td>
+                        <td style={{ padding: '14px 16px', fontSize: '13px', fontWeight: '500', color: '#1f2937' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '50%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '11px',
+                              fontWeight: '700',
+                              ...getAvatarStyle(act.name)
+                            }}>
+                              {act.name.charAt(0)}
+                            </div>
+                            <span style={{ fontWeight: '600' }}>{act.name}</span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '14px 16px', fontSize: '13px', color: '#4b5563' }}>{act.branch}</td>
+                        <td style={{ padding: '14px 16px', fontSize: '13px', fontWeight: '500', color: '#1f2937' }}>
+                          <span style={{
+                            padding: '3px 8px',
+                            borderRadius: '4px',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            backgroundColor: act.feature === '뉴스 아카이브' ? '#ecfdf5' : (act.feature === 'AI TODO' ? '#eff6ff' : (act.feature === '고객 관리' ? '#fdf2f8' : '#fff7ed')),
+                            color: act.feature === '뉴스 아카이브' ? '#059669' : (act.feature === 'AI TODO' ? '#2563eb' : (act.feature === '고객 관리' ? '#db2777' : '#d97706'))
+                          }}>
+                            {act.feature}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
         </div>
+
       </div>
     </div>
   );

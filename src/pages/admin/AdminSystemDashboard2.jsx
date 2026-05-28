@@ -21,7 +21,7 @@ const AdminTabs = () => {
         to="/admin-permission-settings" 
         className={`admin-tab ${path === '/admin-permission-settings' ? 'active' : ''}`}
       >
-        권한 설정
+        인수인계 설정
       </Link>
       <Link 
         to="/admin-system-dashboard-1" 
@@ -64,6 +64,22 @@ export default function AdminSystemDashboard2() {
   const [logFilter, setLogFilter] = useState('전체');
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = "#f3f4f6";
+    document.body.style.backgroundColor = "#f3f4f6";
+    const rootEl = document.getElementById("root");
+    if (rootEl) {
+      rootEl.style.backgroundColor = "#f3f4f6";
+    }
+    return () => {
+      document.documentElement.style.backgroundColor = "";
+      document.body.style.backgroundColor = "";
+      if (rootEl) {
+        rootEl.style.backgroundColor = "";
+      }
+    };
+  }, []);
 
   useEffect(() => {
     async function fetchLogs(silent = false) {
@@ -181,36 +197,38 @@ export default function AdminSystemDashboard2() {
             </div>
           </div>
           
-          <table className="admin-list-table">
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
-                    로그를 불러오는 중입니다...
-                  </td>
-                </tr>
-              ) : logs.length === 0 ? (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
-                    로그 내역이 없습니다.
-                  </td>
-                </tr>
-              ) : (
-                logs.map((log, i) => (
-                  <tr key={i}>
-                    <td style={{ color: '#6b7280' }}>{log.time}</td>
-                    <td>{log.path}</td>
-                    <td style={{ textAlign: 'right', color: '#6b7280' }}>{log.ms}</td>
-                    <td style={{ textAlign: 'right', width: '80px' }}>
-                      <span className={`status-badge ${log.status === '200' ? 'success' : 'error'}`}>
-                        {log.status}
-                      </span>
+          <div className="admin-scrollable-container">
+            <table className="admin-list-table">
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
+                      로그를 불러오는 중입니다...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : logs.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
+                      로그 내역이 없습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  logs.map((log, i) => (
+                    <tr key={i}>
+                      <td style={{ color: '#6b7280' }}>{log.time}</td>
+                      <td>{log.path}</td>
+                      <td style={{ textAlign: 'right', color: '#6b7280' }}>{log.ms}</td>
+                      <td style={{ textAlign: 'right', width: '80px' }}>
+                        <span className={`status-badge ${log.status === '200' ? 'success' : 'error'}`}>
+                          {log.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
