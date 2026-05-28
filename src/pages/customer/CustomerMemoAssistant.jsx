@@ -99,6 +99,32 @@ export default function CustomerMemoAssistant() {
     fetchDetail();
   }, [selectedCustomerId]);
 
+  const [simulatorSaved, setSimulatorSaved] = useState(true);
+
+  useEffect(() => {
+    if (!selectedCustomerId) {
+      setSimulatorSaved(true);
+      return;
+    }
+    
+    const fetchSimInfo = async () => {
+      try {
+        const res = await api.customer.getSimulatorInfo(selectedCustomerId);
+        if (res) {
+          setSimulatorSaved(res.exists);
+          setAdditionalNotes(prev => ({
+            ...prev,
+            [selectedCustomerId]: res.additional_notes || ""
+          }));
+        }
+      } catch (error) {
+        console.error("시뮬레이터 정보 조회 실패:", error);
+      }
+    };
+    
+    fetchSimInfo();
+  }, [selectedCustomerId]);
+
   const fetchTimeline = async (cId) => {
     const targetId = cId || selectedCustomerId;
     if (!targetId) return;
@@ -258,12 +284,15 @@ export default function CustomerMemoAssistant() {
 
   const selectedSimDetails = {
     name: selectedCustomer ? `${selectedCustomer.name} (${fullCustomerDetail?.grade || "VIP"})` : "로딩중...",
+    birthday: fullCustomerDetail?.birthday ? fullCustomerDetail.birthday.replace(/-/g, '.') : "-",
+    job: fullCustomerDetail?.job || "-",
+    risk: fullCustomerDetail?.tendency || "위험 중립형",
     assets: formatAssets(fullCustomerDetail?.total_assets),
     assetsRaw: fullCustomerDetail?.total_assets !== undefined ? (fullCustomerDetail.total_assets / 100000000) : 0, // in 100M units
     needs: fullCustomerDetail?.llm_insight ? 
       (fullCustomerDetail.llm_insight.length > 30 ? fullCustomerDetail.llm_insight.slice(0, 30) + "..." : fullCustomerDetail.llm_insight) 
       : "등록된 주요 니즈가 없습니다.",
-    risk: fullCustomerDetail?.tendency || "위험 중립형",
+    insight: fullCustomerDetail?.llm_insight || "등록된 AI 인사이트가 없습니다.",
     products: fullCustomerDetail ? [
       fullCustomerDetail.deposit > 0 ? "예적금" : null,
       fullCustomerDetail.investment > 0 ? "투자상품" : null,
@@ -280,11 +309,23 @@ export default function CustomerMemoAssistant() {
       ...prev,
       [id]: val
     }));
+    setSimulatorSaved(false);
   };
 
-  const handleSaveNotes = () => {
-    setShowNotesSaveToast(true);
-    setTimeout(() => setShowNotesSaveToast(false), 2000);
+  const handleSaveNotes = async () => {
+    if (!selectedCustomerId) return;
+    const notes = additionalNotes[selectedCustomerId] || "";
+    try {
+      await api.customer.saveSimulatorInfo(selectedCustomerId, {
+        additional_notes: notes
+      });
+      setSimulatorSaved(true);
+      setShowNotesSaveToast(true);
+      setTimeout(() => setShowNotesSaveToast(false), 2000);
+    } catch (error) {
+      console.error("시뮬레이터 정보 저장 실패:", error);
+      alert("시뮬레이터 정보 저장 중 오류가 발생했습니다: " + error.message);
+    }
   };
 
   const handleSendQuestion = async () => {
@@ -678,8 +719,23 @@ export default function CustomerMemoAssistant() {
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>고객명</span>
+                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>고객명(등급)</span>
                       <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.name}</span>
+                    </div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>생년월일</span>
+                      <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.birthday}</span>
+                    </div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>직업</span>
+                      <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.job}</span>
+                    </div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>성향</span>
+                      <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.risk}</span>
                     </div>
                     
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
@@ -687,29 +743,11 @@ export default function CustomerMemoAssistant() {
                       <span style={{ color: '#0284c7', fontSize: '13px', fontWeight: 700 }}>{selectedSimDetails.assets}</span>
                     </div>
                     
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>주요 니즈</span>
-                      <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.needs}</span>
-                    </div>
-                    
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>위험 성향</span>
-                      <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.risk}</span>
-                    </div>
-                    
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>주요 보유 상품</span>
-                      <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.products}</span>
-                    </div>
-                    
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>최근 상담일</span>
-                      <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.lastCounsel}</span>
-                    </div>
-                    
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>다음 상담 예정</span>
-                      <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.nextCounsel}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingTop: '4px' }}>
+                      <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>AI 인사이트</span>
+                      <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600, lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
+                        {selectedSimDetails.insight}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -754,6 +792,17 @@ export default function CustomerMemoAssistant() {
                         </div>
                         저장완료
                       </div>
+                    )}
+                    {simulatorSaved ? (
+                      <span style={{ marginRight: '12px', fontSize: '12px', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
+                        저장됨
+                      </span>
+                    ) : (
+                      <span style={{ marginRight: '12px', fontSize: '12px', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></span>
+                        저장 필요
+                      </span>
                     )}
                     <button
                       onClick={() => handleSaveNotes()}
@@ -804,12 +853,12 @@ export default function CustomerMemoAssistant() {
                       boxSizing: 'border-box'
                     }}>
                       <p style={{ fontSize: '13px', fontWeight: 600, color: '#475569', lineHeight: '1.6', marginBottom: '12px' }}>
-                        왼쪽에서 고객 정보와 시뮬레이션 조건을 입력한 후,<br />
-                        자연어로 질문해보세요.
+                        PB님, 왼쪽에서 고객 정보와 추가 입력 사항을 저장한 후,<br />
+                        상담 지원용 시뮬레이션 질문을 입력해보세요.
                       </p>
                       <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.8' }}>
-                        예) "현재 조건으로 절세 전략 추천해줘"<br />
-                        "10년 후 예상 수익을 보여줘"
+                        예) "이 고객의 자산 포트폴리오를 기반으로 한 절세 전략 제안해줘"<br />
+                        "추가 유학 자금 2억 마련을 위해 추천하는 상담 화법은?"
                       </p>
                     </div>
                   ) : (
@@ -851,7 +900,7 @@ export default function CustomerMemoAssistant() {
                         alignItems: 'center',
                         gap: '6px'
                       }}>
-                        <span className="dot-typing">AI가 시뮬레이션 중입니다...</span>
+                        <span className="dot-typing">AI가 시뮬레이션 분석 중입니다...</span>
                       </div>
                     </div>
                   )}
@@ -886,7 +935,7 @@ export default function CustomerMemoAssistant() {
                         fontSize: '13px',
                         background: 'transparent'
                       }}
-                      placeholder="시뮬레이션 질문을 입력하세요."
+                      placeholder="상담 지원용 시뮬레이션 질문을 입력하세요."
                       value={currentQuestion}
                       onChange={(e) => setCurrentQuestion(e.target.value)}
                       onKeyDown={(e) => {

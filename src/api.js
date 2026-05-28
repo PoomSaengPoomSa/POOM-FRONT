@@ -134,6 +134,8 @@ export const api = {
     generateReport: (c_id, data) => api.post(`/customers/${c_id}/reports/generate`, data),
     saveReport: (c_id, data) => api.post(`/customers/${c_id}/reports`, data),
     simulatorChat: (c_id, data) => api.post(`/customers/${c_id}/simulator/chat`, data),
+    getSimulatorInfo: (c_id) => api.get(`/customers/${c_id}/simulator/info`),
+    saveSimulatorInfo: (c_id, data) => api.post(`/customers/${c_id}/simulator/save`, data),
   },
 
   // 3. 일정 (Schedule) API
