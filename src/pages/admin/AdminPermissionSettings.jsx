@@ -17,7 +17,7 @@ const AdminTabs = () => {
         권한 설정
       </Link>
       <Link
-        to="/admin-system-dashboard-1"
+        to="/admin-system-dashboard"
         className={`admin-tab ${path.includes('/admin-system-dashboard') ? 'active' : ''}`}
       >
         시스템 대시보드
@@ -32,7 +32,76 @@ const AdminTabs = () => {
   );
 };
 
+// Avatar 색상 유틸리티 (DB의 10개 지점 1:1 고유 색상 매핑)
+const getAvatarStyleByBranch = (branchName) => {
+  if (!branchName) return { backgroundColor: '#f1f5f9', color: '#475569' };
+
+  if (branchName.includes('강남역금융센터') || branchName === '강남') {
+    return { backgroundColor: '#e0e7ff', color: '#4f46e5' }; // 1. 강남 - Indigo
+  } else if (branchName.includes('종로금융센터') || branchName === '종로') {
+    return { backgroundColor: '#eff6ff', color: '#2563eb' }; // 2. 종로 - Blue
+  } else if (branchName.includes('여의도중앙지점') || branchName === '여의도') {
+    return { backgroundColor: '#ecfdf5', color: '#059669' }; // 3. 여의도 - Emerald
+  } else if (branchName.includes('분당금융센터') || branchName === '분당') {
+    return { backgroundColor: '#f0fdfa', color: '#0d9488' }; // 4. 분당 - Teal
+  } else if (branchName.includes('송도스마트밸리지점') || branchName === '송도') {
+    return { backgroundColor: '#fce7f3', color: '#db2777' }; // 5. 송도 - Pink
+  } else if (branchName.includes('부산중앙지점') || branchName === '부산') {
+    return { backgroundColor: '#faf5ff', color: '#7c3aed' }; // 6. 부산 - Purple
+  } else if (branchName.includes('대구지점') || branchName === '대구') {
+    return { backgroundColor: '#fff7ed', color: '#ea580c' }; // 7. 대구 - Orange
+  } else if (branchName.includes('대전지점') || branchName === '대전') {
+    return { backgroundColor: '#fffbeb', color: '#d97706' }; // 8. 대전 - Amber
+  } else if (branchName.includes('광주지점') || branchName === '광주') {
+    return { backgroundColor: '#f0fdf4', color: '#166534' }; // 9. 광주 - Green
+  } else if (branchName.includes('제주지점') || branchName === '제주') {
+    return { backgroundColor: '#fdf2f8', color: '#be185d' }; // 10. 제주 - Rose
+  } else {
+    // 부분 매핑 폴백
+    if (branchName.includes('강남')) return { backgroundColor: '#e0e7ff', color: '#4f46e5' };
+    if (branchName.includes('종로')) return { backgroundColor: '#eff6ff', color: '#2563eb' };
+    if (branchName.includes('여의도')) return { backgroundColor: '#ecfdf5', color: '#059669' };
+    if (branchName.includes('분당')) return { backgroundColor: '#f0fdfa', color: '#0d9488' };
+    if (branchName.includes('송도')) return { backgroundColor: '#fce7f3', color: '#db2777' };
+    if (branchName.includes('부산')) return { backgroundColor: '#faf5ff', color: '#7c3aed' };
+    if (branchName.includes('대구')) return { backgroundColor: '#fff7ed', color: '#ea580c' };
+    if (branchName.includes('대전')) return { backgroundColor: '#fffbeb', color: '#d97706' };
+    if (branchName.includes('광주')) return { backgroundColor: '#f0fdf4', color: '#166534' };
+    if (branchName.includes('제주')) return { backgroundColor: '#fdf2f8', color: '#be185d' };
+    
+    return { backgroundColor: '#f1f5f9', color: '#475569' }; // Slate
+  }
+};
+
 const AdminHeader = ({ title }) => {
+  const [user, setUser] = useState({ name: "관리자", role: "Super Admin", branch: "" });
+
+  useEffect(() => {
+    async function fetchMe() {
+      try {
+        const me = await api.auth.getMe();
+        if (me) {
+          setUser({
+            name: me.name,
+            role: me.role === 'admin' ? 'Super Admin' : 'PB User',
+            branch: me.branch || ''
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch me:", err);
+        const localUser = api.auth.getCurrentUser();
+        if (localUser) {
+          setUser({
+            name: localUser.name || localUser.id,
+            role: localUser.role === 'admin' ? 'Super Admin' : 'PB User',
+            branch: ""
+          });
+        }
+      }
+    }
+    fetchMe();
+  }, []);
+
   return (
     <div className="admin-header">
       <h1 className="admin-page-title">{title}</h1>
@@ -40,13 +109,10 @@ const AdminHeader = ({ title }) => {
         <AdminTabs />
         <div className="admin-profile">
           <div className="admin-profile-info">
-            <span className="admin-name">김재욱</span>
-            <span className="admin-role">Super Admin</span>
+            <span className="admin-name">{user.name}</span>
+            <span className="admin-role">{user.role}</span>
           </div>
-          <div className="admin-avatar">
-            <img src="https://i.pravatar.cc/150?img=11" alt="Profile" />
-          </div>
-          <LogOut onClick={() => window.location.href = '/login'} size={20} className="admin-logout" />
+          <LogOut onClick={() => { api.auth.logout(); window.location.href = '/login'; }} size={20} className="admin-logout" />
         </div>
       </div>
     </div>
@@ -335,21 +401,15 @@ export default function AdminPermissionSettings() {
                         <td style={{ textAlign: 'left', color: '#6b7280', borderBottom: 'none' }}>{emp.id}</td>
                         <td style={{ textAlign: 'left', borderBottom: 'none' }}>
                           <div className="employee-name-cell" style={{ justifyContent: 'flex-start' }}>
-                            <div className="employee-avatar" style={{
-                              background: i === 0 ? '#fef3c7' :
-                                i === 1 ? '#ede9fe' :
-                                  i === 2 ? '#fce7f3' :
-                                    i === 3 ? '#e2e8f0' : '#dbeafe',
-                              color: '#475569'
-                            }}>
+                            <div className="employee-avatar" style={getAvatarStyleByBranch(emp.branch)}>
                               {emp.name.charAt(0)}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <span style={{ fontWeight: 600 }}>{emp.name}</span>
+                              <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{emp.name}</span>
                               {emp.pending ? (
-                                <span style={{ fontSize: '12px', color: '#ef4444' }}>{emp.branchNote}</span>
+                                <span style={{ fontSize: '12px', color: '#ef4444', whiteSpace: 'nowrap' }}>{emp.branchNote}</span>
                               ) : (
-                                <span style={{ fontSize: '12px', color: '#6b7280' }}>{emp.branch}</span>
+                                <span style={{ fontSize: '12px', color: '#6b7280', whiteSpace: 'nowrap' }}>{emp.branch}</span>
                               )}
                             </div>
                           </div>
@@ -381,9 +441,7 @@ export default function AdminPermissionSettings() {
             ) : (
               historyData.map((log, i) => (
                 <div className="history-item" key={i}>
-                  <div className="history-icon" style={{
-                    background: i === 1 ? '#ecfccb' : i === 2 ? '#e0e7ff' : '#f1f5f9'
-                  }}>
+                  <div className="history-icon" style={getAvatarStyleByBranch(log.title.split(' ')[1] || "")}>
                     {log.name.charAt(0)}
                   </div>
                   <div className="history-content">
@@ -431,7 +489,7 @@ export default function AdminPermissionSettings() {
                       className={`replacement-item ${selectedReplacement === emp.id ? 'selected' : ''}`}
                       onClick={() => setSelectedReplacement(emp.id)}
                     >
-                      <div className="employee-avatar" style={{ background: '#fef3c7', color: '#475569' }}>
+                      <div className="employee-avatar" style={getAvatarStyleByBranch(transferEmp.branch)}>
                         {emp.name.charAt(0)}
                       </div>
                       <div className="replacement-info">

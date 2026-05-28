@@ -21,13 +21,11 @@ export function parseJwt(token) {
 async function request(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint}`;
   
-  // 기본 헤더 설정
   const headers = {
     "Content-Type": "application/json",
     ...options.headers,
   };
 
-  // 로컬 스토리지에서 JWT 토큰 가져오기
   const token = localStorage.getItem("accessToken");
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -41,15 +39,21 @@ async function request(endpoint, options = {}) {
   try {
     const response = await fetch(url, config);
     
-    // 204 No Content 처리
     if (response.status === 204) {
+      return null;
+    }
+
+    if (response.status === 401) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("currentUser");
+      window.location.href = "/login";
       return null;
     }
 
     const data = await response.json();
 
     if (!response.ok) {
-      // 백엔드에서 제공하는 상세 에러 메시지가 있으면 우선 사용
       throw new Error(data.detail || "요청 처리에 실패했습니다.");
     }
 

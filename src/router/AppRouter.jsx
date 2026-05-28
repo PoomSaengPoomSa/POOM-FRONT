@@ -10,15 +10,12 @@ import CalendarPage from "../pages/calendar/CalendarPage.jsx";
 import ProfilePage from "../pages/profile/ProfilePage.jsx";
 import EconomyPage from "../pages/economy/EconomyPage.jsx";
 import MemoPage from "../pages/memo/MemoPage.jsx";
-import AdminPage from "../pages/admin/AdminPage.jsx";
 
 // New Admin Dashboards
-import AdminSystemDashboard1 from "../pages/admin/AdminSystemDashboard1.jsx";
-import AdminSystemDashboard2 from "../pages/admin/AdminSystemDashboard2.jsx";
+import AdminSystemDashboard from "../pages/admin/AdminSystemDashboard.jsx";
 import AdminEmployeeDashboard from "../pages/admin/AdminEmployeeDashboard.jsx";
 import AdminPermissionSettings from "../pages/admin/AdminPermissionSettings.jsx";
 
-// New News Bucket Page
 // New News Bucket Page
 import NotificationMessageDraft from "../pages/news/NotificationMessageDraft.jsx";
 
@@ -69,11 +66,10 @@ export default function AppRouter() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/economy" element={<EconomyPage />} />
         <Route path="/memo" element={<MemoPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={<AdminPermissionSettings />} />
         
         {/* New Routes */}
-        <Route path="/admin-system-dashboard-1" element={<AdminSystemDashboard1 />} />
-        <Route path="/admin-system-dashboard-2" element={<AdminSystemDashboard2 />} />
+        <Route path="/admin-system-dashboard" element={<AdminSystemDashboard />} />
         <Route path="/admin-employee-dashboard" element={<AdminEmployeeDashboard />} />
         <Route path="/admin-permission-settings" element={<AdminPermissionSettings />} />
         <Route path="/notification-message-draft" element={<NotificationMessageDraft />} />
