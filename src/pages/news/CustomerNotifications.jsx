@@ -103,6 +103,46 @@ export default function CustomerNotifications() {
     return parts[0].trim();
   };
 
+  const parseBriefing = (expandedContent) => {
+    if (!expandedContent || expandedContent.length === 0) return null;
+    
+    const result = {
+      summary: [],
+      preference: [],
+      assets: [],
+      notes: []
+    };
+    
+    let currentSection = null;
+    let hasDynamicData = false;
+    
+    for (const line of expandedContent) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      
+      // 섹션 마커 매칭 지원
+      if (trimmed.includes("Quick Summary") || trimmed.includes("요약")) {
+        currentSection = "summary";
+        hasDynamicData = true;
+      } else if (trimmed.includes("Preference") || trimmed.includes("고객 정보") || trimmed.includes("선호도")) {
+        currentSection = "preference";
+        hasDynamicData = true;
+      } else if (trimmed.includes("자산 현황") || trimmed.includes("거래 내역") || trimmed.includes("자산")) {
+        currentSection = "assets";
+        hasDynamicData = true;
+      } else if (trimmed.includes("특이사항") || trimmed.includes("체크 사항") || trimmed.includes("주의") || trimmed.includes("특이 사항")) {
+        currentSection = "notes";
+        hasDynamicData = true;
+      } else if (currentSection) {
+        result[currentSection].push(trimmed);
+      }
+    }
+    
+    if (!hasDynamicData) return null;
+    return result;
+  };
+
+
   const filteredNotifications = notificationsList;
 
   const handleCardClick = (notif) => {
@@ -214,60 +254,123 @@ export default function CustomerNotifications() {
 
             {/* Content Body */}
             <div className="briefing-modal-body">
-              {/* Quick Summary Section */}
-              <div className="briefing-section">
-                <h3 className="briefing-section-title">Quick Summary</h3>
-                <div className="briefing-section-card">
-                  <p className="briefing-text font-semibold">금리 민감도가 매우 높은 2억 원 만기 재가입 대상 VIP 고객입니다.</p>
-                  <p className="briefing-text font-semibold">타행 이탈 징후가 있으니 당행 특판 및 연계 상품(뉴플러스/채권형)을 통한 방어가 최우선 과제입니다.</p>
-                </div>
-              </div>
+              {(() => {
+                const briefingData = selectedBriefing ? parseBriefing(selectedBriefing.expandedContent) : null;
+                
+                if (briefingData) {
+                  return (
+                    <>
+                      {/* Quick Summary Section */}
+                      <div className="briefing-section">
+                        <h3 className="briefing-section-title">Quick Summary</h3>
+                        <div className="briefing-section-card">
+                          {briefingData.summary.map((line, idx) => (
+                            <p key={idx} className="briefing-text font-semibold">{line}</p>
+                          ))}
+                        </div>
+                      </div>
 
-              {/* 고객 기본 정보 & Preference Section */}
-              <div className="briefing-section">
-                <h3 className="briefing-section-title">고객 기본 정보 & Preference</h3>
-                <div className="briefing-section-card">
-                  <ul className="briefing-list">
-                    <li>고객명/등급: {selectedBriefing ? getCustomerName(selectedBriefing.content) : "김민준"} 고객 (VIP)</li>
-                    <li>담당 PB: 김재욱 팀장</li>
-                    <li>음료/편의 선호도 (★필독):</li>
-                    <li className="indent">☕ 아이스 아메리카노(연하게) 선호.</li>
-                    <li className="indent">❌ 비타500 절대 금지 (과거 제공 시 특유의 약품 냄새와 단맛을 싫어한다고 명확히 기재됨. 웰컴 드링크 준비 시 주의).</li>
-                    <li className="indent">📰 대기 시간 발생 시 경제지(A일보) 제공 선호.</li>
-                  </ul>
-                </div>
-              </div>
+                      {/* 고객 기본 정보 & Preference Section */}
+                      <div className="briefing-section">
+                        <h3 className="briefing-section-title">고객 기본 정보 & Preference</h3>
+                        <div className="briefing-section-card">
+                          <ul className="briefing-list">
+                            <li>고객명/등급: {getCustomerName(selectedBriefing.content)} 고객 (VIP)</li>
+                            <li>담당 PB: 김재욱 팀장</li>
+                            {briefingData.preference.map((line, idx) => (
+                              <li key={idx} className={line.startsWith("-") ? "" : "indent"}>{line.startsWith("-") ? line.substring(1).trim() : line}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
 
-              {/* 자산 현황 & 최근 거래 내역 Section */}
-              <div className="briefing-section">
-                <h3 className="briefing-section-title">자산 현황 & 최근 거래 내역</h3>
-                <div className="briefing-section-card">
-                  <ul className="briefing-list">
-                    <li>총 자산: 3억 2,000만 원 (전월 대비 ▼8%, 약 3,000만 원 감소)</li>
-                    <li>보유 상품 상세:</li>
-                    <li className="indent-2">정기예금: 2억 원 (금일 만기 도래)</li>
-                    <li className="indent-2">공모 펀드: 5,000만 원 (글로벌 기술주 중심)</li>
-                    <li className="indent-2">ISA: 3,000만 원</li>
-                    <li>최근 자금 흐름:</li>
-                    <li className="indent">2025.04.28 타행(신한은행)으로 3,000만 원 송금 확인 (이탈 자금 분석 필요).</li>
-                  </ul>
-                </div>
-              </div>
+                      {/* 자산 현황 & 최근 거래 내역 Section */}
+                      <div className="briefing-section">
+                        <h3 className="briefing-section-title">자산 현황 & 최근 거래 내역</h3>
+                        <div className="briefing-section-card">
+                          <ul className="briefing-list">
+                            {briefingData.assets.map((line, idx) => (
+                              <li key={idx} className={line.startsWith("-") ? "" : "indent"}>{line.startsWith("-") ? line.substring(1).trim() : line}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
 
-              {/* 핵심 특이사항 & 상담 전 필수 체크 Section */}
-              <div className="briefing-section">
-                <h3 className="briefing-section-title">핵심 특이사항 & 상담 전 필수 체크</h3>
-                <div className="briefing-section-card">
-                  <ul className="briefing-list">
-                    <li className="bullet-title">극도의 금리 민감 성향:</li>
-                    <li className="indent">지난주 경쟁사(국민·신한)의 우대금리 이벤트를 직접 언급하며 비교 문의한 이력 있음. 0.1%p 차이에도 민감하게 반응하는 스타일.</li>
-                    <li className="bullet-title">투자 성향 변화 조짐:</li>
-                    <li className="indent">2025.04.15 유선 상담 당시, 기존 보유 중인 해외 펀드의 변동성에 피로감을 토로하며 일부 환매 후 안정적인 채권형 자산이나 고금리 예금으로 갈아탈 의향을 비춤.</li>
-                    <li className="bullet-title">커뮤니케이션 스타일:</li>
-                    <li className="indent">결론부터 듣는 것을 좋아하는 두괄식 성향. 복잡한 상품 구조 설명보다는 ‘세후 실질 수익률’과 ‘리스크 방어력’을 숫자로 정확히 제시할 때 만족도가 높음.</li>
-                  </ul>
-                </div>
-              </div>
+                      {/* 핵심 특이사항 & 상담 전 필수 체크 Section */}
+                      <div className="briefing-section">
+                        <h3 className="briefing-section-title">핵심 특이사항 & 상담 전 필수 체크</h3>
+                        <div className="briefing-section-card">
+                          <ul className="briefing-list">
+                            {briefingData.notes.map((line, idx) => (
+                              <li key={idx} className={line.startsWith("-") ? "" : "indent"}>{line.startsWith("-") ? line.substring(1).trim() : line}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </>
+                  );
+                }
+
+                // FALLBACK: 하드코딩 Mockup 레이아웃 (기존 디자인 유지 보장)
+                return (
+                  <>
+                    {/* Quick Summary Section */}
+                    <div className="briefing-section">
+                      <h3 className="briefing-section-title">Quick Summary</h3>
+                      <div className="briefing-section-card">
+                        <p className="briefing-text font-semibold">금리 민감도가 매우 높은 2억 원 만기 재가입 대상 VIP 고객입니다.</p>
+                        <p className="briefing-text font-semibold">타행 이탈 징후가 있으니 당행 특판 및 연계 상품(뉴플러스/채권형)을 통한 방어가 최우선 과제입니다.</p>
+                      </div>
+                    </div>
+
+                    {/* 고객 기본 정보 & Preference Section */}
+                    <div className="briefing-section">
+                      <h3 className="briefing-section-title">고객 기본 정보 & Preference</h3>
+                      <div className="briefing-section-card">
+                        <ul className="briefing-list">
+                          <li>고객명/등급: {selectedBriefing ? getCustomerName(selectedBriefing.content) : "김민준"} 고객 (VIP)</li>
+                          <li>담당 PB: 김재욱 팀장</li>
+                          <li>음료/편의 선호도 (★필독):</li>
+                          <li className="indent">☕ 아이스 아메리카노(연하게) 선호.</li>
+                          <li className="indent">❌ 비타500 절대 금지 (과거 제공 시 특유의 약품 냄새와 단맛을 싫어한다고 명확히 기재됨. 웰컴 드링크 준비 시 주의).</li>
+                          <li className="indent">📰 대기 시간 발생 시 경제지(A일보) 제공 선호.</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* 자산 현황 & 최근 거래 내역 Section */}
+                    <div className="briefing-section">
+                      <h3 className="briefing-section-title">자산 현황 & 최근 거래 내역</h3>
+                      <div className="briefing-section-card">
+                        <ul className="briefing-list">
+                          <li>총 자산: 3억 2,000만 원 (전월 대비 ▼8%, 약 3,000만 원 감소)</li>
+                          <li>보유 상품 상세:</li>
+                          <li className="indent-2">정기예금: 2억 원 (금일 만기 도래)</li>
+                          <li className="indent-2">공모 펀드: 5,000만 원 (글로벌 기술주 중심)</li>
+                          <li className="indent-2">ISA: 3,000만 원</li>
+                          <li>최근 자금 흐름:</li>
+                          <li className="indent">2025.04.28 타행(신한은행)으로 3,000만 원 송금 확인 (이탈 자금 분석 필요).</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* 핵심 특이사항 & 상담 전 필수 체크 Section */}
+                    <div className="briefing-section">
+                      <h3 className="briefing-section-title">핵심 특이사항 & 상담 전 필수 체크</h3>
+                      <div className="briefing-section-card">
+                        <ul className="briefing-list">
+                          <li className="bullet-title">극도의 금리 민감 성향:</li>
+                          <li className="indent">지난주 경쟁사(국민·신한)의 우대금리 이벤트를 직접 언급하며 비교 문의한 이력 있음. 0.1%p 차이에도 민감하게 반응하는 스타일.</li>
+                          <li className="bullet-title">투자 성향 변화 조짐:</li>
+                          <li className="indent">2025.04.15 유선 상담 당시, 기존 보유 중인 해외 펀드의 변동성에 피로감을 토로하며 일부 환매 후 안정적인 채권형 자산이나 고금리 예금으로 갈아탈 의향을 비춤.</li>
+                          <li className="bullet-title">커뮤니케이션 스타일:</li>
+                          <li className="indent">결론부터 듣는 것을 좋아하는 두괄식 성향. 복잡한 상품 구조 설명보다는 ‘세후 실질 수익률’과 ‘리스크 방어력’을 숫자로 정확히 제시할 때 만족도가 높음.</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             {/* Resizer handle */}
