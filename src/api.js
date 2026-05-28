@@ -210,6 +210,7 @@ export const api = {
 
   // 8. 관리자 (Admin) API
   admin: {
+    getSystemDashboard: () => api.get("/admin/system/dashboard"),
     getSystemLogs: (filter = "all") => {
       const query = filter && filter !== "all" ? `?filter=${encodeURIComponent(filter)}` : "";
       return api.get(`/admin/system/dashboard/logs${query}`);

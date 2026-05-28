@@ -1,70 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { LogOut } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { LogOut, Activity, Database, Cpu, Brain, CheckCircle, AlertTriangle, ShieldAlert } from "lucide-react";
 import { api } from "../../api";
 import "./Admin.css"; 
-
-const tokenData = [
-  { time: "00시", value: 50 },
-  { time: "03시", value: 30 },
-  { time: "06시", value: 60 },
-  { time: "09시", value: 35 },
-  { time: "12시", value: 55 },
-  { time: "15시", value: 20 },
-  { time: "18시", value: 40 },
-  { time: "21시", value: 70 },
-];
-
-const statsData = {
-  '전체': {
-    bars: [
-      { name: '고객관리', count: '10,887회', pct: '45%', width: '85%', color: '#22c55e' },
-      { name: '트렌드 아카이브', count: '12,341회', pct: '35%', width: '75%', color: '#6366f1' },
-      { name: '캘린더', count: '8,254회', pct: '20%', width: '40%', color: '#f97316' }
-    ],
-    pie: [
-      { name: "고객 관리", value: 45, color: "#22c55e" },
-      { name: "트렌드 아카이브", value: 35, color: "#6366f1" },
-      { name: "캘린더", value: 20, color: "#f97316" }
-    ]
-  },
-  '이번 주': {
-    bars: [
-      { name: '고객관리', count: '1,887회', pct: '50%', width: '80%', color: '#22c55e' },
-      { name: '트렌드 아카이브', count: '2,341회', pct: '30%', width: '60%', color: '#6366f1' },
-      { name: '캘린더', count: '1,254회', pct: '20%', width: '35%', color: '#f97316' }
-    ],
-    pie: [
-      { name: "고객 관리", value: 50, color: "#22c55e" },
-      { name: "트렌드 아카이브", value: 30, color: "#6366f1" },
-      { name: "캘린더", value: 20, color: "#f97316" }
-    ]
-  },
-  '이번 달': {
-    bars: [
-      { name: '고객관리', count: '4,887회', pct: '45%', width: '75%', color: '#22c55e' },
-      { name: '트렌드 아카이브', count: '5,341회', pct: '35%', width: '85%', color: '#6366f1' },
-      { name: '캘린더', count: '3,254회', pct: '20%', width: '50%', color: '#f97316' }
-    ],
-    pie: [
-      { name: "고객 관리", value: 45, color: "#22c55e" },
-      { name: "트렌드 아카이브", value: 35, color: "#6366f1" },
-      { name: "캘린더", value: 20, color: "#f97316" }
-    ]
-  }
-};
-
-const transactionLogsData = [
-  { time: "09:14:22", api: "/api/ai/chat/completions", ms: "1,243 ms", status: "200" },
-  { time: "09:14:22", api: "/api/archive/economic-indicators", ms: "88 ms", status: "200" },
-  { time: "09:14:22", api: "/api/archive/news?date=2026-06-07", ms: "124 ms", status: "200" },
-  { time: "09:14:22", api: "/api/ai/chat/completions", ms: "5,003 ms", status: "500" },
-  { time: "09:14:22", api: "/api/report/generate", ms: "2,310 ms", status: "200" },
-  { time: "09:14:22", api: "/api/report/generate", ms: "132 ms", status: "200" },
-  { time: "09:14:22", api: "/api/market/rates?type=exchange", ms: "54 ms", status: "200" },
-  { time: "09:14:22", api: "/api/ai/chat/completions", ms: "988 ms", status: "200" }
-];
 
 const AdminTabs = () => {
   const location = useLocation();
@@ -116,214 +55,445 @@ const AdminHeader = ({ title }) => {
 };
 
 export default function AdminSystemDashboard1() {
-  const [filter, setFilter] = useState('이번 주');
-  const [logFilter, setLogFilter] = useState('전체');
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchLogs(silent = false) {
+    document.documentElement.style.backgroundColor = "#f3f4f6";
+    document.body.style.backgroundColor = "#f3f4f6";
+    const rootEl = document.getElementById("root");
+    if (rootEl) {
+      rootEl.style.backgroundColor = "#f3f4f6";
+    }
+    return () => {
+      document.documentElement.style.backgroundColor = "";
+      document.body.style.backgroundColor = "";
+      if (rootEl) {
+        rootEl.style.backgroundColor = "";
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    async function fetchDashboardData(silent = false) {
       if (!silent) setLoading(true);
       try {
-        const data = await api.admin.getSystemLogs(logFilter === "오류만" ? "오류만" : "all");
-        if (data && data.logs) {
-          setLogs(data.logs);
+        const result = await api.admin.getSystemDashboard();
+        if (result) {
+          setData(result);
+          setError(null);
         }
       } catch (err) {
-        console.error("Failed to fetch logs:", err);
+        console.error("Failed to fetch system dashboard:", err);
+        setError("데이터 연동 실패");
       } finally {
         if (!silent) setLoading(false);
       }
     }
-    
-    fetchLogs();
-    
-    const intervalId = setInterval(() => {
-      fetchLogs(true);
-    }, 5000);
-    
-    return () => clearInterval(intervalId);
-  }, [logFilter]);
 
-  const currentData = statsData[filter];
-  const filteredLogs = logs;
+    fetchDashboardData();
+
+    const intervalId = setInterval(() => {
+      fetchDashboardData(true);
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // 1. API 호출 자체가 거절당했거나 오프라인일 때 전용 커넥션 오프라인 에러 뷰 렌더링
+  if (error && !data) {
+    return (
+      <div className="admin-container">
+        <AdminHeader title="관리자 - 시스템 대시보드" />
+        <div className="admin-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            padding: '48px 40px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+            textAlign: 'center',
+            maxWidth: '520px',
+            border: '1px solid #fee2e2'
+          }}>
+            <ShieldAlert size={64} style={{ color: '#ef4444', margin: '0 auto 16px' }} />
+            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#1f2937', marginBottom: '12px' }}>대시보드 데이터 연동 실패</h2>
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6', marginBottom: '28px' }}>
+              백엔드 서버 또는 대시보드 API와의 연결에 실패했습니다. <br />
+              로그인 세션 만료 여부 및 슈퍼 어드민(<code style={{ background: '#f3f4f6', padding: '2px 6px', borderRadius: '4px', color: '#dc2626', fontWeight: '600' }}>admin1</code>) 계정의 권한 점검이 필요합니다.
+            </p>
+            <button 
+              onClick={() => { setError(null); setLoading(true); window.location.reload(); }}
+              style={{
+                background: '#0284c7',
+                color: '#fff',
+                border: 'none',
+                padding: '12px 28px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                boxShadow: '0 2px 4px rgba(2, 132, 199, 0.2)'
+              }}
+              onMouseEnter={(e) => e.target.style.background = '#0369a1'}
+              onMouseLeave={(e) => e.target.style.background = '#0284c7'}
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading && !data) {
+    return (
+      <div className="admin-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div style={{ textAlign: 'center', color: '#6b7280' }}>
+          <Activity className="animate-spin" size={48} style={{ margin: '0 auto 16px', color: '#0284c7' }} />
+          <h3>시스템 대시보드를 로딩 중입니다...</h3>
+          <p style={{ fontSize: '13px', marginTop: '8px' }}>엘라스틱서치 인덱스 자동 적재 및 실시간 로그 수집 점검 중</p>
+        </div>
+      </div>
+    );
+  }
+
+  const dashboard = data;
+  const isESOffline = dashboard.es_status === "오류";
 
   return (
     <div className="admin-container">
       <AdminHeader title="관리자 - 시스템 대시보드" />
 
-      <div className="admin-content">
-        {/* Stat Cards */}
-        <div className="admin-stats-grid">
-          <div className="admin-stat-card">
-            <div className="admin-stat-title">오늘 AI 토큰</div>
-            <div className="admin-stat-value">1.24 M</div>
-            <div className="admin-stat-sub">전일 + 12%</div>
-          </div>
-          <div className="admin-stat-card">
-            <div className="admin-stat-title">API 호출 수</div>
-            <div className="admin-stat-value">3,847</div>
-            <div className="admin-stat-sub">전일 + 5%</div>
-          </div>
-          <div className="admin-stat-card">
-            <div className="admin-stat-title">평균 응답 시간</div>
-            <div className="admin-stat-value">1.3s</div>
-            <div className="admin-stat-sub positive">+ 0.2s 증가</div>
-          </div>
-          <div className="admin-stat-card">
-            <div className="admin-stat-title">오류율</div>
-            <div className="admin-stat-value">0.8%</div>
-            <div className="admin-stat-sub">목표 2% 이하</div>
-          </div>
-        </div>
-
-        {/* Charts Row */}
-        <div className="admin-charts-row">
-          <div className="admin-chart-card">
-            <h3 className="admin-chart-title">시간대별 토큰 사용</h3>
-            <div className="admin-chart-body" style={{ height: "250px" }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={tokenData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="time" axisLine={false} tickLine={false} />
-                  <YAxis axisLine={false} tickLine={false} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="value" stroke="#a855f7" strokeWidth={3} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className="admin-chart-card">
-            <h3 className="admin-chart-title">접속 히트맵</h3>
-            <div className="admin-heatmap">
-              {/* Mock Heatmap */}
-              <div className="heatmap-grid">
-                {Array.from({ length: 24 }).map((_, i) => (
-                  <div key={i} className={`heatmap-cell ${i >= 9 && i <= 18 ? 'high' : 'low'}`} />
-                ))}
-              </div>
-              <div className="heatmap-labels">
-                <span>00시</span>
-                <span>06시</span>
-                <span>12시</span>
-                <span>18시</span>
-                <span>23시</span>
-              </div>
-              <div className="heatmap-legend">
-                <span>낮음</span>
-                <div className="legend-cells">
-                  <div className="heatmap-cell low"></div>
-                  <div className="heatmap-cell med"></div>
-                  <div className="heatmap-cell high"></div>
-                  <div className="heatmap-cell highest"></div>
-                </div>
-                <span>높음</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="admin-bottom-card">
-          <div className="admin-bars-section">
-            {currentData.bars.map((bar, i) => (
-              <div className="admin-bar-item" key={i}>
-                <div className="bar-label">
-                  <span>{bar.name}</span>
-                  <span>{bar.count} <small>{bar.pct}</small></span>
-                </div>
-                <div className="bar-track">
-                  <div className="bar-fill" style={{ width: bar.width, backgroundColor: bar.color }}></div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="admin-pie-section">
-            <div className="pie-filters">
-              {['전체', '이번 주', '이번 달'].map(f => (
-                <button 
-                  key={f} 
-                  className={filter === f ? 'active' : ''} 
-                  onClick={() => setFilter(f)}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-            <div className="pie-container" style={{ height: "200px", width: "100%" }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={currentData.pie}
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {currentData.pie.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="pie-legend">
-              {currentData.pie.map((item, i) => (
-                <span className="legend-item" key={i}>
-                  <span className="dot" style={{ backgroundColor: item.color }}></span> 
-                  {item.name}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Transaction Log Section */}
-        <div className="transaction-log-card">
-          <div className="log-header">
-            <h3 className="admin-chart-title" style={{ margin: 0 }}>트랜잭션 로그 (DB 적재)</h3>
-            <div className="log-filters">
-              <button 
-                className={logFilter === '전체' ? 'active all' : ''}
-                onClick={() => setLogFilter('전체')}
-              >전체</button>
-              <button 
-                className={logFilter === '오류만' ? 'active error' : ''}
-                onClick={() => setLogFilter('오류만')}
-              >오류만</button>
-            </div>
-          </div>
+      <div className="admin-content" style={{ gap: '28px' }}>
+        
+        {/* ========================================================
+            1. TOP STATS CARDS
+           ======================================================== */}
+        <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
           
-          <table className="log-table">
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
-                    로그를 불러오는 중입니다...
-                  </td>
-                </tr>
-              ) : filteredLogs.length === 0 ? (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
-                    로그 내역이 없습니다.
-                  </td>
-                </tr>
+          {/* Card 1: 서버 상태 */}
+          <div className="admin-stat-card" style={{ position: 'relative', overflow: 'hidden', padding: '24px 20px', borderLeft: `4px solid ${isESOffline ? '#f59e0b' : '#10b981'}` }}>
+            <div className="admin-stat-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+              <Activity size={16} style={{ color: isESOffline ? '#f59e0b' : '#10b981' }} />
+              서버 상태
+            </div>
+            <div className="admin-stat-value" style={{ 
+              color: isESOffline ? "#f59e0b" : "#10b981",
+              fontSize: '36px',
+              fontWeight: '800',
+              marginTop: '12px',
+              textShadow: isESOffline ? '0 0 10px rgba(245, 158, 11, 0.1)' : '0 0 10px rgba(16, 185, 129, 0.1)'
+            }}>
+              {isESOffline ? "주의" : "정상"}
+            </div>
+            <div className="admin-stat-sub" style={{ marginTop: '8px', fontSize: '13px', color: '#6b7280' }}>
+              {isESOffline ? "Elasticsearch 서버 연결 해제" : "모든 서버 정상 운영 중"}
+            </div>
+          </div>
+
+          {/* Card 2: API 응답 속도 */}
+          <div className="admin-stat-card" style={{ padding: '24px 20px', borderLeft: `4px solid ${isESOffline ? '#9ca3af' : '#3b82f6'}` }}>
+            <div className="admin-stat-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+              <Cpu size={16} style={{ color: isESOffline ? '#9ca3af' : '#3b82f6' }} />
+              API 응답 속도
+            </div>
+            <div className="admin-stat-value" style={{ fontSize: isESOffline ? '28px' : '36px', fontWeight: '800', marginTop: isESOffline ? '20px' : '12px', color: isESOffline ? '#ef4444' : '#1f2937' }}>
+              {isESOffline ? "연결 끊김" : `${dashboard.api_response_speed} ms`}
+            </div>
+            <div className="admin-stat-sub" style={{ marginTop: '8px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {isESOffline ? (
+                <span style={{ color: '#ef4444' }}>실시간 집계 불가</span>
               ) : (
-                filteredLogs.map((log, i) => (
-                  <tr key={i}>
-                    <td className="log-time">{log.time}</td>
-                    <td className="log-api">{log.api}</td>
-                    <td className="log-ms">{log.ms}</td>
-                    <td className={`log-status ${log.status === '200' ? 'success' : 'error'}`}>{log.status}</td>
-                  </tr>
-                ))
+                <>
+                  <span style={{ color: '#10b981', fontWeight: '600' }}>- 5%</span> 
+                  <span style={{ color: '#6b7280' }}>(1시간 전)</span>
+                </>
               )}
-            </tbody>
-          </table>
+            </div>
+          </div>
+
+          {/* Card 3: 에러율 */}
+          <div className="admin-stat-card" style={{ padding: '24px 20px', borderLeft: `4px solid ${isESOffline ? '#9ca3af' : '#f43f5e'}` }}>
+            <div className="admin-stat-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+              <ShieldAlert size={16} style={{ color: isESOffline ? '#9ca3af' : '#f43f5e' }} />
+              에러율
+            </div>
+            <div className="admin-stat-value" style={{ fontSize: isESOffline ? '28px' : '36px', fontWeight: '800', marginTop: isESOffline ? '20px' : '12px', color: isESOffline ? '#ef4444' : '#1f2937' }}>
+              {isESOffline ? "연결 끊김" : `${dashboard.error_rate}%`}
+            </div>
+            <div className="admin-stat-sub" style={{ marginTop: '8px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {isESOffline ? (
+                <span style={{ color: '#ef4444' }}>실시간 집계 불가</span>
+              ) : (
+                <span style={{ color: '#f43f5e', fontWeight: '600' }}>+ 0.2s%</span>
+              )}
+            </div>
+          </div>
+
+          {/* Card 4: DB / Elasticsearch / AI 서비스 통합 상태 */}
+          <div className="admin-stat-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              
+              {/* DB 상태 */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', fontWeight: '500', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Database size={14} style={{ color: '#6b7280' }} />
+                  DB 상태
+                </span>
+                <span style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '700', 
+                  color: dashboard.db_status === "정상" ? "#10b981" : "#ef4444",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  {dashboard.db_status === "정상" ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+                  {dashboard.db_status}
+                </span>
+              </div>
+
+              {/* Elasticsearch 상태 */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', fontWeight: '500', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Activity size={14} style={{ color: '#6b7280' }} />
+                  Elasticsearch 상태
+                </span>
+                <span style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '700', 
+                  color: isESOffline ? "#ef4444" : "#10b981",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  {isESOffline ? <AlertTriangle size={14} /> : <CheckCircle size={14} />}
+                  {isESOffline ? "오류" : "정상"}
+                </span>
+              </div>
+
+              {/* AI 서비스 상태 */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', fontWeight: '500', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Brain size={14} style={{ color: '#6b7280' }} />
+                  AI 서비스 상태
+                </span>
+                <span style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '700', 
+                  color: dashboard.ai_status === "정상" ? "#10b981" : "#ef4444",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  {dashboard.ai_status === "정상" ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+                  {dashboard.ai_status}
+                </span>
+              </div>
+
+            </div>
+          </div>
+
         </div>
+
+        {/* ========================================================
+            2. CHARTS SECTION (3 Columns Grid)
+           ======================================================== */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+          
+          {/* Chart 1: 요청 수 */}
+          <div className="admin-chart-card" style={{ padding: '20px', position: 'relative' }}>
+            <h3 className="admin-chart-title" style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>요청 수</h3>
+            {isESOffline ? (
+              <div style={{ height: "180px", display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb', textAlign: 'center', padding: '10px' }}>
+                <ShieldAlert size={28} style={{ color: '#f59e0b', marginBottom: '8px' }} />
+                <span style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Elasticsearch 연결 오프라인</span>
+                <span style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>실시간 통계 집계 불가</span>
+              </div>
+            ) : (
+              <div style={{ height: "180px", width: "100%" }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={dashboard.requests_chart}>
+                    <defs>
+                      <linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} />
+                    <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: 12 }} />
+                    <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorRequests)" dot={{ r: 3, strokeWidth: 1 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+
+          {/* Chart 2: 응답시간(ms) */}
+          <div className="admin-chart-card" style={{ padding: '20px', position: 'relative' }}>
+            <h3 className="admin-chart-title" style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>응답시간(ms)</h3>
+            {isESOffline ? (
+              <div style={{ height: "180px", display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb', textAlign: 'center', padding: '10px' }}>
+                <ShieldAlert size={28} style={{ color: '#f59e0b', marginBottom: '8px' }} />
+                <span style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Elasticsearch 연결 오프라인</span>
+                <span style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>실시간 지연 속도 연산 불가</span>
+              </div>
+            ) : (
+              <div style={{ height: "180px", width: "100%" }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={dashboard.latency_chart}>
+                    <defs>
+                      <linearGradient id="colorLatency" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#a855f7" stopOpacity={0.0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} />
+                    <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: 12 }} />
+                    <Area type="monotone" dataKey="value" stroke="#a855f7" strokeWidth={3} fillOpacity={1} fill="url(#colorLatency)" dot={{ r: 3, strokeWidth: 1 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+
+          {/* Chart 3: 에러율 (%) */}
+          <div className="admin-chart-card" style={{ padding: '20px', position: 'relative' }}>
+            <h3 className="admin-chart-title" style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>에러율 (%)</h3>
+            {isESOffline ? (
+              <div style={{ height: "180px", display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb', textAlign: 'center', padding: '10px' }}>
+                <ShieldAlert size={28} style={{ color: '#f59e0b', marginBottom: '8px' }} />
+                <span style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563' }}>Elasticsearch 연결 오프라인</span>
+                <span style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>실시간 에러율 집계 불가</span>
+              </div>
+            ) : (
+              <div style={{ height: "180px", width: "100%" }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={dashboard.error_chart}>
+                    <defs>
+                      <linearGradient id="colorError" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} />
+                    <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: 12 }} />
+                    <Area type="monotone" dataKey="value" stroke="#f43f5e" strokeWidth={3} fillOpacity={1} fill="url(#colorError)" dot={{ r: 3, strokeWidth: 1 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+
+        </div>
+
+        {/* ========================================================
+            3. BOTTOM TABLES SECTION (Recent Errors & ML Metrics)
+           ======================================================== */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'stretch' }}>
+          
+          {/* Left Table: 최근 에러 로그 */}
+          <div className="admin-chart-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '20px', position: 'relative' }}>
+            <h3 className="admin-chart-title" style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>최근 에러 로그</h3>
+            {isESOffline ? (
+              <div style={{ flex: 1, minHeight: '200px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px dashed #e5e7eb', textAlign: 'center', padding: '10px' }}>
+                <ShieldAlert size={36} style={{ color: '#f59e0b', marginBottom: '12px' }} />
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563' }}>Elasticsearch 연결 오프라인</span>
+                <span style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>실시간 트랜잭션 에러 로그 조회 불가</span>
+              </div>
+            ) : (
+              <div className="admin-scrollable-container" style={{ flex: 1 }}>
+                <table className="admin-list-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#f9fafb' }}>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>시간</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>서비스</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>에러 내용</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dashboard.recent_errors.map((log, index) => (
+                      <tr key={index} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background-color 0.2s' }}>
+                        <td style={{ padding: '12px 14px', fontSize: '13px', color: '#6b7280' }}>{log.time}</td>
+                        <td style={{ padding: '12px 14px', fontSize: '13px', fontWeight: '500', color: '#1f2937' }}>
+                          <span style={{ 
+                            padding: '3px 8px', 
+                            borderRadius: '4px', 
+                            fontSize: '11px', 
+                            fontWeight: '600',
+                            backgroundColor: log.service === 'AI Service' ? '#f5f3ff' : (log.service === 'API Gateway' ? '#eff6ff' : (log.service === 'Elasticsearch' ? '#ecfdf5' : '#fff7ed')),
+                            color: log.service === 'AI Service' ? '#7c3aed' : (log.service === 'API Gateway' ? '#2563eb' : (log.service === 'Elasticsearch' ? '#059669' : '#d97706'))
+                          }}>
+                            {log.service}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px 14px', fontSize: '13px', color: '#dc2626', fontWeight: '500', maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={log.error_detail}>
+                          {log.error_detail}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Right Table: ML 모델 성능지표 (항상 정상 로드) */}
+          <div className="admin-chart-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '20px' }}>
+            <h3 className="admin-chart-title" style={{ fontSize: '15px', fontWeight: '600', marginBottom: '16px' }}>ML 모델 성능지표</h3>
+            <div style={{ flex: 1, overflowX: 'auto' }}>
+              <table className="admin-list-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: '#f9fafb' }}>
+                    <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>서비스</th>
+                    <th colSpan={4} style={{ padding: '10px 14px', textAlign: 'center', fontSize: '13px', fontWeight: '600', color: '#4b5563', borderBottom: '1px solid #e5e7eb' }}>성능 지표</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dashboard.ml_metrics.map((model, index) => {
+                    return (
+                      <React.Fragment key={index}>
+                        <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+                          <td rowSpan={2} style={{ 
+                            padding: '20px 14px', 
+                            fontSize: '14px', 
+                            fontWeight: '700', 
+                            color: '#1f2937', 
+                            verticalAlign: 'middle',
+                            borderBottom: '2px solid #e5e7eb',
+                            backgroundColor: '#fff'
+                          }}>
+                            {model.name}
+                          </td>
+                          <td style={{ padding: '6px 8px', fontSize: '11px', fontWeight: '600', color: '#6b7280', textAlign: 'center', backgroundColor: '#f9fafb' }}>{model.metric1_name}</td>
+                          <td style={{ padding: '6px 8px', fontSize: '11px', fontWeight: '600', color: '#6b7280', textAlign: 'center', backgroundColor: '#f9fafb' }}>{model.metric2_name}</td>
+                          <td style={{ padding: '6px 8px', fontSize: '11px', fontWeight: '600', color: '#6b7280', textAlign: 'center', backgroundColor: '#f9fafb' }}>{model.metric3_name}</td>
+                          <td style={{ padding: '6px 8px', fontSize: '11px', fontWeight: '600', color: '#6b7280', textAlign: 'center', backgroundColor: '#f9fafb' }}>{model.metric4_name}</td>
+                        </tr>
+                        <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
+                          <td style={{ padding: '12px 8px', fontSize: '13px', fontWeight: '700', color: '#059669', textAlign: 'center' }}>{model.metric1_val}</td>
+                          <td style={{ padding: '12px 8px', fontSize: '13px', fontWeight: '700', color: '#4f46e5', textAlign: 'center' }}>{model.metric2_val}</td>
+                          <td style={{ padding: '12px 8px', fontSize: '13px', fontWeight: '700', color: '#3b82f6', textAlign: 'center' }}>{model.metric3_val}</td>
+                          <td style={{ padding: '12px 8px', fontSize: '13px', fontWeight: '700', color: '#10b981', textAlign: 'center' }}>{model.metric4_val}</td>
+                        </tr>
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   );
