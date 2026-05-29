@@ -53,6 +53,15 @@ export default function TrendArchive() {
   const newsItems = dashboardData?.news || { economy: [], politics: [], itScience: [], it: [] };
   const indicators = dashboardData?.indicators || null;
 
+  const goldProbRise = indicators?.gold?.probRise ?? null;
+  const goldProbFall = indicators?.gold?.probFall ?? null;
+  const goldPredText = indicators?.gold?.predictionText ?? "예측 데이터 없음";
+
+  const brProbCut = indicators?.interestRate?.probCut ?? null;
+  const brProbFreeze = indicators?.interestRate?.probFreeze ?? null;
+  const brProbHike = indicators?.interestRate?.probHike ?? null;
+  const brPredText = indicators?.interestRate?.predictionText ?? "예측 데이터 없음";
+
   return (
     <div className="trend-container">
       {/* Sidebar */}
@@ -139,22 +148,26 @@ export default function TrendArchive() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
                   <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>상승</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
-                    <div style={{ width: '73%', height: '100%', background: '#ef4444', borderRadius: 3 }}></div>
+                    <div style={{ width: `${goldProbRise ?? 0}%`, height: '100%', background: '#ef4444', borderRadius: 3 }}></div>
                   </div>
-                  <span style={{ fontWeight: 700, color: '#ef4444', width: 28, textAlign: 'right' }}>73%</span>
+                  <span style={{ fontWeight: 700, color: '#ef4444', width: 28, textAlign: 'right' }}>
+                    {goldProbRise !== null && goldProbRise !== undefined ? `${goldProbRise}%` : "-"}
+                  </span>
                 </div>
                 {/* 하락 */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
                   <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>하락</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
-                    <div style={{ width: '27%', height: '100%', background: '#3b82f6', borderRadius: 3 }}></div>
+                    <div style={{ width: `${goldProbFall ?? 0}%`, height: '100%', background: '#3b82f6', borderRadius: 3 }}></div>
                   </div>
-                  <span style={{ fontWeight: 700, color: '#3b82f6', width: 28, textAlign: 'right' }}>27%</span>
+                  <span style={{ fontWeight: 700, color: '#3b82f6', width: 28, textAlign: 'right' }}>
+                    {goldProbFall !== null && goldProbFall !== undefined ? `${goldProbFall}%` : "-"}
+                  </span>
                 </div>
               </div>
               
               <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--trend-text-main)', borderTop: '1px solid var(--trend-border)', paddingTop: 8, marginTop: 'auto' }}>
-                예측: <span style={{ color: '#ef4444' }}>상승 가능성 높음</span>
+                예측: <span style={{ color: goldPredText.includes('동률') ? '#94a3b8' : goldPredText.includes('상승') ? '#ef4444' : goldPredText.includes('하락') ? '#3b82f6' : '#94a3b8' }}>{goldPredText}</span>
               </div>
             </div>
 
@@ -218,30 +231,36 @@ export default function TrendArchive() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
                   <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>인하</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
-                    <div style={{ width: '45%', height: '100%', background: '#3b82f6', borderRadius: 3 }}></div>
+                    <div style={{ width: `${brProbCut ?? 0}%`, height: '100%', background: '#3b82f6', borderRadius: 3 }}></div>
                   </div>
-                  <span style={{ fontWeight: 700, color: '#3b82f6', width: 28, textAlign: 'right' }}>45%</span>
+                  <span style={{ fontWeight: 700, color: '#3b82f6', width: 28, textAlign: 'right' }}>
+                    {brProbCut !== null && brProbCut !== undefined ? `${brProbCut}%` : "-"}
+                  </span>
                 </div>
                 {/* 동결 */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
                   <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>동결</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
-                    <div style={{ width: '38%', height: '100%', background: '#94a3b8', borderRadius: 3 }}></div>
+                    <div style={{ width: `${brProbFreeze ?? 0}%`, height: '100%', background: '#94a3b8', borderRadius: 3 }}></div>
                   </div>
-                  <span style={{ fontWeight: 700, color: 'var(--trend-text-muted)', width: 28, textAlign: 'right' }}>38%</span>
+                  <span style={{ fontWeight: 700, color: 'var(--trend-text-muted)', width: 28, textAlign: 'right' }}>
+                    {brProbFreeze !== null && brProbFreeze !== undefined ? `${brProbFreeze}%` : "-"}
+                  </span>
                 </div>
                 {/* 인상 */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
                   <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>인상</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
-                    <div style={{ width: '17%', height: '100%', background: '#ef4444', borderRadius: 3 }}></div>
+                    <div style={{ width: `${brProbHike ?? 0}%`, height: '100%', background: '#ef4444', borderRadius: 3 }}></div>
                   </div>
-                  <span style={{ fontWeight: 700, color: '#ef4444', width: 28, textAlign: 'right' }}>17%</span>
+                  <span style={{ fontWeight: 700, color: '#ef4444', width: 28, textAlign: 'right' }}>
+                    {brProbHike !== null && brProbHike !== undefined ? `${brProbHike}%` : "-"}
+                  </span>
                 </div>
               </div>
               
               <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--trend-text-main)', borderTop: '1px solid var(--trend-border)', paddingTop: 8, marginTop: 'auto' }}>
-                예측: <span style={{ color: '#3b82f6' }}>인하 가능성 높음</span>
+                예측: <span style={{ color: brPredText.includes('인상') ? '#ef4444' : brPredText.includes('인하') ? '#3b82f6' : '#94a3b8' }}>{brPredText}</span>
               </div>
             </div>
           </div>
