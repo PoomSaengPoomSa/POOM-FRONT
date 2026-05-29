@@ -14,7 +14,7 @@ const AdminTabs = () => {
         to="/admin-permission-settings"
         className={`admin-tab ${path === '/admin-permission-settings' ? 'active' : ''}`}
       >
-        권한 설정
+        인수인계 설정
       </Link>
       <Link
         to="/admin-system-dashboard"
@@ -330,7 +330,7 @@ export default function AdminPermissionSettings() {
 
   return (
     <div className="admin-container">
-      <AdminHeader title="관리자 - 권한 설정" />
+      <AdminHeader title="관리자 - 인수인계 설정" />
 
       <div className="permission-layout">
         <div className="permission-main">

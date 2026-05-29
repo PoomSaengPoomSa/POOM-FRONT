@@ -15,7 +15,7 @@ const AdminTabs = () => {
         to="/admin-permission-settings"
         className={`admin-tab ${path === '/admin-permission-settings' ? 'active' : ''}`}
       >
-        권한 설정
+        인수인계 설정
       </Link>
       <Link
         to="/admin-system-dashboard"
