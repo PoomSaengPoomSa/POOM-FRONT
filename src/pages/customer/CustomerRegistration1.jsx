@@ -222,15 +222,13 @@ export default function CustomerRegistration1() {
       } else {
         setTodayCustomersList(mapped);
       }
-
-      // 탭 전환 및 최초 진입 시, 사용자의 도입부 화면 요구사항에 맞추어 선택된 고객을 비워 둡니다.
-      setSelectedCustomer(null);
     } catch (error) {
       console.error("고객 목록 조회 실패:", error);
     }
   };
 
   useEffect(() => {
+    setSelectedCustomer(null);
     fetchCustomers();
   }, [activeListTab]);
 
@@ -347,23 +345,31 @@ export default function CustomerRegistration1() {
           gender: formData.gender,
         });
         setEditModalData(null);
+        // 갱신을 수행하기 전에, 목록 업데이트가 selectedCustomer를 지우지 않도록 fetchCustomers를 비동기 호출하되
+        // 로컬 상태 selectedCustomer의 id 값을 안전하게 캡처해 둡니다.
+        const currentId = editModalData.id;
         await fetchCustomers();
         
         // 상세 데이터가 현재 보고있는 고객이면 상세도 다시 로드하여 즉시 UI 반영
-        if (selectedCustomer && selectedCustomer.id === editModalData.id) {
-          const detail = await api.customer.getDetail(selectedCustomer.id);
+        if (selectedCustomer && selectedCustomer.id === currentId) {
+          const detail = await api.customer.getDetail(currentId);
           setFullCustomerDetail(detail);
           
           const updatedColor = formData.gender === "F" ? "pink" : "blue";
 
-          setSelectedCustomer(prev => ({
-            ...prev,
-            name: formData.name,
-            phone: formData.phone,
-            email: formData.email,
-            gender: formData.gender,
-            color: updatedColor
-          }));
+          setSelectedCustomer(prev => {
+            // prev가 null이거나 id가 유실되었을 경우를 대비해 캡처된 currentId를 확실히 주입합니다.
+            const base = prev || {};
+            return {
+              ...base,
+              id: currentId,
+              name: formData.name,
+              phone: formData.phone,
+              email: formData.email,
+              gender: formData.gender,
+              color: updatedColor
+            };
+          });
         }
       } else {
         // 신규 등록 모드
