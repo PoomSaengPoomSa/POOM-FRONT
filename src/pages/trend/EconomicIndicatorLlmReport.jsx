@@ -29,12 +29,24 @@ export default function EconomicIndicatorLlmReport() {
     fromObj.setDate(today.getDate() - 30);
     const from = fromObj.toISOString().split('T')[0];
 
-    Promise.all([
-      api.trend.getIndicatorLatest(type),
-      api.trend.getIndicatorHistory(type, { from, to, granularity: "daily" }),
-      api.trend.getIndicatorContribution(type),
-      api.trend.getLatestReport(type)
-    ])
+    const fetchLatest = api.trend.getIndicatorLatest(type).catch(err => {
+      console.error("Failed to fetch latest indicator:", err);
+      return null;
+    });
+    const fetchHistory = api.trend.getIndicatorHistory(type, { from, to, granularity: "daily" }).catch(err => {
+      console.error("Failed to fetch history:", err);
+      return null;
+    });
+    const fetchContribution = api.trend.getIndicatorContribution(type).catch(err => {
+      console.error("Failed to fetch contribution:", err);
+      return null;
+    });
+    const fetchReport = api.trend.getLatestReport(type).catch(err => {
+      console.error("Failed to fetch latest report:", err);
+      return null;
+    });
+
+    Promise.all([fetchLatest, fetchHistory, fetchContribution, fetchReport])
       .then(([latest, history, contribution, report]) => {
         setLatestData(latest);
         setHistoryData(history);
@@ -43,7 +55,7 @@ export default function EconomicIndicatorLlmReport() {
         setIsLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch indicator data from backend:", err);
+        console.error("Critical error inside LLM report data aggregation:", err);
         setIsLoading(false);
       });
   }, [selectedTab]);

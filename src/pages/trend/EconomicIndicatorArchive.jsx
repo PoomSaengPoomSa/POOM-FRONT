@@ -18,6 +18,15 @@ export default function EconomicIndicatorArchive() {
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const goldProbRise = latestData?.tomorrow?.probRise ?? 0;
+  const goldProbFall = latestData?.tomorrow?.probFall ?? 0;
+  const goldPredText = latestData?.tomorrow?.predictionText ?? "예측 데이터 없음";
+
+  const brProbCut = latestData?.tomorrow?.probCut ?? 0;
+  const brProbFreeze = latestData?.tomorrow?.probFreeze ?? 0;
+  const brProbHike = latestData?.tomorrow?.probHike ?? 0;
+  const brPredText = latestData?.tomorrow?.predictionText ?? "예측 데이터 없음";
+
   useEffect(() => {
     const type = tabToType[selectedTab];
     setIsLoading(true);
@@ -28,12 +37,24 @@ export default function EconomicIndicatorArchive() {
     fromObj.setDate(today.getDate() - 30);
     const from = fromObj.toISOString().split('T')[0];
 
-    Promise.all([
-      api.trend.getIndicatorLatest(type),
-      api.trend.getIndicatorHistory(type, { from, to, granularity: "daily" }),
-      api.trend.getIndicatorContribution(type),
-      api.trend.getLatestReport(type)
-    ])
+    const fetchLatest = api.trend.getIndicatorLatest(type).catch(err => {
+      console.error("Failed to fetch latest indicator from backend:", err);
+      return null;
+    });
+    const fetchHistory = api.trend.getIndicatorHistory(type, { from, to, granularity: "daily" }).catch(err => {
+      console.error("Failed to fetch history from backend:", err);
+      return null;
+    });
+    const fetchContribution = api.trend.getIndicatorContribution(type).catch(err => {
+      console.error("Failed to fetch contribution from backend:", err);
+      return null;
+    });
+    const fetchReport = api.trend.getLatestReport(type).catch(err => {
+      console.error("Failed to fetch latest report from backend:", err);
+      return null;
+    });
+
+    Promise.all([fetchLatest, fetchHistory, fetchContribution, fetchReport])
       .then(([latest, history, contribution, report]) => {
         setLatestData(latest);
         setHistoryData(history);
@@ -42,7 +63,7 @@ export default function EconomicIndicatorArchive() {
         setIsLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch indicator data from backend:", err);
+        console.error("Critical error inside trend API aggregation:", err);
         setIsLoading(false);
       });
   }, [selectedTab]);
@@ -148,8 +169,11 @@ export default function EconomicIndicatorArchive() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <span style={{ fontSize: 13, color: 'var(--trend-text-muted)', fontWeight: 600 }}>예측 결과</span>
-                    <span style={{ fontSize: 44, fontWeight: 800, color: '#ef4444', display: 'flex', alignItems: 'center', gap: 12 }}>
-                      상승 <span style={{ fontSize: 32, display: 'inline-block', transform: 'translateY(-2px)' }}>▲</span>
+                    <span style={{ fontSize: 44, fontWeight: 800, color: goldPredText.includes('동률') ? '#64748b' : goldPredText.includes('상승') ? '#ef4444' : goldPredText.includes('하락') ? '#3b82f6' : '#64748b', display: 'flex', alignItems: 'center', gap: 12 }}>
+                      {goldPredText.includes('동률') ? '동률' : goldPredText.includes('상승') ? '상승' : goldPredText.includes('하락') ? '하락' : '동률'}{' '}
+                      <span style={{ fontSize: 32, display: 'inline-block', transform: 'translateY(-2px)' }}>
+                        {goldPredText.includes('동률') ? '▬' : goldPredText.includes('상승') ? '▲' : goldPredText.includes('하락') ? '▼' : '▬'}
+                      </span>
                     </span>
                   </div>
                   <div style={{ flex: 1, marginLeft: 96, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -157,23 +181,23 @@ export default function EconomicIndicatorArchive() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                       <span style={{ width: 40, fontSize: 13, color: '#ef4444', fontWeight: 700 }}>상승</span>
                       <div style={{ flex: 1, height: 16, background: '#f1f5f9', borderRadius: 8, overflow: 'hidden' }}>
-                        <div style={{ width: '73%', height: '100%', background: '#ef4444', borderRadius: 8 }}></div>
+                        <div style={{ width: `${goldProbRise}%`, height: '100%', background: '#ef4444', borderRadius: 8 }}></div>
                       </div>
-                      <span style={{ width: 40, fontSize: 13, color: '#ef4444', fontWeight: 700, textAlign: 'right' }}>73%</span>
+                      <span style={{ width: 40, fontSize: 13, color: '#ef4444', fontWeight: 700, textAlign: 'right' }}>{goldProbRise}%</span>
                     </div>
                     {/* 하락 Bar */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                       <span style={{ width: 40, fontSize: 13, color: '#3b82f6', fontWeight: 700 }}>하락</span>
                       <div style={{ flex: 1, height: 16, background: '#f1f5f9', borderRadius: 8, overflow: 'hidden' }}>
-                        <div style={{ width: '27%', height: '100%', background: '#3b82f6', borderRadius: 8 }}></div>
+                        <div style={{ width: `${goldProbFall}%`, height: '100%', background: '#3b82f6', borderRadius: 8 }}></div>
                       </div>
-                      <span style={{ width: 40, fontSize: 13, color: '#3b82f6', fontWeight: 700, textAlign: 'right' }}>27%</span>
+                      <span style={{ width: 40, fontSize: 13, color: '#3b82f6', fontWeight: 700, textAlign: 'right' }}>{goldProbFall}%</span>
                     </div>
                   </div>
                 </div>
                 
                 <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--trend-text-main)', borderTop: '1px solid var(--trend-border)', paddingTop: 12, marginTop: 12 }}>
-                  예측: <span style={{ color: '#ef4444' }}>상승 가능성 높음</span>
+                  예측: <span style={{ color: goldPredText.includes('동률') ? '#64748b' : goldPredText.includes('상승') ? '#ef4444' : goldPredText.includes('하락') ? '#3b82f6' : '#64748b' }}>{goldPredText}</span>
                 </div>
               </div>
 
@@ -183,8 +207,10 @@ export default function EconomicIndicatorArchive() {
                 <div className="eco-box" style={{ flex: 1, background: 'rgba(255, 255, 255, 0.85)' }}>
                   <div className="eco-box-title" style={{ marginBottom: 20 }}>예측 기여도 (SHAP)</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {isLoading || !contributionData?.contributions ? (
+                    {isLoading ? (
                       <div style={{ color: 'var(--trend-text-muted)', fontSize: 13 }}>가중치 데이터를 가져오는 중...</div>
+                    ) : !contributionData?.contributions || contributionData.contributions.length === 0 ? (
+                      <div style={{ color: 'var(--trend-text-muted)', fontSize: 13 }}>기여도 데이터가 존재하지 않습니다.</div>
                     ) : (
                       contributionData.contributions.map((item, idx) => (
                         <div key={item.feature} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13 }}>
@@ -206,14 +232,14 @@ export default function EconomicIndicatorArchive() {
                 <div className="eco-box" style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'rgba(255, 255, 255, 0.85)' }}>
                   <div className="eco-box-title" style={{ marginBottom: 16 }}>LLM 분석 요약 보고서</div>
                   <div style={{ fontSize: 13, color: 'var(--trend-text-main)', lineHeight: 1.8, marginBottom: 24, marginTop: 4, flex: 1 }}>
-                    {isLoading || !reportData ? "분석 보고서를 불러오는 중입니다..." : reportData.summary}
+                    {isLoading ? "분석 보고서를 불러오는 중입니다..." : reportData?.summary || "분석 보고서가 존재하지 않습니다."}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', borderTop: '1px solid var(--trend-border)', paddingTop: 12 }}>
                     <Link to="/economic-indicator-archive-llm-report" style={{ textDecoration: 'none' }}>
                       <span style={{ color: 'var(--trend-primary-dark)', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>상세 리포트 보기 →</span>
                     </Link>
                     <div style={{ fontSize: 11, color: 'var(--trend-text-muted)' }}>
-                      {reportData ? `출처: ${reportData.dataSources.join(", ")}` : ""}
+                      {reportData?.dataSources ? `출처: ${reportData.dataSources.join(", ")}` : ""}
                     </div>
                   </div>
                 </div>
@@ -228,8 +254,11 @@ export default function EconomicIndicatorArchive() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <span style={{ fontSize: 13, color: 'var(--trend-text-muted)', fontWeight: 600 }}>예측 결과</span>
-                    <span style={{ fontSize: 44, fontWeight: 800, color: '#3b82f6', display: 'flex', alignItems: 'center', gap: 12 }}>
-                      인하 <span style={{ fontSize: 32, display: 'inline-block', transform: 'translateY(-2px)' }}>▼</span>
+                    <span style={{ fontSize: 44, fontWeight: 800, color: brPredText.includes('인상') ? '#ef4444' : brPredText.includes('인하') ? '#3b82f6' : '#64748b', display: 'flex', alignItems: 'center', gap: 12 }}>
+                      {brPredText.includes('인상') ? '인상' : brPredText.includes('인하') ? '인하' : '동결'}{' '}
+                      <span style={{ fontSize: 32, display: 'inline-block', transform: 'translateY(-2px)' }}>
+                        {brPredText.includes('인상') ? '▲' : brPredText.includes('인하') ? '▼' : '▬'}
+                      </span>
                     </span>
                   </div>
                   <div style={{ flex: 1, marginLeft: 96, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -237,31 +266,31 @@ export default function EconomicIndicatorArchive() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                       <span style={{ width: 40, fontSize: 13, color: '#3b82f6', fontWeight: 700 }}>인하</span>
                       <div style={{ flex: 1, height: 12, background: '#f1f5f9', borderRadius: 6, overflow: 'hidden' }}>
-                        <div style={{ width: '45%', height: '100%', background: '#3b82f6', borderRadius: 6 }}></div>
+                        <div style={{ width: `${brProbCut}%`, height: '100%', background: '#3b82f6', borderRadius: 6 }}></div>
                       </div>
-                      <span style={{ width: 40, fontSize: 13, color: '#3b82f6', fontWeight: 700, textAlign: 'right' }}>45%</span>
+                      <span style={{ width: 40, fontSize: 13, color: '#3b82f6', fontWeight: 700, textAlign: 'right' }}>{brProbCut}%</span>
                     </div>
                     {/* 동결 Bar */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                       <span style={{ width: 40, fontSize: 13, color: '#64748b', fontWeight: 700 }}>동결</span>
                       <div style={{ flex: 1, height: 12, background: '#f1f5f9', borderRadius: 6, overflow: 'hidden' }}>
-                        <div style={{ width: '38%', height: '100%', background: '#94a3b8', borderRadius: 6 }}></div>
+                        <div style={{ width: `${brProbFreeze}%`, height: '100%', background: '#94a3b8', borderRadius: 6 }}></div>
                       </div>
-                      <span style={{ width: 40, fontSize: 13, color: '#64748b', fontWeight: 700, textAlign: 'right' }}>38%</span>
+                      <span style={{ width: 40, fontSize: 13, color: '#64748b', fontWeight: 700, textAlign: 'right' }}>{brProbFreeze}%</span>
                     </div>
                     {/* 인상 Bar */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                       <span style={{ width: 40, fontSize: 13, color: '#ef4444', fontWeight: 700 }}>인상</span>
                       <div style={{ flex: 1, height: 12, background: '#f1f5f9', borderRadius: 6, overflow: 'hidden' }}>
-                        <div style={{ width: '17%', height: '100%', background: '#ef4444', borderRadius: 6 }}></div>
+                        <div style={{ width: `${brProbHike}%`, height: '100%', background: '#ef4444', borderRadius: 6 }}></div>
                       </div>
-                      <span style={{ width: 40, fontSize: 13, color: '#ef4444', fontWeight: 700, textAlign: 'right' }}>17%</span>
+                      <span style={{ width: 40, fontSize: 13, color: '#ef4444', fontWeight: 700, textAlign: 'right' }}>{brProbHike}%</span>
                     </div>
                   </div>
                 </div>
                 
                 <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--trend-text-main)', borderTop: '1px solid var(--trend-border)', paddingTop: 12, marginTop: 12 }}>
-                  예측: <span style={{ color: '#3b82f6' }}>인하 가능성 높음</span>
+                  예측: <span style={{ color: brPredText.includes('인상') ? '#ef4444' : brPredText.includes('인하') ? '#3b82f6' : '#64748b' }}>{brPredText}</span>
                 </div>
               </div>
 
@@ -271,8 +300,10 @@ export default function EconomicIndicatorArchive() {
                 <div className="eco-box" style={{ flex: 1, background: 'rgba(255, 255, 255, 0.85)' }}>
                   <div className="eco-box-title" style={{ marginBottom: 20 }}>예측 기여도 (SHAP)</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {isLoading || !contributionData?.contributions ? (
+                    {isLoading ? (
                       <div style={{ color: 'var(--trend-text-muted)', fontSize: 13 }}>가중치 데이터를 가져오는 중...</div>
+                    ) : !contributionData?.contributions || contributionData.contributions.length === 0 ? (
+                      <div style={{ color: 'var(--trend-text-muted)', fontSize: 13 }}>기여도 데이터가 존재하지 않습니다.</div>
                     ) : (
                       contributionData.contributions.map((item, idx) => (
                         <div key={item.feature} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13 }}>
@@ -294,14 +325,14 @@ export default function EconomicIndicatorArchive() {
                 <div className="eco-box" style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'rgba(255, 255, 255, 0.85)' }}>
                   <div className="eco-box-title" style={{ marginBottom: 16 }}>LLM 분석 요약 보고서</div>
                   <div style={{ fontSize: 13, color: 'var(--trend-text-main)', lineHeight: 1.8, marginBottom: 24, marginTop: 4, flex: 1 }}>
-                    {isLoading || !reportData ? "분석 보고서를 불러오는 중입니다..." : reportData.summary}
+                    {isLoading ? "분석 보고서를 불러오는 중입니다..." : reportData?.summary || "분석 보고서가 존재하지 않습니다."}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', borderTop: '1px solid var(--trend-border)', paddingTop: 12 }}>
                     <Link to="/economic-indicator-archive-llm-report" style={{ textDecoration: 'none' }}>
                       <span style={{ color: 'var(--trend-primary-dark)', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>상세 리포트 보기 →</span>
                     </Link>
                     <div style={{ fontSize: 11, color: 'var(--trend-text-muted)' }}>
-                      {reportData ? `출처: ${reportData.dataSources.join(", ")}` : ""}
+                      {reportData?.dataSources ? `출처: ${reportData.dataSources.join(", ")}` : ""}
                     </div>
                   </div>
                 </div>
@@ -448,8 +479,10 @@ export default function EconomicIndicatorArchive() {
                       </div>
                     </div>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {isLoading || !contributionData?.contributions ? (
+                      {isLoading ? (
                         <div style={{ color: '#64748b', fontSize: 11 }}>가중치 데이터를 가져오는 중...</div>
+                      ) : !contributionData?.contributions || contributionData.contributions.length === 0 ? (
+                        <div style={{ color: '#64748b', fontSize: 11 }}>기여도 데이터가 존재하지 않습니다.</div>
                       ) : (
                         contributionData.contributions.map((item, idx) => (
                           <div key={item.feature} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#334155' }}>
@@ -469,14 +502,15 @@ export default function EconomicIndicatorArchive() {
                 <div className="eco-box">
                   <div className="eco-box-title">LLM 분석 요약 보고서</div>
                   <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.8, marginBottom: 24, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' }}>
-                    {isLoading || !reportData ? "분석 보고서를 불러오는 중입니다..." : reportData.summary}
+                    {isLoading ? "분석 보고서를 불러오는 중입니다..." : reportData?.summary || "분석 보고서가 존재하지 않습니다."}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
                     <Link to="/economic-indicator-archive-llm-report" style={{ textDecoration: 'none' }}>
                       <span style={{ color: '#0284c7', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>상세 리포트 보기 →</span>
                     </Link>
                     <div style={{ fontSize: 9, color: '#94a3b8', textAlign: 'right' }}>
-                      {reportData ? `생성 모델: ${reportData.modelName} | 출처: ${reportData.dataSources.join(", ")}` : ""}
+                      {reportData?.modelName ? `생성 모델: ${reportData.modelName} | ` : ""}
+                      {reportData?.dataSources ? `출처: ${reportData.dataSources.join(", ")}` : ""}
                     </div>
                   </div>
                 </div>
