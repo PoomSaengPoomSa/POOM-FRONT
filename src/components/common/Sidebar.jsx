@@ -113,6 +113,7 @@ export default function Sidebar({ type = "cal" }) {
   const isCollapsed = width < 160;
 
   const isCalendarActive =
+    path.includes('/main') ||
     path.includes('/calendar') ||
     path.includes('/daily-calendar') ||
     path.includes('/weekly-calendar') ||
@@ -294,7 +295,7 @@ export default function Sidebar({ type = "cal" }) {
 
       {/* Sidebar Logo */}
       <Link
-        to="/daily-calendar"
+        to="/main"
         className={`${prefix}-logo`}
         style={{
           display: "flex",
@@ -329,10 +330,10 @@ export default function Sidebar({ type = "cal" }) {
 
       {/* Sidebar Navigation Menu */}
       <div className={`${prefix}-menu`} style={{ marginTop: isCollapsed ? '16px' : '32px' }}>
-        <Link to="/daily-calendar" className={`${prefix}-menu-item sidebar-menu-item ${isCalendarActive ? 'active' : ''}`}>
+        <Link to="/main" className={`${prefix}-menu-item sidebar-menu-item ${isCalendarActive ? 'active' : ''}`}>
           <Calendar size={20} />
-          {!isCollapsed && <span className="menu-text">캘린더</span>}
-          {isCollapsed && <span className="sidebar-tooltip">캘린더</span>}
+          {!isCollapsed && <span className="menu-text">Main</span>}
+          {isCollapsed && <span className="sidebar-tooltip">Main</span>}
         </Link>
         <Link to="/customer-management-registration-1" className={`${prefix}-menu-item sidebar-menu-item ${isCustomerActive ? 'active' : ''}`}>
           <TrendingUp size={20} />

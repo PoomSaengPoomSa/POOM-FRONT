@@ -1,0 +1,783 @@
+/* POOM Premium Main Dashboard CSS - Optimized Compact Version */
+
+:root {
+  --main-bg: #f8fafc;
+  --main-text-title: #0f172a;
+  --main-text-body: #334155;
+  --main-text-muted: #64748b;
+  --main-border: #e2e8f0;
+  
+  --primary-color: #0ea5e9;
+  --primary-bg-light: #e0f2fe;
+  
+  --kpi-green: #10b981;
+  --kpi-red: #ef4444;
+  --kpi-yellow: #f59e0b;
+  
+  --ios-card-bg: rgba(255, 255, 255, 0.7);
+  --ios-card-shadow: 0 2px 16px rgba(0, 0, 0, 0.02);
+}
+
+.main-layout {
+  display: flex;
+  height: 100vh; /* Lock height to viewport to prevent outer scroll */
+  background-color: var(--main-bg);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  padding: 16px 24px; /* Reduced padding */
+  overflow-y: auto; /* Allow inner scrolling if needed but keep compact */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Tighter gap between components */
+  height: 100vh;
+}
+
+/* Header - Compact */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  font-size: 20px; /* Reduced from 28px */
+  font-weight: 800;
+  color: var(--main-text-title);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.header-subtitle {
+  font-size: 11px; /* Reduced from 14px */
+  color: var(--main-text-muted);
+  margin: 2px 0 0 0;
+}
+
+.current-date-tag {
+  background-color: white;
+  border: 1px solid var(--main-border);
+  padding: 4px 12px; /* Reduced padding */
+  border-radius: 12px;
+  font-size: 11px; /* Reduced from 13px */
+  font-weight: 600;
+  color: var(--main-text-body);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+/* 1. Compact Full-Width KPI Dashboard Section */
+.kpi-dashboard-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px; /* Reduced gap */
+  width: 100%;
+}
+
+.kpi-card {
+  background: white;
+  border: 1px solid var(--main-border);
+  border-radius: 12px; /* More compact rounding */
+  padding: 12px 16px; /* Greatly reduced padding from 24px */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.kpi-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+}
+
+.kpi-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--main-border);
+  padding-bottom: 6px; /* Reduced padding */
+  margin-bottom: 10px; /* Reduced margin */
+}
+
+.kpi-title-korean {
+  font-size: 13px; /* Reduced from 16px */
+  font-weight: 700;
+  color: var(--main-text-title);
+}
+
+.kpi-subtitle-korean {
+  font-size: 10px; /* Reduced from 13px */
+  font-weight: 600;
+  color: var(--primary-color);
+  background-color: var(--primary-bg-light);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.kpi-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px; /* Reduced gap */
+}
+
+.kpi-stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-stat-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.kpi-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px; /* Reduced from 22px */
+  height: 18px;
+  border-radius: 4px;
+  background-color: var(--primary-bg-light);
+  color: var(--primary-color);
+}
+
+.kpi-icon-container svg {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.kpi-label-text {
+  font-size: 10px; /* Reduced from 12px */
+  font-weight: 600;
+  color: var(--main-text-muted);
+}
+
+.kpi-stat-value {
+  font-size: 18px; /* Reduced from 24px */
+  font-weight: 800;
+  color: var(--main-text-title);
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.kpi-unit {
+  font-size: 10px; /* Reduced from 13px */
+  font-weight: 500;
+  color: var(--main-text-muted);
+  margin-left: 2px;
+}
+
+.kpi-progress-bar-container {
+  height: 4px; /* Tighter progress bar */
+  background-color: #f1f5f9;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.kpi-progress-bar-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 2px;
+  transition: width 0.5s ease-out;
+}
+
+.personal-kpi .kpi-progress-bar-fill {
+  background-color: var(--primary-color);
+}
+
+.branch-kpi .kpi-progress-bar-fill {
+  background-color: var(--kpi-green);
+}
+
+.kpi-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px; /* Reduced from 11px */
+  font-weight: 600;
+  color: var(--main-text-muted);
+  margin-bottom: 2px;
+}
+
+.kpi-progress-pct {
+  color: var(--main-text-title);
+}
+
+.kpi-trend {
+  font-size: 9px; /* Reduced from 11px */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.kpi-trend.green {
+  color: var(--kpi-green);
+}
+
+.kpi-trend.red {
+  color: var(--kpi-red);
+}
+
+/* 2. Compact Key Customers Section */
+.key-customers-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Tighter gap */
+  background: white;
+  border: 1px solid var(--main-border);
+  border-radius: 12px;
+  padding: 10px 16px; /* Reduced padding from 24px */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+}
+
+.section-title-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.section-title {
+  font-size: 14px; /* Reduced from 18px */
+  font-weight: 800;
+  color: var(--main-text-title);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.section-title-desc {
+  font-size: 10px;
+  color: var(--main-text-muted);
+}
+
+.key-customers-bar {
+  width: 100%;
+  overflow: hidden;
+}
+
+.customers-scroll-container {
+  display: flex;
+  gap: 10px; /* Tighter gap */
+  overflow-x: auto;
+  padding: 2px 2px 6px 2px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.customers-scroll-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.customers-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #e2e8f0;
+  border-radius: 2px;
+}
+
+.customer-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Tighter gap */
+  background: var(--main-bg);
+  border: 1px solid var(--main-border);
+  border-radius: 8px;
+  padding: 4px 10px; /* Tighter padding from 10px 16px */
+  min-width: 125px; /* More compact card width */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.customer-profile-card:hover {
+  transform: translateY(-1px);
+  background: white;
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.04);
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  width: 30px; /* Reduced avatar size from 42px */
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 11px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.blue-bg {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+}
+
+.red-bg {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+}
+
+.visitor-badge, .risk-level-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 0px 3px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.visitor-badge {
+  background: #0f172a;
+  color: white;
+}
+
+.risk-level-badge {
+  background: #ef4444;
+  color: white;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.profile-name {
+  font-size: 12px; /* Tighter text sizes */
+  font-weight: 700;
+  color: var(--main-text-title);
+}
+
+.profile-subtext {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--main-text-muted);
+}
+
+.profile-subtext.text-danger {
+  color: var(--kpi-red);
+}
+
+.customers-loading, .customers-empty {
+  padding: 12px;
+  font-size: 11px;
+}
+
+/* 3. Combined Bottom Layout Grid - Compact Heights - Side-by-Side */
+.bottom-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr 0.9fr;
+  gap: 12px;
+  width: 100%;
+  flex: 1; /* Stretch to fill remaining viewport height */
+  min-height: 0; /* Critical for inner scrolling to work correctly */
+}
+
+.bottom-card {
+  background: white;
+  border: 1px solid var(--main-border);
+  border-radius: 12px;
+  padding: 14px 18px; /* Reduced from 24px */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Crucial for vertical containment */
+}
+
+.bottom-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--main-border);
+  padding-bottom: 8px;
+}
+
+.header-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-icon-title svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.header-icon.primary-color {
+  color: var(--primary-color);
+}
+
+.header-icon.trend-color {
+  color: var(--kpi-green);
+}
+
+.header-icon.notification-color {
+  color: #a855f7;
+}
+
+.bottom-card-title {
+  font-size: 13px; /* Reduced from 16px */
+  font-weight: 800;
+  color: var(--main-text-title);
+  margin: 0;
+}
+
+.kpi-register-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: background 0.2s;
+}
+
+.kpi-register-btn svg {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+/* Daily Calendar Style Timeline View */
+.todo-unified-list.daily-timeline-view {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 100%;
+  overflow-y: auto; /* Enable inner scroll only for lists */
+  padding-right: 4px;
+  padding-left: 4px;
+  position: relative;
+  flex: 1;
+}
+
+.timeline-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.timeline-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 48px; /* Tighter timeline width */
+  flex-shrink: 0;
+  padding-top: 10px;
+}
+
+.timeline-time-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--main-text-title);
+  background: white;
+  border: 1px solid var(--main-border);
+  padding: 1px 5px;
+  border-radius: 6px;
+  z-index: 2;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.01);
+  white-space: nowrap;
+}
+
+.timeline-node {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 36px;
+  z-index: 3;
+  border: 2px solid white;
+}
+
+.my-node {
+  background-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
+}
+
+.ai-node {
+  background-color: #3b82f6;
+  width: 12px;
+  height: 12px;
+  top: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.ai-node svg {
+  width: 7px !important;
+  height: 7px !important;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 40px;
+  bottom: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  background-color: var(--main-border);
+  z-index: 1;
+}
+
+.timeline-right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Card item inside timeline */
+.unified-todo-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px; /* Tighter padding */
+  border-radius: 10px;
+  border: 1px solid var(--main-border);
+  background-color: var(--main-bg);
+  position: relative;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.my-todo-style {
+  background-color: white;
+  border-left: 3px solid var(--primary-color);
+}
+
+/* Diagonal stripes for AI To Do */
+.ai-todo-style.diagonal-stripes {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(224, 242, 254, 0.12),
+    rgba(224, 242, 254, 0.12) 8px,
+    rgba(255, 255, 255, 0.75) 8px,
+    rgba(255, 255, 255, 0.75) 16px
+  );
+  border: 1px dashed #93c5fd;
+  border-left: 3px solid #3b82f6;
+}
+
+.todo-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.todo-tag {
+  font-size: 8px; /* Tiny badges */
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.ai-spark-tag {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 8px;
+  font-weight: 700;
+  color: #3b82f6;
+  background-color: #dbeafe;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.ai-spark-tag svg {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.todo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.todo-title {
+  font-size: 12px; /* Tighter fonts */
+  font-weight: 700;
+  color: var(--main-text-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.todo-memo {
+  font-size: 10px;
+  color: var(--main-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.todo-undo-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--main-text-muted);
+  cursor: pointer;
+}
+
+.todo-undo-btn svg {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.todo-checkbox-pill {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: 1px solid var(--main-border);
+  color: var(--main-text-muted);
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.todo-checkbox-pill.checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.todo-empty-state {
+  padding: 20px;
+  font-size: 11px;
+}
+
+/* Right Stack (Trend & Notifications) */
+.bottom-dashboard-right-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reduced from 24px */
+  min-height: 0;
+}
+
+.arrow-link {
+  font-size: 10px;
+}
+
+.trend-summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Tighter gap */
+}
+
+.summary-paragraph {
+  font-size: 11px; /* Tighter description */
+  line-height: 1.4;
+}
+
+.indicator-preview-box {
+  background-color: var(--main-bg);
+  border: 1px solid var(--main-border);
+  border-radius: 8px;
+  padding: 6px 8px; /* Tighter padding */
+  gap: 2px;
+}
+
+.indicator-label {
+  font-size: 9px;
+}
+
+.indicator-value {
+  font-size: 10px;
+}
+
+/* iPhone-Style Compact Notifications Container */
+.ios-notifications-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.ios-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Tighter gap */
+}
+
+/* iOS Notification Card Glassmorphism - Compact */
+.ios-card {
+  background: var(--ios-card-bg);
+  border-radius: 10px; /* Reduced from 14px */
+  padding: 8px 12px; /* Reduced padding from 12px 16px */
+  box-shadow: var(--ios-card-shadow);
+  gap: 4px;
+}
+
+.app-dot {
+  width: 4px;
+  height: 4px;
+}
+
+.app-name {
+  font-size: 8px;
+}
+
+.ios-card-time {
+  font-size: 8px;
+}
+
+.ios-card-title {
+  font-size: 11px;
+}
+
+.ios-card-desc {
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.notifications-loading, .notifications-empty {
+  padding: 16px;
+  font-size: 11px;
+}
+
+/* Responsiveness overrides */
+@media (max-width: 1200px) {
+  .bottom-dashboard-grid {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+    height: auto;
+  }
+  .main-layout {
+    height: auto;
+    overflow-y: auto;
+  }
+  .main-content {
+    height: auto;
+  }
+}

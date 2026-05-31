@@ -223,7 +223,17 @@ export default function CustomerRegistration1() {
         setTodayCustomersList(mapped);
       }
 
-      // 탭 전환 및 최초 진입 시, 사용자의 도입부 화면 요구사항에 맞추어 선택된 고객을 비워 둡니다.
+      // 탭 전환 및 최초 진입 시, localStorage에 자동 설정된 고객이 있는지 확인
+      const savedCustomerId = localStorage.getItem("poom_selected_customer_id");
+      if (savedCustomerId) {
+        const parsedId = parseInt(savedCustomerId, 10);
+        const found = mapped.find(c => c.id === parsedId);
+        if (found) {
+          setSelectedCustomer(found);
+          localStorage.removeItem("poom_selected_customer_id");
+          return;
+        }
+      }
       setSelectedCustomer(null);
     } catch (error) {
       console.error("고객 목록 조회 실패:", error);
