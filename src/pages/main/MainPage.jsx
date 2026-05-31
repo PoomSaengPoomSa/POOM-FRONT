@@ -21,7 +21,8 @@ import {
   ArrowRight,
   TrendingDown,
   Sparkles,
-  Info
+  Info,
+  X
 } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
 import { api } from "../../api";
@@ -42,10 +43,117 @@ export default function MainPage() {
     transferCheckedAiTodos, 
     revertAiTodo, 
     toast, 
+    showToast,
     personalKpi, 
     branchKpi,
-    fetchKpiData
+    fetchKpiData,
+    fetchCalendarData
   } = useCalendar();
+
+  const handleSelectAiTodo = async (todo) => {
+    try {
+      const currentUser = api.auth.getCurrentUser();
+      const u_id = currentUser ? currentUser.id : null;
+      if (!u_id) return;
+
+      const yyyy = selectedDate.getFullYear();
+      const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(selectedDate.getDate()).padStart(2, '0');
+      const targetDateStr = `${yyyy}-${mm}-${dd}`;
+
+      // Check for overlap first
+      let todoStart = new Date(todo.executionDate);
+      if (targetDateStr) {
+        let timePart = "10:00:00";
+        if (todo.executionDate && todo.executionDate.includes('T')) {
+          timePart = todo.executionDate.split('T')[1].substring(0, 8);
+        } else if (todo.executionDate && todo.executionDate.includes(' ')) {
+          timePart = todo.executionDate.split(' ')[1].substring(0, 8);
+        } else {
+          const parsed = new Date(todo.executionDate);
+          if (!isNaN(parsed.getTime())) {
+            timePart = String(parsed.getHours()).padStart(2, '0') + ':' + String(parsed.getMinutes()).padStart(2, '0') + ':00';
+          }
+        }
+        todoStart = new Date(`${targetDateStr}T${timePart}`);
+      }
+
+      const durationMs = todo.category === '안부 연락 제안' ? 15 * 60 * 1000 : 60 * 60 * 1000;
+      const todoEnd = new Date(todoStart.getTime() + durationMs);
+
+      const isOverlapping = events.some(e => {
+        const eStart = new Date(e.startTime.replace(' ', 'T'));
+        const eEnd = new Date(e.endTime.replace(' ', 'T'));
+        return todoStart < eEnd && todoEnd > eStart;
+      });
+
+      if (isOverlapping) {
+        if (showToast) {
+          showToast(`추천 일정 '${todo.content}'의 시간대에 이미 다른 일정이 존재합니다.`);
+        } else {
+          alert(`추천 일정 '${todo.content}'의 시간대에 이미 다른 일정이 존재합니다. 중복 등록할 수 없습니다.`);
+        }
+        return;
+      }
+
+      await api.aiTodo.confirm(u_id, [todo.id], targetDateStr);
+      await fetchKpiData();
+      if (fetchCalendarData) {
+        await fetchCalendarData();
+      }
+      if (showToast) {
+        showToast(`My To Do에 '${todo.content}' 일정이 바로 등록되었습니다!`);
+      } else {
+        alert(`My To Do에 '${todo.content}' 일정이 바로 등록되었습니다!`);
+      }
+    } catch (error) {
+      console.error("AI To Do 일정 등록 실패:", error);
+      if (showToast) {
+        showToast("일정 등록에 실패했습니다.");
+      } else {
+        alert("일정 등록에 실패했습니다.");
+      }
+    }
+  };
+
+  // State for expanded customer AI insights
+  const [expandedCustomerId, setExpandedCustomerId] = useState(null);
+  const [expandedCustomerDetails, setExpandedCustomerDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+
+  const handleCustomerCardClick = async (customerId) => {
+    if (expandedCustomerId === customerId) {
+      setExpandedCustomerId(null);
+      setExpandedCustomerDetails(null);
+      return;
+    }
+    
+    setExpandedCustomerId(customerId);
+    setLoadingDetails(true);
+    setExpandedCustomerDetails(null);
+    
+    try {
+      const [detail, risk, features, productMatch, stats] = await Promise.all([
+        api.customer.getDetail(customerId),
+        api.customer.getChurnRisk(customerId).catch(() => null),
+        api.customer.getFeatures(customerId).catch(() => null),
+        api.customer.getProductMatch(customerId).catch(() => null),
+        api.customer.getVisitStats(customerId).catch(() => null),
+      ]);
+      
+      setExpandedCustomerDetails({
+        detail,
+        risk,
+        features: features?.features || [],
+        productMatch: productMatch?.items || [],
+        stats
+      });
+    } catch (error) {
+      console.error("Failed to load customer AI insights:", error);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
 
   const [todayVisitors, setTodayVisitors] = useState([]);
   const [churnRiskCustomers, setChurnRiskCustomers] = useState([]);
@@ -226,17 +334,7 @@ export default function MainPage() {
 
       {/* Main Dashboard Content */}
       <div className="main-content">
-        <header className="main-header">
-          <div className="header-info">
-            <h1 className="header-title">Main Dashboard</h1>
-            <p className="header-subtitle">Welcome back, {currentUser?.name || "김재욱"} PB</p>
-          </div>
-          <div className="header-date">
-            <span className="current-date-tag">
-              {selectedDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
-            </span>
-          </div>
-        </header>
+
 
         {/* 1. Full-Width KPI Dashboard Section */}
         <section className="kpi-dashboard-section">
@@ -401,61 +499,7 @@ export default function MainPage() {
           </div>
         </section>
 
-        {/* 2. Full-Width Horizontal Key Customers Section */}
-        <section className="key-customers-section">
-          <div className="section-title-wrap">
-            <h2 className="section-title">주요 고객 관리</h2>
-            <span className="section-title-desc">오늘 방문 예정 고객과 위험 예측 대상 고객을 신속히 파악해 보세요.</span>
-          </div>
 
-          <div className="key-customers-bar">
-            {loadingCustomers ? (
-              <div className="customers-loading">고객 분석을 로드하는 중입니다...</div>
-            ) : (todayVisitors.length === 0 && churnRiskCustomers.length === 0) ? (
-              <div className="customers-empty">분석된 주요 고객이 현재 존재하지 않습니다.</div>
-            ) : (
-              <div className="customers-scroll-container">
-                {/* 1. Today Visitors (Blue backgrounds) */}
-                {todayVisitors.map(c => (
-                  <div 
-                    key={`visitor-${c.id}`} 
-                    className="customer-profile-card today-visitor"
-                    onClick={() => handleCustomerClick(c.id)}
-                    title="고객 정보 바로가기"
-                  >
-                    <div className="profile-avatar-wrap blue-bg">
-                      <span className="avatar-initial">{c.initial}</span>
-                      <span className="visitor-badge">오늘 방문</span>
-                    </div>
-                    <div className="profile-details">
-                      <span className="profile-name">{c.name}</span>
-                      <span className="profile-subtext">오늘 방문 예정</span>
-                    </div>
-                  </div>
-                ))}
-
-                {/* 2. Churn Risk Predictions (Red backgrounds) */}
-                {churnRiskCustomers.map(c => (
-                  <div 
-                    key={`churn-${c.id}`} 
-                    className="customer-profile-card churn-risk"
-                    onClick={() => handleCustomerClick(c.id)}
-                    title="고객 정보 바로가기"
-                  >
-                    <div className="profile-avatar-wrap red-bg">
-                      <span className="avatar-initial">{c.initial}</span>
-                      <span className="risk-level-badge">{c.grade}</span>
-                    </div>
-                    <div className="profile-details">
-                      <span className="profile-name">{c.name}</span>
-                      <span className="profile-subtext text-danger">이탈 {c.grade}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
 
         {/* 3. Combined Bottom Layout Grid (To-Do & Trend & Notifications) */}
         <div className="bottom-dashboard-grid">
@@ -466,15 +510,6 @@ export default function MainPage() {
               <div className="header-icon-title">
                 <CheckCircle2 size={20} className="header-icon primary-color" />
                 <h2 className="bottom-card-title">오늘의 To-Do & AI 추천 액션</h2>
-              </div>
-              <div className="header-actions">
-                <button 
-                  className="kpi-register-btn"
-                  onClick={() => transferCheckedAiTodos(selectedDate)}
-                  title="선택된 AI 추천 항목들을 나의 일정(My To Do)으로 신속히 등록합니다"
-                >
-                  <Plus size={14} /> My To Do 등록
-                </button>
               </div>
             </div>
 
@@ -544,11 +579,11 @@ export default function MainPage() {
                             <span className="todo-memo text-muted">{todo.subText || 'AI 권장 조치사항'}</span>
                           </div>
                           <div 
-                            className={`todo-checkbox-pill ${todo.checked ? 'checked' : ''}`}
-                            onClick={() => toggleAiTodo(todo.id)}
-                            title="선택하여 My To Do 등록 준비"
+                            className="todo-checkbox-pill"
+                            onClick={() => handleSelectAiTodo(todo)}
+                            title="My To Do 등록"
                           >
-                            {todo.checked ? "✓" : "선택"}
+                            선택
                           </div>
                         </div>
                       </div>
@@ -566,85 +601,232 @@ export default function MainPage() {
             )}
           </div>
 
-          {/* Trend Archive Container */}
-          <div className="bottom-card trend-preview-card">
-            <div className="bottom-card-header">
-              <div className="header-icon-title">
-                <TrendingUp size={20} className="header-icon trend-color" />
-                <h2 className="bottom-card-title">트렌드 아카이브 요약</h2>
+          {/* Right Column Stack: Key Customers on Top, Notifications below */}
+          <div className="bottom-dashboard-right-stack" style={{ display: 'flex', flexDirection: 'column', gap: 12, minHeight: 0 }}>
+            {/* 주요 고객 관리 Card */}
+            <div className="bottom-card key-customers-section" style={{ padding: '14px 18px' }}>
+              <div className="bottom-card-header" style={{ marginBottom: 10, borderBottom: '1px solid var(--main-border)', paddingBottom: 6 }}>
+                <div className="header-icon-title">
+                  <Users size={16} className="header-icon primary-color" style={{ color: '#0ea5e9' }} />
+                  <h2 className="bottom-card-title">주요 고객 관리</h2>
+                </div>
               </div>
-              <Link to="/trend-archive" className="arrow-link">
-                전체 보기 <ArrowRight size={14} />
-              </Link>
-            </div>
-
-            <div className="trend-summary-content">
-              <p className="summary-paragraph">
-                금일 분석 결과, 미국 기준 금리 동결 우려와 함께 안전자산인 <strong>금값 상승 압력(72%)</strong>이 확대되고 있습니다. 
-                국내 부동산 시장은 일부 지표 기준 소폭의 우상향 흐름을 이어가고 있어 고액 자산가 대상의 정밀 포트폴리오 상담 편입이 추천됩니다.
-              </p>
-
-              <div className="trend-preview-container">
-                {loadingTrend ? (
-                  <div className="trend-loading">지표 불러오는 중...</div>
+              <div className="key-customers-bar" style={{ width: '100%' }}>
+                {loadingCustomers ? (
+                  <div className="customers-loading" style={{ fontSize: 11 }}>고객 분석을 로드하는 중입니다...</div>
+                ) : (todayVisitors.length === 0 && churnRiskCustomers.length === 0) ? (
+                  <div className="customers-empty" style={{ fontSize: 11 }}>분석된 주요 고객이 현재 존재하지 않습니다.</div>
                 ) : (
-                  <div className="trend-indicators-row">
-                    <div className="indicator-preview-box">
-                      <span className="indicator-label">금값 (Gold)</span>
-                      <span className="indicator-value text-red">상승 (72%)</span>
-                    </div>
-                    <div className="indicator-preview-box">
-                      <span className="indicator-label">기준 금리</span>
-                      <span className="indicator-value text-muted">동결 (85%)</span>
-                    </div>
-                    <div className="indicator-preview-box">
-                      <span className="indicator-label">부동산 지수</span>
-                      <span className="indicator-value text-blue">상승 흐름</span>
-                    </div>
+                  <div className="customers-scroll-container" style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}>
+                    {/* 1. Today Visitors */}
+                    {todayVisitors.map(c => (
+                      <div 
+                        key={`visitor-${c.id}`} 
+                        className={`customer-profile-card today-visitor ${expandedCustomerId === c.id ? 'active-glow' : ''}`}
+                        onClick={() => handleCustomerCardClick(c.id)}
+                        title="고객 AI 인사이트 보기"
+                      >
+                        <div className="profile-avatar-wrap blue-bg">
+                          <span className="avatar-initial">{c.initial}</span>
+                          <span className="visitor-badge">오늘 방문</span>
+                        </div>
+                        <div className="profile-details">
+                          <span className="profile-name">{c.name}</span>
+                          <span className="profile-subtext">오늘 방문 예정</span>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* 2. Churn Risk Predictions */}
+                    {churnRiskCustomers.map(c => (
+                      <div 
+                        key={`churn-${c.id}`} 
+                        className={`customer-profile-card churn-risk ${expandedCustomerId === c.id ? 'active-glow' : ''}`}
+                        onClick={() => handleCustomerCardClick(c.id)}
+                        title="고객 AI 인사이트 보기"
+                      >
+                        <div className="profile-avatar-wrap red-bg">
+                          <span className="avatar-initial">{c.initial}</span>
+                          <span className="risk-level-badge">✨ {c.grade}</span>
+                        </div>
+                        <div className="profile-details">
+                          <span className="profile-name">{c.name}</span>
+                          <span className="profile-subtext text-danger" style={{ fontWeight: 700 }}>🔮 AI 예측: {c.grade}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
-            </div>
-          </div>
 
-          {/* iPhone-Style Notification Container */}
-          <div className="bottom-card ios-notifications-card">
-            <div className="bottom-card-header">
-              <div className="header-icon-title">
-                <Bell size={20} className="header-icon notification-color" />
-                <h2 className="bottom-card-title">실시간 알림 피드</h2>
-              </div>
-            </div>
-
-            <div className="ios-notifications-list">
-              {loadingNotifications ? (
-                <div className="notifications-loading">알림을 불러오는 중입니다...</div>
-              ) : notifications.length === 0 ? (
-                <div className="notifications-empty">실시간 확인된 알림이 없습니다.</div>
-              ) : (
-                <div className="ios-stack">
-                  {notifications.map(notif => (
-                    <div 
-                      key={notif.id} 
-                      className={`ios-card category-${notif.category}`}
-                      onClick={() => navigate("/notifications")}
-                      title="알림 모아보기"
-                    >
-                      <div className="ios-card-header">
-                        <div className="ios-card-app">
-                          <span className="app-dot"></span>
-                          <span className="app-name">{getNotificationCategoryLabel(notif.category)}</span>
-                        </div>
-                        <span className="ios-card-time">{notif.date || "지금"}</span>
-                      </div>
-                      <div className="ios-card-body">
-                        <h4 className="ios-card-title">{notif.type}</h4>
-                        <p className="ios-card-desc">{notif.content}</p>
-                      </div>
+              {/* Expanded Customer AI Insights Section */}
+              {expandedCustomerId && (
+                <div className="ai-customer-insights-panel">
+                  {loadingDetails ? (
+                    <div className="ai-insights-loading">
+                      <Sparkles className="loading-icon-spark animate-pulse" size={20} style={{ color: '#8b5cf6' }} />
+                      <span>AI 분석 엔진에서 실시간 고객 인사이트를 도출하고 있습니다...</span>
                     </div>
-                  ))}
+                  ) : expandedCustomerDetails ? (
+                    <>
+                      <div className="ai-insights-header">
+                        <div className="ai-insights-user-info">
+                          <div className="avatar-small blue-bg">
+                            {expandedCustomerDetails.detail?.name?.charAt(0) || "고"}
+                          </div>
+                          <div className="user-text">
+                            <span className="user-name">{expandedCustomerDetails.detail?.name} 고객님</span>
+                            <span className="user-badges">
+                              <span className="badge-item vip">{expandedCustomerDetails.detail?.grade || "VIP"}</span>
+                              <span className="badge-item tendency">{expandedCustomerDetails.detail?.tendency || "위험중립형"}</span>
+                              <span className="badge-item job">{expandedCustomerDetails.detail?.job || "CEO"}</span>
+                            </span>
+                          </div>
+                        </div>
+                        <div className="ai-insights-actions">
+                          <button 
+                            className="btn-profile-go" 
+                            onClick={() => handleCustomerClick(expandedCustomerId)}
+                          >
+                            상세 프로필 <ArrowRight size={12} />
+                          </button>
+                          <button 
+                            className="btn-close-insights"
+                            onClick={() => {
+                              setExpandedCustomerId(null);
+                              setExpandedCustomerDetails(null);
+                            }}
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="ai-insights-grid">
+                        {/* Churn Risk Section */}
+                        <div className="ai-insight-box churn-box">
+                          <div className="box-title-wrap">
+                            <Sparkles size={12} className="sparkle-purple" />
+                            <h4>🔮 AI 이탈 위험 예측</h4>
+                            <span className={`risk-grade-badge grade-${expandedCustomerDetails.risk?.grade || '양호'}`}>
+                              {expandedCustomerDetails.risk?.grade || '양호'}
+                            </span>
+                          </div>
+                          <p className="box-desc">
+                            {expandedCustomerDetails.risk?.reason || '최근 이탈 관련 이상 징후가 발견되지 않은 양호한 상태입니다.'}
+                          </p>
+                        </div>
+
+                        {/* Product Matching Section */}
+                        <div className="ai-insight-box product-box">
+                          <div className="box-title-wrap">
+                            <Sparkles size={12} className="sparkle-purple" />
+                            <h4>✨ AI 추천 상품 & 매칭 사유</h4>
+                          </div>
+                          <div className="product-match-list">
+                            {expandedCustomerDetails.productMatch && expandedCustomerDetails.productMatch.length > 0 ? (
+                              expandedCustomerDetails.productMatch.slice(0, 2).map((item, idx) => (
+                                <div key={idx} className="product-match-item">
+                                  <div className="product-item-header">
+                                    <span className="product-name">{item.product_name}</span>
+                                    <span className={`product-status status-${item.is_owned ? 'owned' : 'suitable'}`}>
+                                      {item.is_owned ? '보유중' : '추천'}
+                                    </span>
+                                  </div>
+                                  <p className="product-reason">{item.reason}</p>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="empty-insights">추천된 AI 맞춤 상품 데이터가 없습니다.</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* AI Semantic tags */}
+                        <div className="ai-insight-box features-box">
+                          <div className="box-title-wrap">
+                            <Sparkles size={12} className="sparkle-purple" />
+                            <h4>🏷️ AI 메모 요약 핵심 특징</h4>
+                          </div>
+                          <div className="features-tags-list">
+                            {expandedCustomerDetails.features && expandedCustomerDetails.features.length > 0 ? (
+                              expandedCustomerDetails.features.slice(0, 6).map((feat, idx) => (
+                                <span key={idx} className={`feature-tag-item category-${feat.category}`}>
+                                  #{feat.name}
+                                </span>
+                              ))
+                            ) : (
+                              <div className="empty-insights">추출된 AI 고객 특징 키워드가 없습니다.</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Asset allocation diagnostics */}
+                        <div className="ai-insight-box assets-box">
+                          <div className="box-title-wrap">
+                            <Sparkles size={12} className="sparkle-purple" />
+                            <h4>📊 자산 포트폴리오 AI 진단</h4>
+                          </div>
+                          <div className="assets-summary">
+                            <div className="assets-total-val">
+                              <span>총 순자산:</span>
+                              <strong className="text-primary-color">
+                                {expandedCustomerDetails.detail?.net_worth ? `${(expandedCustomerDetails.detail.net_worth / 100000000).toFixed(1)}억원` : '자료 없음'}
+                              </strong>
+                            </div>
+                            <p className="assets-insight-text">
+                              {expandedCustomerDetails.detail?.llm_insight || '안정적인 포트폴리오를 구성하고 있습니다.'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="ai-insights-error">데이터를 불러오는 중 오류가 발생했습니다.</div>
+                  )}
                 </div>
               )}
+            </div>
+
+            {/* iPhone-Style Notification Feed Card */}
+            <div className="bottom-card ios-notifications-card" style={{ flex: 1, minHeight: 0 }}>
+              <div className="bottom-card-header">
+                <div className="header-icon-title">
+                  <Bell size={20} className="header-icon notification-color" />
+                  <h2 className="bottom-card-title">실시간 알림 피드</h2>
+                </div>
+              </div>
+
+              <div className="ios-notifications-list" style={{ overflowY: 'auto', flex: 1 }}>
+                {loadingNotifications ? (
+                  <div className="notifications-loading">알림을 불러오는 중입니다...</div>
+                ) : notifications.length === 0 ? (
+                  <div className="notifications-empty">실시간 확인된 알림이 없습니다.</div>
+                ) : (
+                  <div className="ios-stack">
+                    {notifications.map(notif => (
+                      <div 
+                        key={notif.id} 
+                        className={`ios-card category-${notif.category}`}
+                        onClick={() => navigate("/notifications")}
+                        title="알림 모아보기"
+                      >
+                        <div className="ios-card-header">
+                          <div className="ios-card-app">
+                            <span className="app-dot"></span>
+                            <span className="app-name">{getNotificationCategoryLabel(notif.category)}</span>
+                          </div>
+                          <span className="ios-card-time">{notif.date || "지금"}</span>
+                        </div>
+                        <div className="ios-card-body">
+                          <h4 className="ios-card-title">{notif.type}</h4>
+                          <p className="ios-card-desc">{notif.content}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

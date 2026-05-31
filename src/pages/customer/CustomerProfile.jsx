@@ -17,6 +17,7 @@ const allCustomers = [
 ];
 
 const customers = [
+  { id: 1001, name: "최OO", email: "choi1001@naver.com", phone: "010-8888-1001", color: "gold", initial: "최", time: "16:30 PM" },
   { id: 1, name: "김OO", email: "abcdefg@naver.com", phone: "010-0000-0000", color: "pink", initial: "김", time: "10:00 AM" },
   { id: 2, name: "박OO", email: "erlkgjldfjgkld@gmail.com", phone: "010-1234-5678", color: "purple", initial: "박", time: "13:30 PM" },
   { id: 3, name: "이OO", email: "lgkesdl@gmail.com", phone: "010-9876-5432", color: "red", initial: "이", time: "15:00 PM" },
@@ -28,7 +29,7 @@ export default function CustomerProfile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editModalData, setEditModalData] = useState(null);
-  const [selectedCustomerId, setSelectedCustomerId] = useState(1);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(1001);
   const [searchQuery, setSearchQuery] = useState("");
 
   const selectedCustomer = customers.find(c => c.id === selectedCustomerId) || customers[0];
@@ -104,67 +105,96 @@ export default function CustomerProfile() {
                   <button className="cust-detail-tab">메모 어시스턴트</button>
                 </Link>
               </div>
-              <button 
-                onClick={() => setIsDeleteModalOpen(true)}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 6, border: '1px solid #e2e8f0', background: 'white', color: '#ef4444', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
-              >
-                <Trash2 size={14} />
-                삭제하기
-              </button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button 
+                  onClick={() => setEditModalData(selectedCustomer)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 6, border: '1px solid #cbd5e1', background: 'white', color: '#0284c7', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                  수정하기
+                </button>
+                <button 
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 6, border: '1px solid #fee2e2', background: '#fef2f2', color: '#ef4444', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                  <Trash2 size={14} />
+                  삭제하기
+                </button>
+              </div>
             </div>
           </div>
 
           <div style={{ padding: '8px 24px 24px 24px' }}>
-            {/* Header section with Contact btn */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{ width: 64, height: 64, background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: '#e2e8f0', border: '2px dashed #cbd5e1' }}>
+            {/* Sleek Compact Profile Card */}
+            <div style={{ 
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%)', 
+              border: '1px solid #e2e8f0', 
+              borderRadius: 16, 
+              padding: '20px 24px', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 16, 
+              marginBottom: 24,
+              boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.02)'
+            }}>
+              {/* Profile Top Row: Avatar & Basic Badges */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ 
+                  width: 48, 
+                  height: 48, 
+                  background: '#e0f2fe', 
+                  borderRadius: '50%', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontSize: 18, 
+                  fontWeight: 700, 
+                  color: '#0284c7', 
+                  border: '1px solid #bae6fd' 
+                }}>
                   {selectedCustomer.initial}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 24, fontWeight: 700, color: '#0f172a' }}>{selectedCustomer.name}</span>
-                    <span style={{ background: '#fef3c7', color: '#b45309', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 12 }}>VIP</span>
-                    <span style={{ background: '#e2e8f0', color: '#64748b', fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 12 }}>중립형</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: '#0f172a' }}>{selectedCustomer.name}</span>
+                    <span style={{ background: '#fef3c7', color: '#b45309', fontSize: 10, fontWeight: 700, padding: '1.5px 6px', borderRadius: 10 }}>VIP</span>
+                    <span style={{ background: '#e2e8f0', color: '#64748b', fontSize: 10, fontWeight: 600, padding: '1.5px 6px', borderRadius: 10 }}>중립형</span>
                   </div>
-                  <div style={{ fontSize: 14, color: '#64748b', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>📷</span> 중견기업 CEO
-                  </div>
+                  <span style={{ fontSize: 12, color: '#64748b', fontWeight: 500 }}>💼 중견기업 CEO</span>
                 </div>
               </div>
-              <button 
-                onClick={() => setEditModalData(selectedCustomer)}
-                style={{ background: '#0284c7', color: 'white', border: 'none', borderRadius: 6, padding: '8px 24px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
-              >
-                수정하기
-              </button>
-            </div>
 
-            {/* Profile Info Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 32 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>총 자산</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>16억</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>생년월일</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>1972.08.14</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>연락처</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>{selectedCustomer.phone}</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>이메일</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>{selectedCustomer.email || "example@email.com"}</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>주소</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>서울시 강남구</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>거래 시작일</label>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', borderRadius: 8, fontSize: 14, color: '#0f172a' }}>2018.03.05</div>
+              {/* Profile Compact Grid (Horizontal dense key-values) */}
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(3, 1fr)', 
+                gap: '12px 24px', 
+                paddingTop: 12, 
+                borderTop: '1px solid #f1f5f9' 
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', width: 64 }}>총 자산</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#334155' }}>16억</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', width: 64 }}>생년월일</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#334155' }}>1972.08.14</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', width: 64 }}>연락처</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#334155' }}>{selectedCustomer.phone}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', width: 64 }}>이메일</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#334155', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{selectedCustomer.email || "example@email.com"}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', width: 64 }}>주소</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#334155' }}>서울시 강남구</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', width: 64 }}>거래시작일</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#334155' }}>2018.03.05</span>
+                </div>
               </div>
             </div>
 

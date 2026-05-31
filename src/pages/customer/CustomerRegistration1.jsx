@@ -483,11 +483,9 @@ export default function CustomerRegistration1() {
             <>
           <div className="cust-detail-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '16px', borderBottom: 'none', paddingBottom: 0 }}>
             <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div className="cust-detail-profile" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div className={`cust-avatar ${selectedCustomer.color}`} style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>
-                  {selectedCustomer.initial}
-                </div>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 }}>{selectedCustomer.name}</h2>
+              <div className="cust-detail-profile">
+                <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
+                <h2>{selectedCustomer.name}</h2>
               </div>
             </div>
 
