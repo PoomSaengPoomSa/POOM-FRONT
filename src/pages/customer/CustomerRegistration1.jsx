@@ -223,6 +223,18 @@ export default function CustomerRegistration1() {
         setTodayCustomersList(mapped);
       }
 
+      // Check query parameter c_id or state c_id
+      const queryParams = new URLSearchParams(location.search);
+      const targetCId = queryParams.get("c_id") || location.state?.c_id;
+      
+      if (targetCId) {
+        const found = mapped.find(c => c.id === parseInt(targetCId, 10));
+        if (found) {
+          setSelectedCustomer(found);
+          return;
+        }
+      }
+
       // 탭 전환 및 최초 진입 시, 사용자의 도입부 화면 요구사항에 맞추어 선택된 고객을 비워 둡니다.
       setSelectedCustomer(null);
     } catch (error) {
@@ -233,6 +245,21 @@ export default function CustomerRegistration1() {
   useEffect(() => {
     fetchCustomers();
   }, [activeListTab]);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const targetCId = queryParams.get("c_id") || location.state?.c_id;
+    if (targetCId) {
+      if (activeListTab !== '전체 고객') {
+        setActiveListTab('전체 고객');
+      } else {
+        const found = allCustomersList.find(c => c.id === parseInt(targetCId, 10));
+        if (found) {
+          setSelectedCustomer(found);
+        }
+      }
+    }
+  }, [location, allCustomersList]);
 
   // 선택된 고객이 바뀔 때 상세 정보, 방문 통계 및 이탈 위험도 로드
   useEffect(() => {
