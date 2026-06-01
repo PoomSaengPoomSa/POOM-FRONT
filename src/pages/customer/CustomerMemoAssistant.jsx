@@ -11,7 +11,7 @@ export default function CustomerMemoAssistant() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeListTab, setActiveListTab] = useState("전체 고객");
+  const [showTodayOnly, setShowTodayOnly] = useState(true);
   const [allCustomersList, setAllCustomersList] = useState([]);
   const [todayCustomersList, setTodayCustomersList] = useState([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -42,7 +42,7 @@ export default function CustomerMemoAssistant() {
 
   const fetchCustomers = async () => {
     try {
-      const tabParam = activeListTab === '전체 고객' ? 'all' : 'today';
+      const tabParam = showTodayOnly ? 'today' : 'all';
       const response = await api.customer.getList(tabParam);
       
       const mapped = response.map((c) => {
@@ -56,14 +56,13 @@ export default function CustomerMemoAssistant() {
           color: avatarColor,
           gender: c.gender,
           initial: char,
-          time: c.c_id % 2 === 0 ? "10:00 AM" : "14:30 PM",
         };
       });
 
-      if (activeListTab === '전체 고객') {
-        setAllCustomersList(mapped);
-      } else {
+      if (showTodayOnly) {
         setTodayCustomersList(mapped);
+      } else {
+        setAllCustomersList(mapped);
       }
       
       if (pendingSelectedCustomerIdRef.current) {
@@ -79,7 +78,7 @@ export default function CustomerMemoAssistant() {
 
   useEffect(() => {
     fetchCustomers();
-  }, [activeListTab]);
+  }, [showTodayOnly]);
 
   useEffect(() => {
     if (!selectedCustomerId) {
@@ -240,13 +239,13 @@ export default function CustomerMemoAssistant() {
     }
   };
   
-  const currentList = activeListTab === '전체 고객' ? allCustomersList : todayCustomersList;
+  const currentList = showTodayOnly ? todayCustomersList : allCustomersList;
   const selectedCustomer = (allCustomersList.concat(todayCustomersList).find(c => c.id === selectedCustomerId) || currentList[0]) || { name: "로딩중...", color: "gray", initial: "고" };
 
-  const [activeTab, setActiveTab] = useState("memo"); // "memo" or "simulator"
-  const [listWidth, setListWidth] = useState(320);
+  const [activeTab, setActiveTab] = useState("simulator"); // "memo" or "simulator"
+  const [listWidth, setListWidth] = useState(240);
   const [isDragging, setIsDragging] = useState(false);
-  const isNarrow = listWidth < 220;
+  const isNarrow = listWidth < 200;
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -413,13 +412,23 @@ export default function CustomerMemoAssistant() {
             />
           </div>
 
-          <div className="cust-list-tabs" style={{ marginBottom: isNarrow ? '12px' : '16px' }}>
-            <div className={`cust-list-tab ${activeListTab === '전체 고객' ? 'active' : ''}`} onClick={() => { setActiveListTab('전체 고객'); }} style={{ cursor: 'pointer', padding: isNarrow ? '8px 0' : '12px 0', fontSize: isNarrow ? '12px' : '14px' }}>
-              {isNarrow ? '전체' : '전체 고객'}
-            </div>
-            <div className={`cust-list-tab ${activeListTab === '오늘 방문' ? 'active' : ''}`} onClick={() => { setActiveListTab('오늘 방문'); }} style={{ cursor: 'pointer', padding: isNarrow ? '8px 0' : '12px 0', fontSize: isNarrow ? '12px' : '14px' }}>
-              {isNarrow ? '오늘' : '오늘 방문'}
-            </div>
+          <div className="cust-filter-area" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isNarrow ? '12px' : '16px' }}>
+            <label className="cust-checkbox-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: isNarrow ? '11px' : '13px', fontWeight: 600, color: '#334155', userSelect: 'none' }}>
+              <input 
+                type="checkbox" 
+                className="cust-checkbox-input" 
+                checked={showTodayOnly}
+                onChange={(e) => setShowTodayOnly(e.target.checked)}
+                style={{ 
+                  width: '14px', 
+                  height: '14px', 
+                  accentColor: '#0284c7', 
+                  cursor: 'pointer',
+                  borderRadius: '4px'
+                }} 
+              />
+              <span>{isNarrow ? '오늘 방문' : '오늘 방문 고객만 보기'}</span>
+            </label>
           </div>
 
           <div className="cust-list-items">
@@ -446,7 +455,6 @@ export default function CustomerMemoAssistant() {
                     <span className="cust-item-name" style={{ fontSize: '14px' }}>{c.name}</span>
                   </div>
                 )}
-                {c.time && !isNarrow && <div className="cust-item-time">{c.time}</div>}
               </div>
             ))}
           </div>
@@ -459,21 +467,68 @@ export default function CustomerMemoAssistant() {
         <div key={selectedCustomerId || 'empty'} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
           {selectedCustomerId ? (
             <>
-              <div className="cust-detail-header" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', marginBottom: '16px' }}>
+              <div className="cust-detail-header" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '0px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div className="cust-detail-profile">
                     <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
-                    <h2>{selectedCustomer.name}</h2>
+                    <h2 style={{ fontSize: '18px', margin: 0, fontWeight: 700, color: '#0f172a' }}>{selectedCustomer.name}</h2>
                   </div>
+                </div>
+
+                {/* AI Workspace Tabs */}
+                <div style={{ display: 'flex', gap: '8px', borderBottom: 'none', margin: '0 0 -1px 0' }}>
+                  <button
+                    onClick={() => setActiveTab("simulator")}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: activeTab === 'simulator' ? '#8b5cf6' : '#64748b',
+                      border: 'none',
+                      background: activeTab === 'simulator' ? '#f5f3ff' : 'transparent',
+                      borderBottom: activeTab === 'simulator' ? '2px solid #8b5cf6' : '2px solid transparent',
+                      borderRadius: '6px 6px 0 0',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease-in-out',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <TrendingUp size={13} />
+                    AI 상담 시뮬레이터
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("memo")}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: activeTab === 'memo' ? '#0284c7' : '#64748b',
+                      border: 'none',
+                      background: activeTab === 'memo' ? '#e0f2fe' : 'transparent',
+                      borderBottom: activeTab === 'memo' ? '2px solid #0284c7' : '2px solid transparent',
+                      borderRadius: '6px 6px 0 0',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease-in-out',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <PenLine size={13} />
+                    AI 상담 메모 어시스턴트
+                  </button>
                 </div>
               </div>
 
               {/* Unified Single Scroll Layout */}
-              <div style={{ display: 'flex', flexDirection: 'column', padding: '8px 24px 32px 24px', gap: '40px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', padding: '8px 24px 32px 24px', gap: '24px' }}>
                 
                 {/* Section 1: Memo Assistant (Top Workspace) */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {activeTab === "memo" && (
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ width: '4px', height: '14px', background: '#0284c7', borderRadius: '2px', display: 'inline-block' }}></span>
                     상담 메모 및 보고서 어시스턴트
                   </div>
@@ -484,7 +539,7 @@ export default function CustomerMemoAssistant() {
                       /* AI Report (with editable textareas) */
                       <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                          <div className="memo-box-title" style={{ margin: 0 }}>AI 상담 보고서</div>
+                          <div className="memo-box-title" style={{ margin: 0, fontSize: '13px', fontWeight: 700 }}>AI 상담 보고서</div>
                           <button 
                             onClick={() => setGeneratedReport(null)} 
                             style={{
@@ -626,12 +681,12 @@ export default function CustomerMemoAssistant() {
                                 position: 'absolute', right: '80px', top: '50%', transform: 'translateY(-50%)',
                                 display: 'flex', alignItems: 'center', gap: 8,
                                 background: '#334155', color: 'white',
-                                padding: '8px 16px', borderRadius: 20,
-                                fontSize: 14, fontWeight: 500,
+                                padding: '6px 12px', borderRadius: 20,
+                                fontSize: 12, fontWeight: 500,
                                 whiteSpace: 'nowrap'
                               }}>
-                                <div style={{ width: 18, height: 18, background: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <Check size={12} color="white" strokeWidth={3} />
+                                <div style={{ width: 16, height: 16, background: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <Check size={10} color="white" strokeWidth={3} />
                                 </div>
                                 저장완료
                               </div>
@@ -639,6 +694,7 @@ export default function CustomerMemoAssistant() {
                             <button 
                               className="report-btn report-btn-primary"
                               onClick={handleSaveReport}
+                              style={{ fontSize: '12px' }}
                             >
                               저장
                             </button>
@@ -648,16 +704,16 @@ export default function CustomerMemoAssistant() {
                     ) : (
                       /* Memo Input */
                       <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                        <div className="memo-box-title">AI 기반 상담 메모 구조화</div>
+                        <div className="memo-box-title" style={{ fontSize: '12px', fontWeight: 700 }}>AI 기반 상담 메모 구조화</div>
                         <textarea 
                           className="memo-textarea" 
                           placeholder="상담 내용을 이곳에 메모하세요."
                           value={memoText}
                           onChange={(e) => setMemoText(e.target.value)}
-                          style={{ minHeight: '200px', flex: 1, marginBottom: '16px', resize: 'none' }}
+                          style={{ minHeight: '200px', flex: 1, marginBottom: '16px', resize: 'none', fontSize: '12px' }}
                         />
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
-                          <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '11px' }}>
                             💡 자유롭게 메모하세요. AI가 구조화된 상담 보고서로 변환합니다.
                           </div>
                           <button 
@@ -682,11 +738,11 @@ export default function CustomerMemoAssistant() {
 
                     {/* Right Container (Always Timeline): Timeline History */}
                     <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: '420px' }}>
-                      <div className="memo-box-title" style={{ marginBottom: '20px' }}>이전 상담 타임라인</div>
+                      <div className="memo-box-title" style={{ marginBottom: '20px', fontSize: '13px', fontWeight: 700 }}>이전 상담 타임라인</div>
                       
                       <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
                         {timelineList.length === 0 ? (
-                          <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>
+                          <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8', fontSize: '11px', fontWeight: '500' }}>
                             이전 상담 타임라인 이력이 없습니다.
                           </div>
                         ) : (
@@ -725,18 +781,18 @@ export default function CustomerMemoAssistant() {
                                 )}
                                 <div className="timeline-content" style={{ paddingLeft: isExpanded ? '8px' : '0' }}>
                                   <span className="timeline-date">{item.date}</span>
-                                  <span className="timeline-text" style={{ color: isExpanded ? '#0f172a' : '#475569', fontWeight: isExpanded ? '600' : 'normal' }}>
+                                  <span className="timeline-text" style={{ color: isExpanded ? '#0f172a' : '#475569', fontWeight: isExpanded ? '600' : 'normal', fontSize: isExpanded ? '12px' : '11px' }}>
                                     {item.content?.summary || item.memo}
                                   </span>
                                   
                                   {isExpanded && (
                                     <div style={{ marginTop: '12px' }}>
                                       <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8b5cf6', fontSize: '13px', fontWeight: '700', marginBottom: '12px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8b5cf6', fontSize: '11px', fontWeight: '700', marginBottom: '12px' }}>
                                           AI 요약
                                         </div>
                                         {timelineDetails[item.timelineId] ? (
-                                          <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
+                                          <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
                                             <tbody>
                                               <tr>
                                                 <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>주요 내용</td>
@@ -779,17 +835,12 @@ export default function CustomerMemoAssistant() {
                     </div>
                   </div>
                 </div>
-
-                {/* Premium Divider between workspaces */}
-                <div style={{ borderTop: '1px solid #e2e8f0', width: '100%', position: 'relative' }}>
-                  <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#ffffff', padding: '4px 16px', color: '#94a3b8', fontSize: '11px', fontWeight: 600, borderRadius: '12px', border: '1px solid #cbd5e1' }}>
-                    CLIENT SIMULATOR WORKSPACE
-                  </span>
-                </div>
+              )}
 
                 {/* Section 2: Simulator (Bottom Workspace) */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {activeTab === "simulator" && (
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ width: '4px', height: '14px', background: '#8b5cf6', borderRadius: '2px', display: 'inline-block' }}></span>
                     자산 시뮬레이터 및 AI 질의응답
                   </div>
@@ -800,32 +851,32 @@ export default function CustomerMemoAssistant() {
                       
                       {/* Single Integrated Container */}
                       <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto' }}>
-                        <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', marginBottom: '12px', marginTop: 0 }}>고객 정보 & AI 인사이트</h3>
+                        <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '12px', marginTop: 0 }}>고객 정보 & AI 인사이트</h3>
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>고객명(등급)</span>
-                            <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.name}</span>
+                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>고객명(등급)</span>
+                            <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.name}</span>
                           </div>
                           
                           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>생년월일</span>
-                            <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.birthday}</span>
+                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>생년월일</span>
+                            <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.birthday}</span>
                           </div>
                           
                           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>직업</span>
-                            <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.job}</span>
+                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>직업</span>
+                            <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.job}</span>
                           </div>
                           
                           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>성향</span>
-                            <span style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600 }}>{selectedSimDetails.risk}</span>
+                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>성향</span>
+                            <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.risk}</span>
                           </div>
                           
                           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '13px', fontWeight: 500 }}>총자산</span>
-                            <span style={{ color: '#0284c7', fontSize: '13px', fontWeight: 700 }}>{selectedSimDetails.assets}</span>
+                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>총자산</span>
+                            <span style={{ color: '#0284c7', fontSize: '12px', fontWeight: 700 }}>{selectedSimDetails.assets}</span>
                           </div>
                           
                           </div>
@@ -833,24 +884,24 @@ export default function CustomerMemoAssistant() {
                           {/* Premium AI Insight Glow Card */}
                           <div className="ai-insight-glow-card" style={{ marginTop: '16px' }}>
                             <div className="ai-insight-header">
-                              <span className="ai-badge-gradient">AI INSIGHT</span>
-                              <span style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: 800 }}>금융 라이프스타일 분석</span>
+                              <span className="ai-badge-gradient" style={{ fontSize: '9px' }}>AI INSIGHT</span>
+                              <span style={{ fontSize: '10px', color: '#8b5cf6', fontWeight: 800 }}>금융 라이프스타일 분석</span>
                             </div>
-                            <div className="ai-insight-body">
+                            <div className="ai-insight-body" style={{ fontSize: '11px' }}>
                               {selectedSimDetails.insight}
                             </div>
                           </div>
 
                         {/* Additional Notes Integrated at the bottom */}
                         <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px', gap: '8px' }}>
-                          <span style={{ color: '#475569', fontSize: '13px', fontWeight: 700 }}>추가 입력 사항</span>
+                          <span style={{ color: '#475569', fontSize: '12px', fontWeight: 700 }}>추가 입력 사항</span>
                           <textarea
                             style={{ 
                               width: '100%', 
                               border: '1px solid #cbd5e1', 
                               borderRadius: '8px', 
                               padding: '10px 12px', 
-                              fontSize: '12px', 
+                              fontSize: '11px', 
                               color: '#334155', 
                               resize: 'none',
                               outline: 'none',
@@ -1054,13 +1105,14 @@ export default function CustomerMemoAssistant() {
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
                 
               </div>
-            </div>
             </>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#64748b', textAlign: 'center', flex: 1 }}>
-              {activeListTab === '전체 고객' ? (
+              {!showTodayOnly ? (
                 <div style={{ width: 100, height: 100, borderRadius: '50%', background: '#e0f2fe', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
                   <UserCircle size={48} color="#0284c7" strokeWidth={1.5} />
                 </div>
@@ -1069,11 +1121,11 @@ export default function CustomerMemoAssistant() {
                   <Calendar size={48} color="#ffffff" strokeWidth={1.5} />
                 </div>
               )}
-              <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>{activeListTab === '전체 고객' ? '전체 고객 목록' : '오늘 방문 고객'}</h2>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: '#0f172a', marginBottom: 16 }}>{!showTodayOnly ? '전체 고객 목록' : '오늘 방문 고객'}</h2>
               <p style={{ fontSize: 15, lineHeight: 1.6, marginBottom: 40, whiteSpace: 'pre-wrap', color: '#94a3b8' }}>
-                {activeListTab === '전체 고객' ? '왼쪽 목록에서 고객을 선택하면\n상세 정보를 확인할 수 있어요.' : '왼쪽에서 오늘 방문 고객을 선택하면\n상세 정보를 확인할 수 있어요.'}
+                {!showTodayOnly ? '왼쪽 목록에서 고객을 선택하면\n상세 정보를 확인할 수 있어요.' : '왼쪽에서 오늘 방문 고객을 선택하면\n상세 정보를 확인할 수 있어요.'}
               </p>
-              {activeListTab === '전체 고객' && <p style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>고객 이름을 클릭해 메모 어시스턴트와 시뮬레이터를 확인하세요</p>}
+              {!showTodayOnly && <p style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>고객 이름을 클릭해 메모 어시스턴트와 시뮬레이터를 확인하세요</p>}
             </div>
           )}
         </div>
@@ -1095,7 +1147,7 @@ export default function CustomerMemoAssistant() {
             });
 
             pendingSelectedCustomerIdRef.current = created.c_id;
-            setActiveListTab("전체 고객");
+            setShowTodayOnly(false);
 
             // Fetch refreshed list to update the client state
             const response = await api.customer.getList("all");
@@ -1110,7 +1162,6 @@ export default function CustomerMemoAssistant() {
                 color: avatarColor,
                 gender: c.gender,
                 initial: char,
-                time: c.c_id % 2 === 0 ? "10:00 AM" : "14:30 PM",
               };
             });
 

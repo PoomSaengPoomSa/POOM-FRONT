@@ -1207,3 +1207,369 @@
   padding: 8px;
 }
 
+/* ==========================================================================
+   Restructured 50:50 Dual-Column Dashboard Layout
+   ========================================================================== */
+
+.main-dashboard-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  flex: 1;
+  min-height: 0; /* Let children manage overflow */
+}
+
+.dashboard-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* ==========================================================================
+   KPI Combined Tabbed Container Styles
+   ========================================================================== */
+
+.kpi-combined-card {
+  background: white;
+  border: 1px solid var(--main-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.kpi-tab-buttons {
+  display: flex;
+  background-color: #f1f5f9;
+  padding: 3px;
+  border-radius: 8px;
+  gap: 2px;
+}
+
+.kpi-tab-btn {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--main-text-muted);
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kpi-tab-btn:hover {
+  color: var(--main-text-title);
+}
+
+.kpi-tab-btn.active {
+  background-color: white;
+  color: var(--main-text-title);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-tab-content {
+  margin-top: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.kpi-inner-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fadeInSlide 0.2s ease-out forwards;
+}
+
+.kpi-subtitle-korean-inner {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary-color);
+  background-color: var(--primary-bg-light);
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.kpi-stats-grid-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.kpi-stat-item-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-stat-label-wrap-inner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+  color: var(--main-text-muted);
+}
+
+.kpi-icon-inner {
+  color: var(--primary-color);
+}
+
+.kpi-label-text-inner {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.kpi-stat-value-inner {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--main-text-title);
+  margin-bottom: 2px;
+}
+
+.kpi-unit-inner {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--main-text-muted);
+  margin-left: 2px;
+}
+
+.kpi-progress-bar-container-inner {
+  height: 4px;
+  background-color: #f1f5f9;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 3px;
+}
+
+.kpi-progress-bar-fill-inner {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease-out;
+}
+
+.kpi-progress-bar-fill-inner.bg-primary {
+  background-color: var(--primary-color);
+}
+
+.kpi-progress-bar-fill-inner.bg-green {
+  background-color: var(--kpi-green);
+}
+
+.kpi-progress-labels-inner {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--main-text-muted);
+}
+
+.kpi-progress-pct-inner {
+  color: var(--main-text-title);
+}
+
+.kpi-trend-inner {
+  font-size: 9px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin-top: 2px;
+}
+
+.kpi-trend-inner.green {
+  color: var(--kpi-green);
+}
+
+.kpi-trend-inner.red {
+  color: var(--kpi-red);
+}
+
+/* ==========================================================================
+   Trend Archive Predictions Card Styles
+   ========================================================================== */
+
+.trend-prediction-card {
+  background: white;
+  border: 1px solid var(--main-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.trend-prediction-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.trend-mini-card {
+  background-color: var(--main-bg);
+  border: 1px solid var(--main-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.trend-mini-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.mini-card-title-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--main-border);
+  padding-bottom: 4px;
+}
+
+.mini-card-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--main-text-title);
+}
+
+.mini-card-sublabel {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--main-text-muted);
+}
+
+.mini-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.prob-bar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prob-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.prob-name {
+  font-size: 9px;
+  font-weight: 700;
+  width: 16px;
+}
+
+.prob-progress-bar {
+  flex: 1;
+  height: 4px;
+  background-color: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.prob-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+.prob-fill.bg-danger {
+  background-color: var(--kpi-red);
+}
+
+.prob-fill.bg-blue {
+  background-color: #3b82f6;
+}
+
+.prob-fill.bg-muted {
+  background-color: #94a3b8;
+}
+
+.prob-value {
+  font-size: 9px;
+  font-weight: 800;
+  width: 22px;
+  text-align: right;
+}
+
+.trend-pred-text {
+  font-size: 9.5px;
+  font-weight: 700;
+  border-top: 1px dashed var(--main-border);
+  padding-top: 4px;
+  margin-top: auto;
+  color: var(--main-text-body);
+}
+
+.text-danger {
+  color: var(--kpi-red);
+}
+
+.text-blue {
+  color: #3b82f6;
+}
+
+.real-estate-content {
+  justify-content: space-between;
+}
+
+/* ==========================================================================
+   AI To Do Switched Timeline Tab Styles
+   ========================================================================== */
+
+.todo-view-mode-tabs {
+  display: flex;
+  background-color: #f1f5f9;
+  padding: 2px;
+  border-radius: 8px;
+  gap: 1px;
+}
+
+.todo-mode-btn {
+  background: transparent;
+  border: none;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--main-text-muted);
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.todo-mode-btn:hover {
+  color: var(--main-text-title);
+}
+
+.todo-mode-btn.active {
+  background-color: white;
+  color: var(--main-text-title);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.trend-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 0;
+}
+
+.trend-loading-spinner {
+  font-size: 20px;
+  color: var(--kpi-green);
+}
+

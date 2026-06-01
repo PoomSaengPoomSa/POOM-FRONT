@@ -401,16 +401,28 @@ export default function Sidebar({ type = "cal" }) {
             </div>
           )}
         </div>
-        <Link to="/daily-calendar" className={`${prefix}-menu-item sidebar-menu-item ${isCalendarActive ? 'active' : ''}`}>
-          <Calendar size={20} />
-          {!isCollapsed && <span className="menu-text">캘린더</span>}
-          {isCollapsed && <span className="sidebar-tooltip">캘린더</span>}
-        </Link>
         <Link to="/notifications" className={`${prefix}-menu-item sidebar-menu-item ${isNotificationActive ? 'active' : ''}`}>
           <Bell size={20} />
           {!isCollapsed && <span className="menu-text">알림</span>}
           {todayCount > 0 && (
-            <span className={`${prefix}-badge sidebar-badge`} style={{ backgroundColor: '#fee2e2', color: '#ef4444', marginLeft: 'auto' }}>
+            <span 
+              className={`sidebar-bell-badge ${isCollapsed ? 'sidebar-badge' : ''}`} 
+              style={{ 
+                backgroundColor: '#fee2e2', 
+                color: '#ef4444', 
+                marginLeft: isCollapsed ? '0' : 'auto',
+                fontSize: '11px',
+                fontWeight: '700',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '18px',
+                minWidth: '18px',
+                boxSizing: 'border-box'
+              }}
+            >
               {todayCount}
             </span>
           )}
