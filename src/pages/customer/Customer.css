@@ -397,4 +397,18 @@
   font-weight: 500;
 }
 
+/* Dynamic Word Cloud Styles */
+.cust-wordcloud-tag {
+  transition: transform 0.2s ease, filter 0.2s ease, text-shadow 0.2s ease;
+  cursor: pointer;
+  display: inline-block;
+  user-select: none;
+}
+.cust-wordcloud-tag:hover {
+  transform: scale(1.15) translate(-1px, -1px);
+  filter: brightness(0.95);
+  text-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+
 

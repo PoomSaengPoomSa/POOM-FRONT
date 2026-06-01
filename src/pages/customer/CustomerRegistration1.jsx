@@ -164,19 +164,25 @@ export default function CustomerRegistration1() {
   const [showWordCloud, setShowWordCloud] = useState(true);
   const [selectedProductModal, setSelectedProductModal] = useState(null);
 
-  const wordCloudData = [
-    { text: "위험선호형", size: 15, color: "#ef4444", bg: "#fee2e2" },
-    { text: "IT 대기업 CEO", size: 14, color: "#3b82f6", bg: "#dbeafe" },
-    { text: "리츠 관심", size: 13, color: "#10b981", bg: "#d1fae5" },
-    { text: "채권 선호", size: 13, color: "#8b5cf6", bg: "#ede9fe" },
-    { text: "골프 기호", size: 11, color: "#f59e0b", bg: "#fef3c7" },
-    { text: "안정 추구", size: 11, color: "#06b6d4", bg: "#ecfeff" },
-    { text: "해외주식", size: 12, color: "#ec4899", bg: "#fce7f3" },
-    { text: "절세 우선", size: 14, color: "#0ea5e9", bg: "#e0f2fe" },
-    { text: "자녀 증여", size: 13, color: "#6366f1", bg: "#e0e7ff" },
-    { text: "부동산 투자", size: 11, color: "#14b8a6", bg: "#ccfbf1" },
-    { text: "50대 장기투자", size: 10, color: "#64748b", bg: "#f1f5f9" }
-  ];
+  const getDynamicWordCloudData = () => {
+    if (!fullCustomerDetail?.features) return [];
+    const tags = fullCustomerDetail.features.split(",")
+      .map(t => t.trim())
+      .filter(Boolean);
+      
+    const colors = ["#ef4444", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#06b6d4", "#ec4899", "#0ea5e9", "#6366f1", "#14b8a6"];
+    const bgs = ["#fee2e2", "#dbeafe", "#d1fae5", "#ede9fe", "#fef3c7", "#ecfeff", "#fce7f3", "#e0f2fe", "#e0e7ff", "#ccfbf1"];
+    const sizes = [14, 13, 12, 12, 11, 11, 12, 13, 12, 11, 10];
+    
+    return tags.map((tag, idx) => {
+      const color = colors[idx % colors.length];
+      const bg = bgs[idx % bgs.length];
+      const size = sizes[idx % sizes.length];
+      return { text: tag, size, color, bg };
+    });
+  };
+
+  const wordCloudData = getDynamicWordCloudData();
 
   const fetchCustomers = async () => {
     try {
@@ -763,31 +769,67 @@ export default function CustomerRegistration1() {
                       </div>
 
                       {showWordCloud ? (
-                        /* 워드 클라우드 뷰 */
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '4px 2px', overflowY: 'auto' }}>
-                          {wordCloudData.map((tag, idx) => (
-                            <span
-                              key={idx}
-                              style={{
-                                fontSize: tag.size,
-                                color: tag.color,
-                                background: tag.bg,
-                                padding: '6px 12px',
-                                borderRadius: 16,
-                                fontWeight: 700,
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                                cursor: 'default',
-                                userSelect: 'none',
-                                transition: 'transform 0.2s',
-                                display: 'inline-block'
-                              }}
-                              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            >
-                              {tag.text}
-                            </span>
-                          ))}
-                        </div>
+                        wordCloudData.length > 0 ? (
+                          /* 워드 클라우드 뷰 */
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '4px 2px', overflowY: 'auto' }}>
+                            {wordCloudData.map((tag, idx) => (
+                              <span
+                                key={idx}
+                                style={{
+                                  fontSize: tag.size,
+                                  color: tag.color,
+                                  background: tag.bg,
+                                  padding: '6px 12px',
+                                  borderRadius: 16,
+                                  fontWeight: 700,
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                  cursor: 'default',
+                                  userSelect: 'none',
+                                  transition: 'transform 0.2s',
+                                  display: 'inline-block'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                              >
+                                {tag.text}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          /* 예외 처리 (Graceful Fallback) */
+                          <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                            textAlign: 'center',
+                            padding: '16px',
+                            background: 'white',
+                            borderRadius: 12,
+                            border: '1px dashed #cbd5e1',
+                            margin: '8px 0',
+                            minHeight: 140
+                          }}>
+                            <div style={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: '50%',
+                              background: '#f8fafc',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginBottom: 8
+                            }}>
+                              <span style={{ fontSize: 16, color: '#94a3b8' }}>❓</span>
+                            </div>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: '#64748b', margin: '0 0 2px 0' }}>대표 관심사 키워드 미수립</p>
+                            <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, lineHeight: 1.3 }}>
+                              최근 1개월 내 상담 내역이 없거나<br />
+                              AI 분석 특징 정보가 존재하지 않습니다.
+                            </p>
+                          </div>
+                        )
                       ) : (
                         /* 기존 카테고리 탭 및 특징 목록 */
                         <>
