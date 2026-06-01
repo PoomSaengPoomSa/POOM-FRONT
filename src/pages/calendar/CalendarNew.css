@@ -1752,4 +1752,94 @@
   }
 }
 
+/* AI To Do Diagonal Stripe Patterns in Calendar Events */
+.ai-recommended-event-stripe {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--stripe-bg-light),
+    var(--stripe-bg-light) 8px,
+    var(--stripe-bg-dark) 8px,
+    var(--stripe-bg-dark) 16px
+  ) !important;
+  border: 1px dashed var(--stripe-border) !important;
+  opacity: 0.9;
+  position: relative;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.ai-recommended-event-stripe:hover {
+  filter: brightness(0.95) contrast(1.05);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+  transform: translateY(-1px);
+  opacity: 1;
+}
+
+.ai-recommended-event-stripe::after {
+  content: '✨ AI 추천';
+  position: absolute;
+  bottom: 2px;
+  right: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--stripe-text);
+  opacity: 0.75;
+}
+
+/* Color variations for AI Recommended Stripes */
+.ai-stripe-yellow {
+  --stripe-bg-light: #fef9c3;
+  --stripe-bg-dark: #fef08a;
+  --stripe-border: #eab308;
+  --stripe-text: #854d0e;
+}
+.ai-stripe-blue {
+  --stripe-bg-light: #e0f2fe;
+  --stripe-bg-dark: #bae6fd;
+  --stripe-border: #0ea5e9;
+  --stripe-text: #0369a1;
+}
+.ai-stripe-pink {
+  --stripe-bg-light: #fce7f3;
+  --stripe-bg-dark: #fbcfe8;
+  --stripe-border: #ec4899;
+  --stripe-text: #9d174d;
+}
+.ai-stripe-purple {
+  --stripe-bg-light: #f3e8ff;
+  --stripe-bg-dark: #e9d5ff;
+  --stripe-border: #a855f7;
+  --stripe-text: #6b21a8;
+}
+.ai-stripe-lightblue {
+  --stripe-bg-light: #ecfeff;
+  --stripe-bg-dark: #cffafe;
+  --stripe-border: #06b6d4;
+  --stripe-text: #164e63;
+}
+.ai-stripe-orange {
+  --stripe-bg-light: #ffedd5;
+  --stripe-bg-dark: #fed7aa;
+  --stripe-border: #f97316;
+  --stripe-text: #9a3412;
+}
+.ai-stripe-green {
+  --stripe-bg-light: #dcfce7;
+  --stripe-bg-dark: #bbf7d0;
+  --stripe-border: #22c55e;
+  --stripe-text: #166534;
+}
+
+/* Monthly event stripe */
+.monthly-event.ai-stripe {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.4) 4px,
+    rgba(0, 0, 0, 0.05) 4px,
+    rgba(0, 0, 0, 0.05) 8px
+  );
+  border: 1px dashed currentColor !important;
+}
+
 

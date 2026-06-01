@@ -293,17 +293,16 @@ export function CalendarProvider({ children }) {
   // AI To-Do는 언제나 실제 '오늘' 날짜를 기준으로 고정하여 노출합니다.
   // (어차피 전날 등록 안 한 중요 추천은 AI 에이전트가 오늘 자로 다시 끌어올려 추천해주기 때문)
   useEffect(() => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
+    const yyyy = selectedDate.getFullYear();
+    const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(selectedDate.getDate()).padStart(2, '0');
+    const dateStr = `${yyyy}-${mm}-${dd}`;
     
     const filtered = allAiTodos.filter(todo => 
-      todo.executionDate && todo.executionDate.startsWith(todayStr)
+      todo.executionDate && todo.executionDate.startsWith(dateStr)
     );
     setAiTodos(filtered);
-  }, [allAiTodos]);
+  }, [allAiTodos, selectedDate]);
 
   const transferCheckedAiTodos = async (date) => {
     const checkedTodos = aiTodos.filter(t => t.checked);
@@ -412,6 +411,7 @@ export function CalendarProvider({ children }) {
       selectedDate, 
       setSelectedDate,
       aiTodos,
+      allAiTodos,
       toggleAiTodo,
       transferCheckedAiTodos,
       revertAiTodo,
@@ -423,7 +423,8 @@ export function CalendarProvider({ children }) {
       personalKpi,
       branchKpi,
       seasonalProducts,
-      fetchKpiData
+      fetchKpiData,
+      fetchCalendarData
     }}>
       {children}
     </CalendarContext.Provider>

@@ -234,27 +234,70 @@ export default function CustomerDashboard() {
         <div key={selectedCustomerId || 'empty'} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
           {selectedCustomer ? (
             <>
-              <div className="cust-detail-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '24px' }}>
+              <div className="cust-detail-header" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div className="cust-detail-profile">
                     <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
                     <h2>{selectedCustomer.name}</h2>
                   </div>
                 </div>
-                <div className="cust-detail-tabs" style={{ margin: 0 }}>
-                  <Link to="/customer-management-registration-1" style={{ textDecoration: 'none' }}>
-                    <button className="cust-detail-tab">프로필</button>
-                  </Link>
-                  <button className="cust-detail-tab active">고객 대시보드</button>
-                  
-                  <Link to="/customer-management-memo-assistant" style={{ textDecoration: 'none' }}>
-                    <button className="cust-detail-tab">메모 어시스턴트</button>
-                  </Link>
-                </div>
               </div>
 
               <div style={{ padding: '8px 24px 24px 24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
                 
+                {/* 🌟 AI 종합 진단 및 핵심 인사이트 Board */}
+                <div className="ai-insight-glow-card" style={{ 
+                  margin: 0, 
+                  background: 'linear-gradient(135deg, #f8fafc 0%, #f5f3ff 100%)', 
+                  border: '1.5px solid rgba(139, 92, 246, 0.3)', 
+                  boxShadow: '0 12px 30px -10px rgba(139, 92, 246, 0.15)',
+                  padding: '20px 24px',
+                  borderRadius: 16
+                }}>
+                  {/* Title Bar */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                    <div style={{ 
+                      width: 24, 
+                      height: 24, 
+                      borderRadius: '50%', 
+                      background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      boxShadow: '0 4px 10px rgba(139, 92, 246, 0.4)'
+                    }}>
+                      <span style={{ fontSize: 12, color: 'white' }}>⚡</span>
+                    </div>
+                    <span className="ai-badge-gradient" style={{ fontSize: 9 }}>AI COMPREHENSIVE DIAGNOSIS</span>
+                    <h3 style={{ fontSize: 15, fontWeight: 800, color: '#4c1d95', margin: 0 }}>AI 종합 진단 및 핵심 인사이트</h3>
+                  </div>
+
+                  {/* Two Columns Grid for AI Portfolio Asset Diagnosis & AI Churn Diagnosis */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                    {/* Left Column: Asset Diagnosis */}
+                    <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid rgba(139, 92, 246, 0.1)', boxShadow: '0 4px 6px -1px rgba(139, 92, 246, 0.02)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                        <span style={{ fontSize: 14 }}>📊</span>
+                        <span style={{ fontSize: 12, color: '#7c3aed', fontWeight: 800 }}>AI 포트폴리오 자산 진단</span>
+                      </div>
+                      <p style={{ fontSize: 12, color: '#475569', lineHeight: 1.6, fontWeight: 500, margin: 0 }}>
+                        {fullCustomerDetail?.llm_insight || "고객님의 현재 포트폴리오는 현금 및 예적금 비율이 높은 편이며, 글로벌 변동성에 대비한 리츠 및 대체자산 비중을 확대하는 방안을 고려해볼 수 있습니다."}
+                      </p>
+                    </div>
+
+                    {/* Right Column: Churn Risk Diagnosis */}
+                    <div style={{ background: 'white', padding: '16px 20px', borderRadius: 12, border: '1px solid rgba(139, 92, 246, 0.1)', boxShadow: '0 4px 6px -1px rgba(139, 92, 246, 0.02)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                        <span style={{ fontSize: 14 }}>🎯</span>
+                        <span style={{ fontSize: 12, color: '#7c3aed', fontWeight: 800 }}>AI 이탈 위험 상세 진단</span>
+                      </div>
+                      <p style={{ fontSize: 12, color: '#475569', lineHeight: 1.6, fontWeight: 500, margin: 0 }}>
+                        {churnRisk?.reason || "자산 변화 추이와 내방 일정, 대화 피드백 감정이 매우 긍정적이며 안정적으로 유지되고 있는 상태입니다."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Row 1: 자산 보유 현황 / 이탈 위험 수준 */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                   
@@ -265,7 +308,7 @@ export default function CustomerDashboard() {
                       <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>포트폴리오 비중</span>
                     </div>
                     <div style={{ display: 'flex', flex: 1, alignItems: 'center' }}>
-                      <div style={{ position: 'relative', width: 140, height: 140 }}>
+                      <div style={{ position: 'relative', width: 140, height: 140, flexShrink: 0 }}>
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
                             <Pie data={dynamicAssetData} innerRadius={45} outerRadius={70} paddingAngle={2} dataKey="value" stroke="none">
@@ -298,14 +341,12 @@ export default function CustomerDashboard() {
                       <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>이탈 위험 수준</h3>
                       <span style={{ fontSize: 14, color: churnUI.headerColor, fontWeight: 700 }}>{churnUI.label}</span>
                     </div>
-                    <div style={{ background: churnUI.bg, borderRadius: 12, padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24, boxShadow: churnUI.boxShadow }}>
-                      <div style={{ fontSize: 32, marginBottom: 4 }}>{churnUI.emoji}</div>
-                      <div style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 4 }}>{churnRisk?.grade || "양호"}</div>
-                      <div style={{ fontSize: 12, color: 'white', fontWeight: 500, textAlign: 'center', wordBreak: 'keep-all', lineHeight: 1.4 }}>
-                        {churnRisk?.reason || churnUI.subtitle}
-                      </div>
+                    <div style={{ background: churnUI.bg, borderRadius: 12, padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20, boxShadow: churnUI.boxShadow }}>
+                      <div style={{ fontSize: 28, marginBottom: 2 }}>{churnUI.emoji}</div>
+                      <div style={{ fontSize: 18, fontWeight: 700, color: 'white' }}>{churnRisk?.grade || "양호"}</div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                         <span style={{ fontSize: 11, color: '#94a3b8', width: 50, textAlign: 'right' }}>방문 간격</span>
                         <div style={{ flex: 1, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>

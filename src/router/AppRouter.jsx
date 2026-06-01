@@ -24,6 +24,7 @@ import SignUpNew from "../pages/auth/SignUpNew.jsx";
 import LoginNew from "../pages/auth/LoginNew.jsx";
 import WeeklyCalendar from "../pages/calendar/WeeklyCalendar.jsx";
 import MonthlyCalendar from "../pages/calendar/MonthlyCalendar.jsx";
+import MainPage from "../pages/main/MainPage.jsx";
 
 // Phase 3: Customer Management and News Bucket Pages
 import CustomerNotifications from "../pages/news/CustomerNotifications.jsx";
@@ -76,6 +77,7 @@ export default function AppRouter() {
         
         {/* Phase 2 Calendar Routes */}
         <Route element={<CalendarProvider><Outlet /></CalendarProvider>}>
+          <Route path="/main" element={<MainPage />} />
           <Route path="/daily-calendar" element={<DailyCalendar />} />
           <Route path="/weekly-calendar" element={<WeeklyCalendar />} />
           <Route path="/monthly-calendar" element={<MonthlyCalendar />} />
