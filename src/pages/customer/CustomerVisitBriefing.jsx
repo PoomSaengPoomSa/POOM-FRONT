@@ -85,19 +85,7 @@ export default function CustomerVisitBriefing() {
 
         {/* Right Detail Panel */}
         <div key={selectedCustomerId} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
-          <div className="cust-detail-header">
-            <div className="cust-detail-tabs" style={{ margin: 0 }}>
-              <Link to="/customer-management-profile" style={{ textDecoration: 'none' }}>
-              <button className="cust-detail-tab">프로필</button>
-            </Link>
-            <Link to="/customer-management-dashboard-2" style={{ textDecoration: 'none' }}>
-              <button className="cust-detail-tab">고객 대시보드</button>
-            </Link>
-            
-            <Link to="/customer-management-memo-assistant" style={{ textDecoration: 'none' }}>
-              <button className="cust-detail-tab">메모 어시스턴트</button>
-            </Link>
-            </div>
+          <div className="cust-detail-header" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div className="cust-detail-profile">
                 <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
