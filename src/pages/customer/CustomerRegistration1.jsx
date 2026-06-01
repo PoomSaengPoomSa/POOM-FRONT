@@ -9,13 +9,13 @@ import "./Customer.css";
 
 const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, customerFeatures, productMatches) => {
   if (!customer) return null;
-  
+
   let lastVisitDiffVal = "9";
   if (visitStats && visitStats.last_visit_date) {
     const lastDate = new Date(visitStats.last_visit_date);
     const today = new Date();
-    lastDate.setHours(0,0,0,0);
-    today.setHours(0,0,0,0);
+    lastDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
     const diffTime = today.getTime() - lastDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     if (diffDays === 0) {
@@ -29,20 +29,20 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
 
   const monthlyVisits = visitStats && visitStats.monthly_visits
     ? visitStats.monthly_visits.map(mv => ({
-        month: mv.month,
-        visited: mv.count > 0,
-        height: mv.count > 0 ? 80 : 0
-      }))
+      month: mv.month,
+      visited: mv.count > 0,
+      height: mv.count > 0 ? 80 : 0
+    }))
     : [
-        { month: "09월", visited: false },
-        { month: "10월", visited: false },
-        { month: "11월", visited: true, height: 80 },
-        { month: "12월", visited: false },
-        { month: "01월", visited: true, height: 80 },
-        { month: "02월", visited: false },
-        { month: "03월", visited: true, height: 80 },
-        { month: "04월", visited: true, height: 80 },
-      ];
+      { month: "09월", visited: false },
+      { month: "10월", visited: false },
+      { month: "11월", visited: true, height: 80 },
+      { month: "12월", visited: false },
+      { month: "01월", visited: true, height: 80 },
+      { month: "02월", visited: false },
+      { month: "03월", visited: true, height: 80 },
+      { month: "04월", visited: true, height: 80 },
+    ];
 
   let riskLevel = "미측정";
   let riskLabel = "데이터 부족";
@@ -109,15 +109,15 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
     features: (customerFeatures && customerFeatures.features) ? customerFeatures.features : [],
     productMatchingList: (productMatches && productMatches.items && productMatches.items.length > 0)
       ? productMatches.items.map(item => ({
-          productName: item.product_name,
-          productDesc: item.product_explanation,
-          status: (item.is_owned || Number(item.is_suitable) === 2) ? "보유 중" : (Number(item.is_suitable) === 1 ? "적합" : "부적합"),
-          statusColor: (item.is_owned || Number(item.is_suitable) === 2) ? "#3b82f6" : (Number(item.is_suitable) === 1 ? "#10b981" : "#ef4444"),
-          matchingDesc: item.reason
-        }))
+        productName: item.product_name,
+        productDesc: item.product_explanation,
+        status: (item.is_owned || Number(item.is_suitable) === 2) ? "보유 중" : (Number(item.is_suitable) === 1 ? "적합" : "부적합"),
+        statusColor: (item.is_owned || Number(item.is_suitable) === 2) ? "#3b82f6" : (Number(item.is_suitable) === 1 ? "#10b981" : "#ef4444"),
+        matchingDesc: item.reason
+      }))
       : []
   };
- 
+
   if (fullDetail && fullDetail.net_worth === 0) {
     defaults.assetList = [
       { name: '예적금', value: 0, color: '#2dd4bf' },
@@ -164,25 +164,31 @@ export default function CustomerRegistration1() {
   const [showWordCloud, setShowWordCloud] = useState(true);
   const [selectedProductModal, setSelectedProductModal] = useState(null);
 
-  const wordCloudData = [
-    { text: "위험선호형", size: 15, color: "#ef4444", bg: "#fee2e2" },
-    { text: "IT 대기업 CEO", size: 14, color: "#3b82f6", bg: "#dbeafe" },
-    { text: "리츠 관심", size: 13, color: "#10b981", bg: "#d1fae5" },
-    { text: "채권 선호", size: 13, color: "#8b5cf6", bg: "#ede9fe" },
-    { text: "골프 기호", size: 11, color: "#f59e0b", bg: "#fef3c7" },
-    { text: "안정 추구", size: 11, color: "#06b6d4", bg: "#ecfeff" },
-    { text: "해외주식", size: 12, color: "#ec4899", bg: "#fce7f3" },
-    { text: "절세 우선", size: 14, color: "#0ea5e9", bg: "#e0f2fe" },
-    { text: "자녀 증여", size: 13, color: "#6366f1", bg: "#e0e7ff" },
-    { text: "부동산 투자", size: 11, color: "#14b8a6", bg: "#ccfbf1" },
-    { text: "50대 장기투자", size: 10, color: "#64748b", bg: "#f1f5f9" }
-  ];
+  const getDynamicWordCloudData = () => {
+    if (!fullCustomerDetail?.features) return [];
+    const tags = fullCustomerDetail.features.split(",")
+      .map(t => t.trim())
+      .filter(Boolean);
+      
+    const colors = ["#ef4444", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b", "#06b6d4", "#ec4899", "#0ea5e9", "#6366f1", "#14b8a6"];
+    const bgs = ["#fee2e2", "#dbeafe", "#d1fae5", "#ede9fe", "#fef3c7", "#ecfeff", "#fce7f3", "#e0f2fe", "#e0e7ff", "#ccfbf1"];
+    const sizes = [14, 13, 12, 12, 11, 11, 12, 13, 12, 11, 10];
+    
+    return tags.map((tag, idx) => {
+      const color = colors[idx % colors.length];
+      const bg = bgs[idx % bgs.length];
+      const size = sizes[idx % sizes.length];
+      return { text: tag, size, color, bg };
+    });
+  };
+
+  const wordCloudData = getDynamicWordCloudData();
 
   const fetchCustomers = async () => {
     try {
       const tabParam = showTodayOnly ? 'today' : 'all';
       const response = await api.customer.getList(tabParam);
-      
+
       const mapped = response.map((c) => {
         const char = c.name ? c.name[0] : "고";
         const avatarColor = c.gender === "F" ? "pink" : "blue";
@@ -223,6 +229,7 @@ export default function CustomerRegistration1() {
   };
 
   useEffect(() => {
+    setSelectedCustomer(null);
     fetchCustomers();
   }, [showTodayOnly]);
 
@@ -235,7 +242,7 @@ export default function CustomerRegistration1() {
       setProductMatches(null);
       return;
     }
-    
+
     const fetchDetail = () => {
       api.customer.getDetail(selectedCustomer.id)
         .then(detail => {
@@ -281,7 +288,7 @@ export default function CustomerRegistration1() {
           setProductMatches(null);
         });
     };
-    
+
     fetchDetail();
   }, [selectedCustomer]);
 
@@ -308,9 +315,9 @@ export default function CustomerRegistration1() {
   };
 
   const currentList = showTodayOnly ? todayCustomersList : allCustomersList;
-  const filteredCustomers = currentList.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    c.email.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredCustomers = currentList.filter(c =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.phone.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -332,22 +339,30 @@ export default function CustomerRegistration1() {
           gender: formData.gender,
         });
         setEditModalData(null);
+        // 갱신을 수행하기 전에, 목록 업데이트가 selectedCustomer를 지우지 않도록 fetchCustomers를 비동기 호출하되
+        // 로컬 상태 selectedCustomer의 id 값을 안전하게 캡처해 둡니다.
+        const currentId = editModalData.id;
         await fetchCustomers();
-        
+
         if (selectedCustomer && selectedCustomer.id === editModalData.id) {
           const detail = await api.customer.getDetail(selectedCustomer.id);
           setFullCustomerDetail(detail);
-          
+
           const updatedColor = formData.gender === "F" ? "pink" : "blue";
 
-          setSelectedCustomer(prev => ({
-            ...prev,
-            name: formData.name,
-            phone: formData.phone,
-            email: formData.email,
-            gender: formData.gender,
-            color: updatedColor
-          }));
+          setSelectedCustomer(prev => {
+            // prev가 null이거나 id가 유실되었을 경우를 대비해 캡처된 currentId를 확실히 주입합니다.
+            const base = prev || {};
+            return {
+              ...base,
+              id: currentId,
+              name: formData.name,
+              phone: formData.phone,
+              email: formData.email,
+              gender: formData.gender,
+              color: updatedColor
+            };
+          });
         }
       } else {
         const created = await api.customer.create({
@@ -393,13 +408,13 @@ export default function CustomerRegistration1() {
             <h2 className="cust-list-title" style={{ fontSize: isNarrow ? '15px' : '18px' }}>나의 고객</h2>
             <button className="cust-add-btn" onClick={() => setIsModalOpen(true)}><Plus size={16} /></button>
           </div>
-          
+
           <div className="cust-search" style={{ marginBottom: isNarrow ? '16px' : '24px' }}>
             <Search size={16} className="cust-search-icon" style={{ left: isNarrow ? '10px' : '12px' }} />
-            <input 
-              type="text" 
-              className="cust-search-input" 
-              placeholder={isNarrow ? "" : "Search"} 
+            <input
+              type="text"
+              className="cust-search-input"
+              placeholder={isNarrow ? "" : "Search"}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ paddingLeft: isNarrow ? '32px' : '40px', paddingRight: isNarrow ? '8px' : '16px' }}
@@ -408,18 +423,18 @@ export default function CustomerRegistration1() {
 
           <div className="cust-filter-area" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isNarrow ? '12px' : '16px' }}>
             <label className="cust-checkbox-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: isNarrow ? '11px' : '13px', fontWeight: 600, color: '#334155', userSelect: 'none' }}>
-              <input 
-                type="checkbox" 
-                className="cust-checkbox-input" 
+              <input
+                type="checkbox"
+                className="cust-checkbox-input"
                 checked={showTodayOnly}
                 onChange={(e) => setShowTodayOnly(e.target.checked)}
-                style={{ 
-                  width: '14px', 
-                  height: '14px', 
-                  accentColor: '#0284c7', 
+                style={{
+                  width: '14px',
+                  height: '14px',
+                  accentColor: '#0284c7',
                   cursor: 'pointer',
                   borderRadius: '4px'
-                }} 
+                }}
               />
               <span>{isNarrow ? '오늘 방문' : '오늘 방문 고객만 보기'}</span>
             </label>
@@ -427,11 +442,11 @@ export default function CustomerRegistration1() {
 
           <div className="cust-list-items">
             {filteredCustomers.map(c => (
-              <div 
-                className={`cust-list-item ${selectedCustomer?.id === c.id ? 'active' : ''}`} 
-                key={c.id} 
-                onClick={() => { setSelectedCustomer(c); setFeatureSubTab("전체"); }} 
-                style={{ 
+              <div
+                className={`cust-list-item ${selectedCustomer?.id === c.id ? 'active' : ''}`}
+                key={c.id}
+                onClick={() => { setSelectedCustomer(c); setFeatureSubTab("전체"); }}
+                style={{
                   cursor: 'pointer',
                   padding: isNarrow ? '10px 8px' : '12px 16px',
                   gap: isNarrow ? '10px' : '16px'
@@ -461,482 +476,518 @@ export default function CustomerRegistration1() {
         <div key={selectedCustomer?.id || 'empty'} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
           {selectedCustomer ? (
             <>
-          <div className="cust-detail-header" style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #e2e8f0', paddingBottom: 14 }}>
-            <div className="cust-detail-profile" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <div className={`cust-avatar ${selectedCustomer.color}`} style={{ width: 40, height: 40, fontSize: 14, fontWeight: 700 }}>{selectedCustomer.initial}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <h2 style={{ fontSize: 18, margin: 0, fontWeight: 700, color: '#0f172a' }}>{selectedCustomer.name}</h2>
-                  <span style={{ background: '#fef3c7', color: '#b45309', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{details.vipStatus}</span>
-                  <span style={{ background: '#e2e8f0', color: '#64748b', fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 10 }}>{details.typeStatus}</span>
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 8px', fontSize: 11, color: '#64748b', fontWeight: 500, lineHeight: 1.4 }}>
-                  <span><strong>직업:</strong> {details.job}</span>
-                  <span style={{ color: '#cbd5e1' }}>|</span>
-                  <span><strong>연락처:</strong> {selectedCustomer.phone}</span>
-                  <span style={{ color: '#cbd5e1' }}>|</span>
-                  <span><strong>이메일:</strong> {selectedCustomer.email || details.email}</span>
-                  <span style={{ color: '#cbd5e1' }}>|</span>
-                  <span><strong>생일:</strong> {details.gridData.birthdayStr}</span>
-                  <span style={{ color: '#cbd5e1' }}>|</span>
-                  <span><strong>주소:</strong> {details.address}</span>
-                  <span style={{ color: '#cbd5e1' }}>|</span>
-                  <span><strong>거래시작:</strong> {details.gridData.startDate}</span>
-                </div>
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-              <button 
-                onClick={() => {
-                  setEditModalData({
-                    id: selectedCustomer.id,
-                    name: selectedCustomer.name,
-                    birthday: fullCustomerDetail?.birthday || "",
-                    phone: selectedCustomer.phone,
-                    email: selectedCustomer.email || fullCustomerDetail?.email || "",
-                    job: fullCustomerDetail?.job || "",
-                    grade: fullCustomerDetail?.grade || "일반",
-                    address: fullCustomerDetail?.address || "",
-                    tendency: fullCustomerDetail?.tendency || "위험중립형",
-                    gender: selectedCustomer.gender || fullCustomerDetail?.gender || "M"
-                  });
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '6px 12px',
-                  borderRadius: 6,
-                  border: '1px solid #cbd5e1',
-                  background: 'white',
-                  color: '#0284c7',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-                  transition: 'all 0.2s'
-                }}
-              >
-                수정하기
-              </button>
-              <button 
-                onClick={() => setIsDeleteModalOpen(true)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  padding: '6px 12px',
-                  borderRadius: 6,
-                  border: '1px solid #cbd5e1',
-                  background: 'white',
-                  color: '#ef4444',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                }}
-              >
-                <Trash2 size={13} color="#ef4444" />
-                삭제하기
-              </button>
-            </div>
-          </div>
-
-          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {/* 이탈 위험 수준 (최상단 가로 Full-Width) */}
-            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-                <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>이탈 위험 수준</h3>
-                <span style={{ 
-                  background: `${details.riskColor}15`, 
-                  color: details.riskColor, 
-                  fontSize: 10, 
-                  fontWeight: 700, 
-                  padding: '2px 6px', 
-                  borderRadius: 6, 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 4 
-                }}>
-                  <span>{details.riskEmoji}</span>
-                  <span>위험도 {details.riskLevel} ({details.riskLabel})</span>
-                </span>
-              </div>
-              
-              <div style={{
-                padding: '10px 12px',
-                background: 'linear-gradient(135deg, rgba(248, 250, 252, 0.4) 0%, rgba(241, 245, 249, 0.5) 100%)',
-                border: '1px dashed ' + (details.riskColor || '#cbd5e1'),
-                borderRadius: 8,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.01)',
-                marginTop: 4
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
-                  <span style={{
-                    background: 'linear-gradient(135deg, ' + (details.riskColor || '#cbd5e1') + ' 0%, #64748b 100%)',
-                    color: 'white',
-                    fontSize: 9,
-                    fontWeight: 800,
-                    padding: '1px 5px',
-                    borderRadius: 8,
-                    letterSpacing: '0.3px',
-                    textShadow: '0 1px 1px rgba(0,0,0,0.1)'
-                  }}>AI 이탈 방지 인사이트</span>
-                  <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>{details.riskDesc}</span>
-                </div>
-                <p style={{ fontSize: 11, color: '#4b5563', lineHeight: 1.4, margin: 0, fontWeight: 500 }}>
-                  {details.riskLLMInsight}
-                </p>
-              </div>
-            </div>
-
-            {/* Row: 좌측(자산-상품) / 우측(메모-방문) 2컬럼 레이아웃 */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-              {/* Left Column: 자산 보유 현황 + 주력 상품 매칭 현황 */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {/* 자산 보유 현황 (높이 240px 맞춤 & 가로 병렬화) */}
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6, height: 240, boxSizing: 'border-box' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>자산 보유 현황</h3>
-                    <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>포트폴리오 비중</span>
+              <div className="cust-detail-header" style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #e2e8f0', paddingBottom: 14 }}>
+                <div className="cust-detail-profile" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div className={`cust-avatar ${selectedCustomer.color}`} style={{ width: 40, height: 40, fontSize: 14, fontWeight: 700 }}>{selectedCustomer.initial}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <h2 style={{ fontSize: 18, margin: 0, fontWeight: 700, color: '#0f172a' }}>{selectedCustomer.name}</h2>
+                      <span style={{ background: '#fef3c7', color: '#b45309', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{details.vipStatus}</span>
+                      <span style={{ background: '#e2e8f0', color: '#64748b', fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 10 }}>{details.typeStatus}</span>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 8px', fontSize: 11, color: '#64748b', fontWeight: 500, lineHeight: 1.4 }}>
+                      <span><strong>직업:</strong> {details.job}</span>
+                      <span style={{ color: '#cbd5e1' }}>|</span>
+                      <span><strong>연락처:</strong> {selectedCustomer.phone}</span>
+                      <span style={{ color: '#cbd5e1' }}>|</span>
+                      <span><strong>이메일:</strong> {selectedCustomer.email || details.email}</span>
+                      <span style={{ color: '#cbd5e1' }}>|</span>
+                      <span><strong>생일:</strong> {details.gridData.birthdayStr}</span>
+                      <span style={{ color: '#cbd5e1' }}>|</span>
+                      <span><strong>주소:</strong> {details.address}</span>
+                      <span style={{ color: '#cbd5e1' }}>|</span>
+                      <span><strong>거래시작:</strong> {details.gridData.startDate}</span>
+                    </div>
                   </div>
-                  
-                  <div style={{ display: 'flex', flexDirection: 'row', gap: 12, flex: 1, alignItems: 'center', minHeight: 0 }}>
-                    {/* Left: 차트 & 범례 */}
-                    <div style={{ flex: '1 1 50%', display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
-                      <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                           <PieChart>
-                             <Pie data={details.assetList} innerRadius={20} outerRadius={32} paddingAngle={2} dataKey="value" stroke="none">
-                               {details.assetList.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                             </Pie>
-                           </PieChart>
-                        </ResponsiveContainer>
-                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                           <span style={{ fontSize: 8, color: '#64748b', fontWeight: 600 }}>순자산</span>
-                           <span style={{ fontSize: 10, fontWeight: 700, color: '#d97706' }}>{details.netWorthTotal}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+                  <button
+                    onClick={() => {
+                      setEditModalData({
+                        id: selectedCustomer.id,
+                        name: selectedCustomer.name,
+                        birthday: fullCustomerDetail?.birthday || "",
+                        phone: selectedCustomer.phone,
+                        email: selectedCustomer.email || fullCustomerDetail?.email || "",
+                        job: fullCustomerDetail?.job || "",
+                        grade: fullCustomerDetail?.grade || "일반",
+                        address: fullCustomerDetail?.address || "",
+                        tendency: fullCustomerDetail?.tendency || "위험중립형",
+                        gender: selectedCustomer.gender || fullCustomerDetail?.gender || "M"
+                      });
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '6px 12px',
+                      borderRadius: 6,
+                      border: '1px solid #cbd5e1',
+                      background: 'white',
+                      color: '#0284c7',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    수정하기
+                  </button>
+                  <button
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      padding: '6px 12px',
+                      borderRadius: 6,
+                      border: '1px solid #cbd5e1',
+                      background: 'white',
+                      color: '#ef4444',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                    }}
+                  >
+                    <Trash2 size={13} color="#ef4444" />
+                    삭제하기
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {/* 이탈 위험 수준 (최상단 가로 Full-Width) */}
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>이탈 위험 수준</h3>
+                    <span style={{
+                      background: `${details.riskColor}15`,
+                      color: details.riskColor,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      padding: '2px 6px',
+                      borderRadius: 6,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}>
+                      <span>{details.riskEmoji}</span>
+                      <span>위험도 {details.riskLevel} ({details.riskLabel})</span>
+                    </span>
+                  </div>
+
+                  <div style={{
+                    padding: '10px 12px',
+                    background: 'linear-gradient(135deg, rgba(248, 250, 252, 0.4) 0%, rgba(241, 245, 249, 0.5) 100%)',
+                    border: '1px dashed ' + (details.riskColor || '#cbd5e1'),
+                    borderRadius: 8,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.01)',
+                    marginTop: 4
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
+                      <span style={{
+                        background: 'linear-gradient(135deg, ' + (details.riskColor || '#cbd5e1') + ' 0%, #64748b 100%)',
+                        color: 'white',
+                        fontSize: 9,
+                        fontWeight: 800,
+                        padding: '1px 5px',
+                        borderRadius: 8,
+                        letterSpacing: '0.3px',
+                        textShadow: '0 1px 1px rgba(0,0,0,0.1)'
+                      }}>AI 이탈 방지 인사이트</span>
+                      <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>{details.riskDesc}</span>
+                    </div>
+                    <p style={{ fontSize: 11, color: '#4b5563', lineHeight: 1.4, margin: 0, fontWeight: 500 }}>
+                      {details.riskLLMInsight}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Row: 좌측(자산-상품) / 우측(메모-방문) 2컬럼 레이아웃 */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                  {/* Left Column: 자산 보유 현황 + 주력 상품 매칭 현황 */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {/* 자산 보유 현황 (높이 240px 맞춤 & 가로 병렬화) */}
+                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6, height: 240, boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>자산 보유 현황</h3>
+                        <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>포트폴리오 비중</span>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'row', gap: 12, flex: 1, alignItems: 'center', minHeight: 0 }}>
+                        {/* Left: 차트 & 범례 */}
+                        <div style={{ flex: '1 1 50%', display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
+                          <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                <Pie data={details.assetList} innerRadius={20} outerRadius={32} paddingAngle={2} dataKey="value" stroke="none">
+                                  {details.assetList.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                                </Pie>
+                              </PieChart>
+                            </ResponsiveContainer>
+                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                              <span style={{ fontSize: 8, color: '#64748b', fontWeight: 600 }}>순자산</span>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#d97706' }}>{details.netWorthTotal}</span>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flexShrink: 0 }}>
+                            {details.assetList.map((item, idx) => (
+                              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: item.color }}></div>
+                                <span style={{ fontSize: 9, color: '#475569', fontWeight: 600 }}>{item.name}</span>
+                                <span style={{ fontSize: 9, fontWeight: 700, color: '#0f172a' }}>{item.value}%</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Right: AI 포트폴리오 제언 */}
+                        <div style={{
+                          flex: '1 1 50%',
+                          padding: '8px 10px',
+                          background: 'linear-gradient(135deg, rgba(245, 243, 255, 0.4) 0%, rgba(238, 242, 255, 0.5) 100%)',
+                          border: '1px dashed rgba(139, 92, 246, 0.25)',
+                          borderRadius: 8,
+                          boxShadow: '0 2px 8px rgba(139, 92, 246, 0.02)',
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 4,
+                          justifyContent: 'center',
+                          overflowY: 'auto'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <span style={{
+                              background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)',
+                              color: 'white',
+                              fontSize: 8,
+                              fontWeight: 800,
+                              padding: '1px 4px',
+                              borderRadius: 6,
+                              letterSpacing: '0.2px'
+                            }}>AI 제언</span>
+                          </div>
+                          <p style={{ fontSize: 10, color: '#4b5563', lineHeight: 1.35, margin: 0, fontWeight: 500 }}>
+                            {details.assetLLMInsight}
+                          </p>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flexShrink: 0 }}>
-                        {details.assetList.map((item, idx) => (
-                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <div style={{ width: 4, height: 4, borderRadius: '50%', background: item.color }}></div>
-                            <span style={{ fontSize: 9, color: '#475569', fontWeight: 600 }}>{item.name}</span>
-                            <span style={{ fontSize: 9, fontWeight: 700, color: '#0f172a' }}>{item.value}%</span>
+                    </div>
+
+                    {/* 주력 상품 매칭 현황 (높이 220px 고정 및 콤팩트 리스트 모달 연계) */}
+                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, height: 220, boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>주력 상품 매칭 현황</h3>
+                        <span style={{ fontSize: 9, color: '#94a3b8', fontWeight: 600 }}>클릭 시 AI 제언 상세 팝업</span>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto', paddingRight: 4, flex: 1 }}>
+                        {details.productMatchingList.map((product, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => setSelectedProductModal(product)}
+                            style={{
+                              background: 'white',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: 8,
+                              padding: '10px 12px',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              gap: 8,
+                              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.borderColor = '#8b5cf6';
+                              e.currentTarget.style.boxShadow = '0 2px 4px rgba(139, 92, 246, 0.08)';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.borderColor = '#e2e8f0';
+                              e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.02)';
+                            }}
+                          >
+                            <h4 style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {product.productName}
+                            </h4>
+                            <div
+                              style={{
+                                width: 52,
+                                height: 18,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: product.statusColor || '#ef4444',
+                                color: 'white',
+                                borderRadius: 4,
+                                fontWeight: 700,
+                                fontSize: 9,
+                                flexShrink: 0
+                              }}
+                            >
+                              {product.status}
+                            </div>
                           </div>
                         ))}
-                      </div>
-                    </div>
-
-                    {/* Right: AI 포트폴리오 제언 */}
-                    <div style={{
-                      flex: '1 1 50%',
-                      padding: '8px 10px',
-                      background: 'linear-gradient(135deg, rgba(245, 243, 255, 0.4) 0%, rgba(238, 242, 255, 0.5) 100%)',
-                      border: '1px dashed rgba(139, 92, 246, 0.25)',
-                      borderRadius: 8,
-                      boxShadow: '0 2px 8px rgba(139, 92, 246, 0.02)',
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 4,
-                      justifyContent: 'center',
-                      overflowY: 'auto'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{
-                          background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)',
-                          color: 'white',
-                          fontSize: 8,
-                          fontWeight: 800,
-                          padding: '1px 4px',
-                          borderRadius: 6,
-                          letterSpacing: '0.2px'
-                        }}>AI 제언</span>
-                      </div>
-                      <p style={{ fontSize: 10, color: '#4b5563', lineHeight: 1.35, margin: 0, fontWeight: 500 }}>
-                        {details.assetLLMInsight}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 주력 상품 매칭 현황 (높이 220px 고정 및 콤팩트 리스트 모달 연계) */}
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, height: 220, boxSizing: 'border-box' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>주력 상품 매칭 현황</h3>
-                    <span style={{ fontSize: 9, color: '#94a3b8', fontWeight: 600 }}>클릭 시 AI 제언 상세 팝업</span>
-                  </div>
-                  
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto', paddingRight: 4, flex: 1 }}>
-                    {details.productMatchingList.map((product, idx) => (
-                      <div 
-                        key={idx} 
-                        onClick={() => setSelectedProductModal(product)}
-                        style={{ 
-                          background: 'white', 
-                          border: '1px solid #e2e8f0', 
-                          borderRadius: 8, 
-                          padding: '10px 12px', 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'center', 
-                          gap: 8, 
-                          boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.borderColor = '#8b5cf6';
-                          e.currentTarget.style.boxShadow = '0 2px 4px rgba(139, 92, 246, 0.08)';
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.borderColor = '#e2e8f0';
-                          e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.02)';
-                        }}
-                      >
-                        <h4 style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {product.productName}
-                        </h4>
-                        <div 
-                          style={{ 
-                            width: 52, 
-                            height: 18, 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center', 
-                            background: product.statusColor || '#ef4444', 
-                            color: 'white', 
-                            borderRadius: 4, 
-                            fontWeight: 700, 
-                            fontSize: 9,
-                            flexShrink: 0
-                          }}
-                        >
-                          {product.status}
-                        </div>
-                      </div>
-                    ))}
-                    {details.productMatchingList.length === 0 && (
-                      <div style={{ padding: '24px 0', textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: 500, background: 'white', border: '1px solid #e2e8f0', borderRadius: 10 }}>
-                        추천된 상품 매칭 분석 결과가 없습니다.
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: 메모 기반 고객 특징 + 방문 주기 그래프 */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {/* 메모 기반 고객 특징 (높이 240px 맞춤) */}
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, height: 240, boxSizing: 'border-box' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>메모 기반 고객 특징</h3>
-                    <button 
-                      onClick={() => setShowWordCloud(!showWordCloud)}
-                      style={{
-                        padding: '4px 8px',
-                        borderRadius: 6,
-                        fontSize: 10,
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        background: 'white',
-                        color: '#0284c7',
-                        border: '1px solid #cbd5e1',
-                        boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 4,
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      {showWordCloud ? "특징 목록 보기" : "워드클라우드 보기"}
-                    </button>
-                  </div>
-                  
-                  {showWordCloud ? (
-                    /* 워드 클라우드 뷰 */
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '4px 2px', overflowY: 'auto' }}>
-                      {wordCloudData.map((tag, idx) => (
-                        <span 
-                          key={idx} 
-                          style={{ 
-                            fontSize: tag.size, 
-                            color: tag.color, 
-                            background: tag.bg, 
-                            padding: '6px 12px', 
-                            borderRadius: 16, 
-                            fontWeight: 700, 
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                            cursor: 'default',
-                            userSelect: 'none',
-                            transition: 'transform 0.2s',
-                            display: 'inline-block'
-                          }}
-                          onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                          onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                        >
-                          {tag.text}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    /* 기존 카테고리 탭 및 특징 목록 */
-                    <>
-                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                        {["전체", "관계", "성향", "상품", "기호", "건강", "기타"].map((tab) => {
-                          const isActive = featureSubTab === tab;
-                          return (
-                            <button
-                              key={tab}
-                              onClick={() => setFeatureSubTab(tab)}
-                              style={{
-                                padding: '4px 10px',
-                                borderRadius: 6,
-                                fontSize: 11,
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                background: isActive ? '#0284c7' : 'white',
-                                color: isActive ? 'white' : '#4b5563',
-                                border: isActive ? '1px solid #0284c7' : '1px solid #cbd5e1',
-                                boxShadow: isActive ? '0 1px 2px rgba(2, 132, 199, 0.2)' : 'none',
-                              }}
-                            >
-                              {tab}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', paddingRight: 4, flex: 1 }}>
-                        {details.features
-                          .filter(item => featureSubTab === "전체" || item.category === featureSubTab)
-                          .map((item, idx) => (
-                            <div 
-                              key={idx} 
-                              style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                background: 'white', 
-                                border: '1px solid #e2e8f0', 
-                                borderRadius: 10, 
-                                padding: '10px 14px', 
-                                gap: 12, 
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.02)' 
-                              }}
-                            >
-                              <div 
-                                style={{ 
-                                  width: 48, 
-                                  height: 22, 
-                                  borderRadius: 4, 
-                                  background: item.color || '#64748b', 
-                                  color: 'white', 
-                                  display: 'flex', 
-                                  alignItems: 'center', 
-                                  justifyContent: 'center', 
-                                  fontSize: 10, 
-                                  fontWeight: 700 
-                                }}
-                              >
-                                {item.category}
-                              </div>
-                              <span style={{ fontSize: 12, color: '#0f172a', fontWeight: 600, flex: 1 }}>
-                                {item.text}
-                              </span>
-                              <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>
-                                {item.date}
-                              </span>
-                            </div>
-                          ))}
-                        {details.features.filter(item => featureSubTab === "전체" || item.category === featureSubTab).length === 0 && (
-                          <div style={{ padding: '24px 0', textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: 500 }}>
-                            해당 카테고리의 특징 메모가 없습니다.
+                        {details.productMatchingList.length === 0 && (
+                          <div style={{ padding: '24px 0', textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: 500, background: 'white', border: '1px solid #e2e8f0', borderRadius: 10 }}>
+                            추천된 상품 매칭 분석 결과가 없습니다.
                           </div>
                         )}
                       </div>
-                    </>
-                  )}
-                </div>
-
-                {/* 방문 주기 그래프 (높이 220px 맞춤 및 차트 축소) */}
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, height: 220, boxSizing: 'border-box' }}>
-                  <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>방문 주기 그래프</h3>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))', gap: 8 }}>
-                    <div style={{ background: '#e0e7ff', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
-                      <span style={{ fontSize: 10, color: '#475569', fontWeight: 600 }}>총 방문</span>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
-                        <span style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>{details.visitData.totalVisits}</span>
-                        <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>회</span>
-                      </div>
-                    </div>
-                    <div style={{ background: '#e0e7ff', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
-                      <span style={{ fontSize: 10, color: '#475569', fontWeight: 600 }}>평균 주기</span>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
-                        <span style={{ fontSize: 18, fontWeight: 700, color: '#5c5ced', lineHeight: 1 }}>{details.visitData.averageInterval}</span>
-                        <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>일</span>
-                      </div>
-                    </div>
-                    <div style={{ background: '#e0e7ff', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
-                      <span style={{ fontSize: 10, color: '#475569', fontWeight: 600 }}>마지막 방문</span>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
-                        <span style={{ fontSize: 18, fontWeight: 700, color: '#14b8a6', lineHeight: 1 }}>
-                          {details.visitData.lastVisitDiff === "-" || details.visitData.lastVisitDiff === "오늘" ? "" : "+"}
-                          {details.visitData.lastVisitDiff}
-                        </span>
-                        <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>
-                          {details.visitData.lastVisitDiff === "-" || details.visitData.lastVisitDiff === "오늘" ? "" : "일"}
-                        </span>
-                      </div>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '8px 0 4px 0', border: '1px solid #e2e8f0', borderRadius: 12, background: 'white' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', height: 56, padding: '0 12px', position: 'relative' }}>
-                      <div style={{ position: 'absolute', left: 10, right: 10, bottom: 0, height: 2, backgroundColor: '#cbd5e1' }} />
+                  {/* Right Column: 메모 기반 고객 특징 + 방문 주기 그래프 */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {/* 메모 기반 고객 특징 (높이 240px 맞춤) */}
+                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, height: 240, boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>메모 기반 고객 특징</h3>
+                        <button
+                          onClick={() => setShowWordCloud(!showWordCloud)}
+                          style={{
+                            padding: '4px 8px',
+                            borderRadius: 6,
+                            fontSize: 10,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            background: 'white',
+                            color: '#0284c7',
+                            border: '1px solid #cbd5e1',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {showWordCloud ? "특징 목록 보기" : "워드클라우드 보기"}
+                        </button>
+                      </div>
 
-                      {details.visitData.monthlyVisits.map((item, idx) => (
-                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '10%', position: 'relative', height: '100%', justifyContent: 'flex-end' }}>
-                          {item.visited ? (
-                            <div 
-                              style={{ 
-                                width: 12, 
-                                height: (item.height ? item.height * 0.4 : 40),
-                                backgroundColor: '#5c5ced', 
-                                borderRadius: 4, 
-                                marginBottom: -1,
-                                zIndex: 2,
-                              }} 
-                            />
-                          ) : (
-                            <div 
-                              style={{ 
-                                width: 10, 
-                                height: 4, 
-                                backgroundColor: '#cbd5e1', 
-                                borderRadius: 2, 
-                                marginBottom: 2, 
-                                zIndex: 2 
-                              }} 
-                            />
-                          )}
-                        </div>
-                      ))}
+                      {showWordCloud ? (
+                        wordCloudData.length > 0 ? (
+                          /* 워드 클라우드 뷰 */
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '4px 2px', overflowY: 'auto' }}>
+                            {wordCloudData.map((tag, idx) => (
+                              <span
+                                key={idx}
+                                style={{
+                                  fontSize: tag.size,
+                                  color: tag.color,
+                                  background: tag.bg,
+                                  padding: '6px 12px',
+                                  borderRadius: 16,
+                                  fontWeight: 700,
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                  cursor: 'default',
+                                  userSelect: 'none',
+                                  transition: 'transform 0.2s',
+                                  display: 'inline-block'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                              >
+                                {tag.text}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          /* 예외 처리 (Graceful Fallback) */
+                          <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                            textAlign: 'center',
+                            padding: '16px',
+                            background: 'white',
+                            borderRadius: 12,
+                            border: '1px dashed #cbd5e1',
+                            margin: '8px 0',
+                            minHeight: 140
+                          }}>
+                            <div style={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: '50%',
+                              background: '#f8fafc',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginBottom: 8
+                            }}>
+                              <span style={{ fontSize: 16, color: '#94a3b8' }}>❓</span>
+                            </div>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: '#64748b', margin: '0 0 2px 0' }}>대표 관심사 키워드 미수립</p>
+                            <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, lineHeight: 1.3 }}>
+                              최근 1개월 내 상담 내역이 없거나<br />
+                              AI 분석 특징 정보가 존재하지 않습니다.
+                            </p>
+                          </div>
+                        )
+                      ) : (
+                        /* 기존 카테고리 탭 및 특징 목록 */
+                        <>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            {["전체", "관계", "성향", "상품", "기호", "건강", "기타"].map((tab) => {
+                              const isActive = featureSubTab === tab;
+                              return (
+                                <button
+                                  key={tab}
+                                  onClick={() => setFeatureSubTab(tab)}
+                                  style={{
+                                    padding: '4px 10px',
+                                    borderRadius: 6,
+                                    fontSize: 11,
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    background: isActive ? '#0284c7' : 'white',
+                                    color: isActive ? 'white' : '#4b5563',
+                                    border: isActive ? '1px solid #0284c7' : '1px solid #cbd5e1',
+                                    boxShadow: isActive ? '0 1px 2px rgba(2, 132, 199, 0.2)' : 'none',
+                                  }}
+                                >
+                                  {tab}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', paddingRight: 4, flex: 1 }}>
+                            {details.features
+                              .filter(item => featureSubTab === "전체" || item.category === featureSubTab)
+                              .map((item, idx) => (
+                                <div
+                                  key={idx}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    background: 'white',
+                                    border: '1px solid #e2e8f0',
+                                    borderRadius: 10,
+                                    padding: '10px 14px',
+                                    gap: 12,
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      width: 48,
+                                      height: 22,
+                                      borderRadius: 4,
+                                      background: item.color || '#64748b',
+                                      color: 'white',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      fontSize: 10,
+                                      fontWeight: 700
+                                    }}
+                                  >
+                                    {item.category}
+                                  </div>
+                                  <span style={{ fontSize: 12, color: '#0f172a', fontWeight: 600, flex: 1 }}>
+                                    {item.text}
+                                  </span>
+                                  <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>
+                                    {item.date}
+                                  </span>
+                                </div>
+                              ))}
+                            {details.features.filter(item => featureSubTab === "전체" || item.category === featureSubTab).length === 0 && (
+                              <div style={{ padding: '24px 0', textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: 500 }}>
+                                해당 카테고리의 특징 메모가 없습니다.
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 12px 0 12px' }}>
-                      {details.visitData.monthlyVisits.map((item, idx) => (
-                        <div key={idx} style={{ width: '10%', display: 'flex', justifyContent: 'center' }}>
-                          <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600 }}>{item.month.replace("월", "")}</span>
+                    {/* 방문 주기 그래프 (높이 220px 맞춤 및 차트 축소) */}
+                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, height: 220, boxSizing: 'border-box' }}>
+                      <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>방문 주기 그래프</h3>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))', gap: 8 }}>
+                        <div style={{ background: '#e0e7ff', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
+                          <span style={{ fontSize: 10, color: '#475569', fontWeight: 600 }}>총 방문</span>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>{details.visitData.totalVisits}</span>
+                            <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>회</span>
+                          </div>
                         </div>
-                      ))}
+                        <div style={{ background: '#e0e7ff', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
+                          <span style={{ fontSize: 10, color: '#475569', fontWeight: 600 }}>평균 주기</span>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: '#5c5ced', lineHeight: 1 }}>{details.visitData.averageInterval}</span>
+                            <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>일</span>
+                          </div>
+                        </div>
+                        <div style={{ background: '#e0e7ff', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
+                          <span style={{ fontSize: 10, color: '#475569', fontWeight: 600 }}>마지막 방문</span>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: '#14b8a6', lineHeight: 1 }}>
+                              {details.visitData.lastVisitDiff === "-" || details.visitData.lastVisitDiff === "오늘" ? "" : "+"}
+                              {details.visitData.lastVisitDiff}
+                            </span>
+                            <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>
+                              {details.visitData.lastVisitDiff === "-" || details.visitData.lastVisitDiff === "오늘" ? "" : "일"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '8px 0 4px 0', border: '1px solid #e2e8f0', borderRadius: 12, background: 'white' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', height: 56, padding: '0 12px', position: 'relative' }}>
+                          <div style={{ position: 'absolute', left: 10, right: 10, bottom: 0, height: 2, backgroundColor: '#cbd5e1' }} />
+
+                          {details.visitData.monthlyVisits.map((item, idx) => (
+                            <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '10%', position: 'relative', height: '100%', justifyContent: 'flex-end' }}>
+                              {item.visited ? (
+                                <div
+                                  style={{
+                                    width: 12,
+                                    height: (item.height ? item.height * 0.4 : 40),
+                                    backgroundColor: '#5c5ced',
+                                    borderRadius: 4,
+                                    marginBottom: -1,
+                                    zIndex: 2,
+                                  }}
+                                />
+                              ) : (
+                                <div
+                                  style={{
+                                    width: 10,
+                                    height: 4,
+                                    backgroundColor: '#cbd5e1',
+                                    borderRadius: 2,
+                                    marginBottom: 2,
+                                    zIndex: 2
+                                  }}
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 12px 0 12px' }}>
+                          {details.visitData.monthlyVisits.map((item, idx) => (
+                            <div key={idx} style={{ width: '10%', display: 'flex', justifyContent: 'center' }}>
+                              <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600 }}>{item.month.replace("월", "")}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
             </>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#64748b', textAlign: 'center', flex: 1 }}>
@@ -964,13 +1015,13 @@ export default function CustomerRegistration1() {
                 <strong style={{ color: '#0f172a' }}>{selectedCustomer.name}</strong> 고객을 삭제하겠습니까?
               </p>
               <div style={{ display: 'flex', gap: 12, width: '100%' }}>
-                <button 
+                <button
                   onClick={() => setIsDeleteModalOpen(false)}
                   style={{ flex: 1, padding: '12px', borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', color: '#64748b', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
                 >
                   취소
                 </button>
-                <button 
+                <button
                   onClick={async () => {
                     try {
                       setIsDeleteModalOpen(false);
@@ -993,31 +1044,31 @@ export default function CustomerRegistration1() {
 
         {/* AI 상품 추천 판단 근거 상세 팝업 모달 */}
         {selectedProductModal && (
-          <div 
-            className="cust-modal-overlay" 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              zIndex: 1000, 
-              position: 'fixed', 
-              top: 0, 
-              left: 0, 
-              right: 0, 
-              bottom: 0, 
-              background: 'rgba(15, 23, 42, 0.4)', 
-              backdropFilter: 'blur(4px)' 
+          <div
+            className="cust-modal-overlay"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(15, 23, 42, 0.4)',
+              backdropFilter: 'blur(4px)'
             }}
             onClick={() => setSelectedProductModal(null)}
           >
-            <div 
-              className="cust-modal" 
-              style={{ 
-                width: 440, 
-                padding: 24, 
-                display: 'flex', 
-                flexDirection: 'column', 
-                background: 'white', 
+            <div
+              className="cust-modal"
+              style={{
+                width: 440,
+                padding: 24,
+                display: 'flex',
+                flexDirection: 'column',
+                background: 'white',
                 borderRadius: 16,
                 boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
                 border: '1px solid #e2e8f0'
@@ -1039,14 +1090,14 @@ export default function CustomerRegistration1() {
                     {selectedProductModal.productName}
                   </h3>
                 </div>
-                <div 
-                  style={{ 
-                    padding: '2px 8px', 
-                    background: selectedProductModal.statusColor || '#ef4444', 
-                    color: 'white', 
-                    borderRadius: 4, 
-                    fontWeight: 700, 
-                    fontSize: 10 
+                <div
+                  style={{
+                    padding: '2px 8px',
+                    background: selectedProductModal.statusColor || '#ef4444',
+                    color: 'white',
+                    borderRadius: 4,
+                    fontWeight: 700,
+                    fontSize: 10
                   }}
                 >
                   {selectedProductModal.status}
@@ -1061,10 +1112,10 @@ export default function CustomerRegistration1() {
                   </p>
                 </div>
 
-                <div style={{ 
-                  padding: '12px 14px', 
-                  background: 'linear-gradient(135deg, rgba(245, 243, 255, 0.6) 0%, rgba(238, 242, 255, 0.4) 100%)', 
-                  borderLeft: '4px solid #8b5cf6', 
+                <div style={{
+                  padding: '12px 14px',
+                  background: 'linear-gradient(135deg, rgba(245, 243, 255, 0.6) 0%, rgba(238, 242, 255, 0.4) 100%)',
+                  borderLeft: '4px solid #8b5cf6',
                   borderRadius: '0 8px 8px 0',
                   marginTop: 8
                 }}>
@@ -1077,17 +1128,17 @@ export default function CustomerRegistration1() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={() => setSelectedProductModal(null)}
-                style={{ 
-                  width: '100%', 
-                  padding: '10px', 
-                  borderRadius: 8, 
-                  border: 'none', 
-                  background: '#0f172a', 
-                  color: 'white', 
-                  fontSize: 13, 
-                  fontWeight: 600, 
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: '#0f172a',
+                  color: 'white',
+                  fontSize: 13,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                   boxShadow: '0 4px 6px -1px rgba(15, 23, 42, 0.1)'
@@ -1101,9 +1152,9 @@ export default function CustomerRegistration1() {
           </div>
         )}
 
-        <CustomerRegistrationModal 
-          isOpen={isModalOpen || !!editModalData} 
-          onClose={() => { setIsModalOpen(false); setEditModalData(null); }} 
+        <CustomerRegistrationModal
+          isOpen={isModalOpen || !!editModalData}
+          onClose={() => { setIsModalOpen(false); setEditModalData(null); }}
           initialData={editModalData}
           onSave={handleSaveCustomer}
         />
