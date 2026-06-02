@@ -109,6 +109,49 @@ function HistoryItem({ hist, c_id }) {
   );
 }
 
+const formatToYyyyMmDd = (dateStr) => {
+  try {
+    const parts = dateStr.replace(",", "").split(" ");
+    if (parts.length === 3) {
+      const day = parts[0].padStart(2, "0");
+      const monthStr = parts[1];
+      const year = parts[2];
+      
+      const months = {
+        Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06",
+        Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12"
+      };
+      const month = months[monthStr] || "01";
+      return `${year}.${month}.${day}`;
+    }
+  } catch (e) {}
+  return dateStr;
+};
+
+function DateSeparator({ label }) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      margin: '28px 0 16px 0',
+      userSelect: 'none'
+    }}>
+      <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
+      <span style={{
+        padding: '0 16px',
+        color: '#64748b',
+        fontSize: '12.5px',
+        fontWeight: '700',
+        letterSpacing: '0.5px',
+        backgroundColor: '#ffffff'
+      }}>
+        {label}
+      </span>
+      <div style={{ flex: 1, height: '1px', backgroundColor: '#e2e8f0' }} />
+    </div>
+  );
+}
+
 export default function CustomerNotifications() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("today");
@@ -243,16 +286,32 @@ export default function CustomerNotifications() {
       } else if (currentSection) {
         // 이전 상담 내역 전용 파싱
         if (currentSection === "notes" && (trimmed.includes("상담 내용:") || trimmed.includes("상담 히스토리"))) {
-          let match = trimmed.match(/^-\s*\[(\d{4}-\d{2}-\d{2})\]\s*상담 내용:\s*(.*?)\s*\|\s*AI 요약:\s*(.*?)(?:\s*\|\s*ID:\s*(\d+))?$/);
-          if (!match) {
-            match = trimmed.match(/^\[(\d{4}-\d{2}-\d{2})\]\s*상담 내용:\s*(.*?)\s*\|\s*AI 요약:\s*(.*?)(?:\s*\|\s*ID:\s*(\d+))?$/);
-          }
-          if (match) {
+          let line = trimmed.replace(/^-\s*/, '');
+          let dateMatch = line.match(/^\[(\d{4}-\d{2}-\d{2})\]/);
+          if (dateMatch) {
+            const date = dateMatch[1];
+            let rest = line.substring(dateMatch[0].length).trim();
+            const parts = rest.split(" | ");
+            let content = "";
+            let summary = "";
+            let cm_id = null;
+            
+            for (const part of parts) {
+              const trimmedPart = part.trim();
+              if (trimmedPart.startsWith("상담 내용:")) {
+                content = trimmedPart.substring("상담 내용:".length).trim();
+              } else if (trimmedPart.startsWith("AI 요약:")) {
+                summary = trimmedPart.substring("AI 요약:".length).trim();
+              } else if (trimmedPart.startsWith("ID:")) {
+                cm_id = parseInt(trimmedPart.substring("ID:".length).trim(), 10) || null;
+              }
+            }
+            
             result.history.push({
-              date: match[1],
-              content: match[2],
-              summary: match[3],
-              cm_id: match[4] ? parseInt(match[4], 10) : null
+              date,
+              content: content || rest,
+              summary: summary || "요약 정보 없음",
+              cm_id
             });
             continue;
           }
@@ -276,12 +335,14 @@ export default function CustomerNotifications() {
     if (activeTab === "today") {
       return notif.today;
     } else {
-      if (showOlder) return true;
+      if (showOlder) {
+        return notif.days_diff <= 10;
+      }
       return notif.days_diff <= 2;
     }
   });
 
-  const hasOlder = notificationsList.some(notif => notif.days_diff > 2);
+  const hasOlder = notificationsList.some(notif => notif.days_diff > 2 && notif.days_diff <= 10);
 
   const handleCardClick = (notif) => {
     if (notif.isBriefing) {
@@ -321,10 +382,29 @@ export default function CustomerNotifications() {
 
           {/* Notifications Card List */}
           <div className="news-alert-list">
-            {filteredNotifications.map((notif) => {
-              const isExpanded = activeDetailId === notif.id;
-              return (
-                <div key={notif.id} style={{ display: "flex", flexDirection: "column" }}>
+            {(() => {
+              let prevGroupLabel = null;
+              return filteredNotifications.map((notif) => {
+                const isExpanded = activeDetailId === notif.id;
+                
+                let currentGroupLabel = "";
+                if (notif.days_diff === 0) {
+                  currentGroupLabel = "오늘";
+                } else if (notif.days_diff === 1) {
+                  currentGroupLabel = "어제";
+                } else {
+                  currentGroupLabel = formatToYyyyMmDd(notif.date);
+                }
+                
+                const showSeparator = activeTab === "all" && prevGroupLabel !== currentGroupLabel;
+                if (showSeparator) {
+                  prevGroupLabel = currentGroupLabel;
+                }
+
+                return (
+                  <div key={notif.id}>
+                    {showSeparator && <DateSeparator label={currentGroupLabel} />}
+                    <div style={{ display: "flex", flexDirection: "column" }}>
                   <div 
                     className="news-alert-card"
                     onClick={() => handleCardClick(notif)}
@@ -392,32 +472,34 @@ export default function CustomerNotifications() {
                       )}
                     </div>
                   )}
-                </div>
-              );
-            })}
-              {activeTab === "all" && !showOlder && hasOlder && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px', marginBottom: '8px' }}>
-                  <button 
-                    onClick={() => setShowOlder(true)}
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '12.5px',
-                      fontWeight: '600',
-                      color: '#64748b',
-                      backgroundColor: '#f1f5f9',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '20px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
-                    }}
-                    onMouseOver={(e) => { e.target.style.backgroundColor = '#e2e8f0'; e.target.style.color = '#334155'; }}
-                    onMouseOut={(e) => { e.target.style.backgroundColor = '#f1f5f9'; e.target.style.color = '#64748b'; }}
-                  >
-                    ▼ 이전 알림 보기
-                  </button>
-                </div>
-              )}
+                    </div>
+                  </div>
+                );
+              });
+            })()}
+            {activeTab === "all" && !showOlder && hasOlder && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px', marginBottom: '8px' }}>
+                <button 
+                  onClick={() => setShowOlder(true)}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '12.5px',
+                    fontWeight: '600',
+                    color: '#64748b',
+                    backgroundColor: '#f1f5f9',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '20px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                  }}
+                  onMouseOver={(e) => { e.target.style.backgroundColor = '#e2e8f0'; e.target.style.color = '#334155'; }}
+                  onMouseOut={(e) => { e.target.style.backgroundColor = '#f1f5f9'; e.target.style.color = '#64748b'; }}
+                >
+                  ▼ 이전 알림 보기
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
