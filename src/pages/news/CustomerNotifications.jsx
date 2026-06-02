@@ -462,16 +462,20 @@ export default function CustomerNotifications() {
                       </div>
 
                       {/* 이전 상담 히스토리 요약 Section (토글식 리스트) */}
-                      {briefingData.history && briefingData.history.length > 0 && (
-                        <div className="briefing-section">
-                          <h3 className="briefing-section-title">이전 상담 히스토리 요약 (클릭 시 상세 접고 펴기)</h3>
-                          <div className="briefing-section-card" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {briefingData.history.map((hist, idx) => (
+                      <div className="briefing-section">
+                        <h3 className="briefing-section-title">이전 상담 히스토리 요약 (클릭 시 상세 접고 펴기)</h3>
+                        <div className="briefing-section-card" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {briefingData.history && briefingData.history.length > 0 ? (
+                            briefingData.history.map((hist, idx) => (
                               <HistoryItem key={idx} hist={hist} />
-                            ))}
-                          </div>
+                            ))
+                          ) : (
+                            <div style={{ padding: '8px 0', textAlign: 'center', color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>
+                              이전 상담 이력이 존재하지 않습니다.
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </>
                   );
                 }

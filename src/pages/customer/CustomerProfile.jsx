@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
-import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, Trash2, Settings } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, Trash2, Settings, ChevronLeft, ChevronRight } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
 import "./Customer.css";
 
@@ -27,6 +27,7 @@ export default function CustomerProfile() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isListCollapsed, setIsListCollapsed] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editModalData, setEditModalData] = useState(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState(1001);
@@ -49,8 +50,18 @@ export default function CustomerProfile() {
       <div className="cust-main">
 
         {/* Left Panel */}
-        <div className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
-          <div className="cust-list-header">
+        <div 
+          className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}
+          style={{ 
+            width: isListCollapsed ? 0 : '240px', 
+            flexShrink: 0, 
+            padding: isListCollapsed ? 0 : '24px',
+            overflow: 'hidden',
+            border: isListCollapsed ? 'none' : '1px solid var(--cust-glass-border)',
+            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
+          <div className="cust-list-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <h2 className="cust-list-title">나의 고객</h2>
             <button className="cust-add-btn" onClick={() => setIsModalOpen(true)}><Plus size={16} /></button>
           </div>
@@ -84,6 +95,48 @@ export default function CustomerProfile() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Collapse Toggle Trigger Area */}
+        <div 
+          className="cust-resizer" 
+          style={{ 
+            width: isListCollapsed ? '16px' : '8px', 
+            cursor: 'default',
+            position: 'relative',
+            background: 'transparent',
+            flexShrink: 0
+          }}
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsListCollapsed(!isListCollapsed);
+            }}
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 100,
+              color: '#0284c7',
+              transition: 'transform 0.2s, background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'}
+          >
+            {isListCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          </button>
         </div>
 
         {/* Right Detail Panel */}

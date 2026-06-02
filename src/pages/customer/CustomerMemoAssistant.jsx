@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
-import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, PenLine, Check, Settings, ArrowUp, UserCircle } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, PenLine, Check, Settings, ArrowUp, UserCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
 import { api } from "../../api";
 import "./Customer.css";
@@ -11,6 +11,7 @@ export default function CustomerMemoAssistant() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isListCollapsed, setIsListCollapsed] = useState(false);
   const [showTodayOnly, setShowTodayOnly] = useState(true);
   const [allCustomersList, setAllCustomersList] = useState([]);
   const [todayCustomersList, setTodayCustomersList] = useState([]);
@@ -404,8 +405,18 @@ export default function CustomerMemoAssistant() {
       <div className={`cust-main ${isDragging ? 'dragging' : ''}`}>
 
         {/* Left Panel */}
-        <div className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''} ${isNarrow ? 'narrow' : ''}`} style={{ width: listWidth, flexShrink: 0, padding: isNarrow ? '20px 10px' : '24px' }}>
-          <div className="cust-list-header" style={{ marginBottom: isNarrow ? '16px' : '24px' }}>
+        <div 
+          className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''} ${isNarrow ? 'narrow' : ''}`} 
+          style={{ 
+            width: isListCollapsed ? 0 : listWidth, 
+            flexShrink: 0, 
+            padding: isListCollapsed ? 0 : (isNarrow ? '20px 10px' : '24px'),
+            overflow: 'hidden',
+            border: isListCollapsed ? 'none' : '1px solid var(--cust-glass-border)',
+            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
+          <div className="cust-list-header" style={{ marginBottom: isNarrow ? '16px' : '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <h2 className="cust-list-title" style={{ fontSize: isNarrow ? '15px' : '18px' }}>나의 고객</h2>
             <button className="cust-add-btn" onClick={() => setIsModalOpen(true)}><Plus size={16} /></button>
           </div>
@@ -471,7 +482,45 @@ export default function CustomerMemoAssistant() {
         </div>
 
         {/* Resizer Divider */}
-        <div className={`cust-resizer ${isDragging ? 'dragging' : ''}`} onMouseDown={handleMouseDown} />
+        <div 
+          className={`cust-resizer ${isDragging ? 'dragging' : ''}`} 
+          onMouseDown={isListCollapsed ? null : handleMouseDown} 
+          style={{ 
+            width: isListCollapsed ? '16px' : '24px', 
+            cursor: isListCollapsed ? 'default' : 'col-resize',
+            position: 'relative'
+          }}
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsListCollapsed(!isListCollapsed);
+            }}
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 100,
+              color: '#0284c7',
+              transition: 'transform 0.2s, background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'}
+          >
+            {isListCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          </button>
+        </div>
 
         {/* Right Detail Panel */}
         <div key={selectedCustomerId || 'empty'} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
