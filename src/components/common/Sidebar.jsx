@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, TrendingUp, Contact, BarChart2, Bell, LogOut, LayoutDashboard } from "lucide-react";
+import { Calendar, TrendingUp, Contact, BarChart2, Bell, LogOut, LayoutDashboard, ChevronLeft, ChevronRight, Home, Bot } from "lucide-react";
 import { api } from "../../api";
 
 export default function Sidebar({ type = "cal" }) {
@@ -10,6 +10,7 @@ export default function Sidebar({ type = "cal" }) {
   const prefix = type; // e.g., "cal", "cust", "news", "trend"
   const [todayCount, setTodayCount] = useState(0);
   const [isTrendHovered, setIsTrendHovered] = useState(false);
+  const [isAssistantHovered, setIsAssistantHovered] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(() => {
     try {
@@ -67,50 +68,19 @@ export default function Sidebar({ type = "cal" }) {
     };
   }, [path]);
 
-  // Retrieve or initialize sidebar width
-  const [width, setWidth] = useState(() => {
-    const saved = localStorage.getItem("sidebarWidth");
-    return saved ? parseInt(saved, 10) : 180;
+  // Retrieve or initialize sidebar collapsed state
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem("sidebarCollapsed");
+    return saved === "true";
   });
 
-  const isResizing = useRef(false);
-  const [resizingActive, setResizingActive] = useState(false);
-
-  const startResizing = (e) => {
-    e.preventDefault();
-    isResizing.current = true;
-    setResizingActive(true);
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("sidebarCollapsed", String(next));
+      return next;
+    });
   };
-
-  const handleMouseMove = (e) => {
-    if (!isResizing.current) return;
-    // Set boundary limits: Min 50px, Max 240px
-    const newWidth = Math.max(50, Math.min(240, e.clientX));
-    setWidth(newWidth);
-    localStorage.setItem("sidebarWidth", newWidth.toString());
-  };
-
-  const handleMouseUp = () => {
-    isResizing.current = false;
-    setResizingActive(false);
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
-    document.body.style.cursor = "";
-    document.body.style.userSelect = "";
-  };
-
-  useEffect(() => {
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, []);
-
-  const isCollapsed = width < 100;
 
   const isMainActive = path === '/main';
 
@@ -127,6 +97,12 @@ export default function Sidebar({ type = "cal" }) {
   const isAssistantActive =
     path.includes('/customer-management-memo-assistant');
 
+  const queryParams = new URLSearchParams(location.search);
+  const tabParam = queryParams.get("tab");
+
+  const isSimulatorActive = isAssistantActive && (tabParam === 'simulator' || !tabParam);
+  const isMemoActive = isAssistantActive && tabParam === 'memo';
+
   const isTrendActive =
     path.includes('/trend') ||
     path.includes('/economic') ||
@@ -140,34 +116,43 @@ export default function Sidebar({ type = "cal" }) {
     <div
       className={`${prefix}-sidebar sidebar-container ${isCollapsed ? 'collapsed' : ''}`}
       style={{
-        width: isCollapsed ? '60px' : `${width}px`,
+        width: isCollapsed ? '60px' : '200px',
         position: 'relative',
-        transition: resizingActive ? 'none' : 'width 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+        transition: 'width 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
       }}
     >
-      {/* Resizing Handle */}
-      <div
-        className="sidebar-resize-handle"
-        onMouseDown={startResizing}
+      {/* Toggle Collapse Button */}
+      <button
+        onClick={toggleCollapse}
         style={{
           position: 'absolute',
-          top: 0,
-          right: '-3px',
-          width: '6px',
-          height: '100%',
-          cursor: 'col-resize',
-          zIndex: 1000,
-          backgroundColor: resizingActive ? 'rgba(2, 132, 199, 0.3)' : 'transparent',
+          top: '24px',
+          right: '-12px',
+          width: '24px',
+          height: '24px',
+          borderRadius: '50%',
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+          zIndex: 1001,
+          transition: 'all 0.2s ease',
+          color: '#64748b'
         }}
-      />
+        className="sidebar-toggle-btn"
+      >
+        {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+      </button>
 
       <style>{`
-        /* Resizing handle behavior */
-        .sidebar-resize-handle {
-          transition: background-color 0.2s ease;
-        }
-        .sidebar-resize-handle:hover {
-          background-color: rgba(2, 132, 199, 0.2);
+        /* Toggle button hover style */
+        .sidebar-toggle-btn:hover {
+          background-color: #f8fafc !important;
+          color: #0284c7 !important;
+          transform: scale(1.1);
         }
 
         /* Collapsed overrides */
@@ -195,7 +180,12 @@ export default function Sidebar({ type = "cal" }) {
           box-sizing: border-box !important;
         }
 
+        /* Keep icon size 20px when collapsed and prevent shrinking */
         .sidebar-container.collapsed .sidebar-menu-item svg {
+          width: 20px !important;
+          height: 20px !important;
+          min-width: 20px !important;
+          min-height: 20px !important;
           margin: 0 !important;
           flex-shrink: 0 !important;
         }
@@ -332,20 +322,70 @@ export default function Sidebar({ type = "cal" }) {
       {/* Sidebar Navigation Menu */}
       <div className={`${prefix}-menu`} style={{ marginTop: isCollapsed ? '16px' : '32px' }}>
         <Link to="/main" className={`${prefix}-menu-item sidebar-menu-item ${isMainActive ? 'active' : ''}`}>
-          <LayoutDashboard size={20} />
-          {!isCollapsed && <span className="menu-text">Main</span>}
-          {isCollapsed && <span className="sidebar-tooltip">Main</span>}
+          <Home size={20} />
+          {!isCollapsed && <span className="menu-text">홈</span>}
+          {isCollapsed && <span className="sidebar-tooltip">홈</span>}
         </Link>
         <Link to="/customer-management-registration-1" className={`${prefix}-menu-item sidebar-menu-item ${isCustomerActive ? 'active' : ''}`}>
-          <TrendingUp size={20} />
-          {!isCollapsed && <span className="menu-text">고객관리</span>}
-          {isCollapsed && <span className="sidebar-tooltip">고객관리</span>}
-        </Link>
-        <Link to="/customer-management-memo-assistant" className={`${prefix}-menu-item sidebar-menu-item ${isAssistantActive ? 'active' : ''}`}>
           <Contact size={20} />
-          {!isCollapsed && <span className="menu-text">상담 보조</span>}
-          {isCollapsed && <span className="sidebar-tooltip">상담 보조</span>}
+          {!isCollapsed && <span className="menu-text">고객정보</span>}
+          {isCollapsed && <span className="sidebar-tooltip">고객정보</span>}
         </Link>
+        <div
+          className="assistant-menu-wrapper"
+          onMouseEnter={() => setIsAssistantHovered(true)}
+          onMouseLeave={() => setIsAssistantHovered(false)}
+          style={{ display: 'flex', flexDirection: 'column' }}
+        >
+          <Link to="/customer-management-memo-assistant?tab=simulator" className={`${prefix}-menu-item sidebar-menu-item ${isAssistantActive ? 'active' : ''}`}>
+            <Bot size={20} />
+            {!isCollapsed && <span className="menu-text">AI 상담보조</span>}
+            {isCollapsed && <span className="sidebar-tooltip">AI 상담보조</span>}
+          </Link>
+
+          {/* 서브메뉴 (아래 탭) */}
+          {!isCollapsed && (isAssistantHovered || isAssistantActive) && (
+            <div
+              className="assistant-submenu"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                paddingLeft: '36px',
+                gap: '8px',
+                marginTop: '4px',
+                marginBottom: '8px',
+                animation: 'fadeInSlide 0.2s ease-out forwards',
+              }}
+            >
+              <Link
+                to="/customer-management-memo-assistant?tab=simulator"
+                style={{
+                  textDecoration: 'none',
+                  color: isSimulatorActive ? '#0284c7' : '#64748b',
+                  fontSize: '13px',
+                  fontWeight: isSimulatorActive ? '600' : '500',
+                  padding: '4px 0',
+                  transition: 'color 0.2s',
+                }}
+              >
+                AI 시뮬레이터
+              </Link>
+              <Link
+                to="/customer-management-memo-assistant?tab=memo"
+                style={{
+                  textDecoration: 'none',
+                  color: isMemoActive ? '#0284c7' : '#64748b',
+                  fontSize: '13px',
+                  fontWeight: isMemoActive ? '600' : '500',
+                  padding: '4px 0',
+                  transition: 'color 0.2s',
+                }}
+              >
+                AI 메모 어시스턴트
+              </Link>
+            </div>
+          )}
+        </div>
         <div
           className="trend-menu-wrapper"
           onMouseEnter={() => setIsTrendHovered(true)}
