@@ -737,12 +737,6 @@ export default function MainPage() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        /**
-         * [FIX #8] MAX_NEWS_COUNT + 1 초과 요청 제거
-         * 기존: size: MAX_NEWS_COUNT + 1 (3개) 요청 후 slice로 2개만 사용
-         *       → 페이지네이션 여부 확인 로직도 없어 +1의 의미가 없음
-         * 수정: 필요한 수(MAX_NEWS_COUNT)만큼만 요청
-         */
         const response = await api.trend.getNewsList({ size: MAX_NEWS_COUNT });
         if (response?.items?.length > 0) {
           setNewsList(
