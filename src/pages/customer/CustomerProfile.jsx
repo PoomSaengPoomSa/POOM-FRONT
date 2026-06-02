@@ -151,7 +151,7 @@ export default function CustomerProfile() {
             <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
               <div className="cust-detail-tabs" style={{ margin: 0 }}>
                 <button className="cust-detail-tab active">프로필</button>
-                <Link to="/customer-management-dashboard-2" style={{ textDecoration: 'none' }}>
+                <Link to="/customer-management-dashboard" style={{ textDecoration: 'none' }}>
                   <button className="cust-detail-tab">고객 대시보드</button>
                 </Link>
                 <Link to="/customer-management-memo-assistant" style={{ textDecoration: 'none' }}>

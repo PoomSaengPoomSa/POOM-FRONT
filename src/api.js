@@ -162,6 +162,7 @@ export const api = {
   notification: {
     getList: (tab = "all") => api.get(`/notifications?tab=${tab}`),
     getTodayCount: () => api.get("/notifications/today-count"),
+    getBriefing: (c_id) => api.get(`/notifications/briefing/${c_id}`),
   },
 
   // 6. KPI & 주력 상품 API

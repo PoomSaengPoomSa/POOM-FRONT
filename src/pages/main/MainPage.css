@@ -390,12 +390,17 @@
   background: white;
   border: 1px solid var(--main-border);
   border-radius: 12px;
-  padding: 14px 18px; /* Reduced from 24px */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+  padding: 14px 18px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.02);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* Crucial for vertical containment */
+  min-height: 0;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.bottom-card:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.03);
 }
 
 .bottom-card-header {
@@ -1594,10 +1599,15 @@
   padding: 10px 16px;
   border-radius: 12px;
   border: 1px solid var(--main-border);
-  margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
+  margin-bottom: 0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.02);
   box-sizing: border-box;
   gap: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.main-dashboard-top-band-stacked:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.03);
 }
 
 .top-band-row {
@@ -1762,7 +1772,8 @@
   cursor: pointer;
   transition: opacity 0.15s ease;
   min-width: 0;
-  width: 100%;
+  max-width: 50%;
+  flex: 1;
 }
 
 .news-item-link:hover {
@@ -1923,9 +1934,15 @@
   border-radius: 10px;
   border: 1px solid var(--main-border);
   background-color: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.005);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
   min-width: 0;
   box-sizing: border-box;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.new-schedule-item:hover {
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.03);
+  transform: translateY(-0.5px);
 }
 
 .my-todo-card {
@@ -2026,7 +2043,7 @@
     #f1f5f9 20px
   );
   border: 1px dashed #cbd5e1;
-  border-left: 4px solid #94a3b8;
+  border-left: 1px solid #94a3b8;
 }
 
 /* AI 제안 텍스트 색상 차분하게 변경 */
@@ -2161,20 +2178,34 @@
 
 .customers-pill-scroll {
   display: flex;
+  flex-wrap: nowrap; /* 줄바꿈 절대 방지 */
   gap: 10px;
-  overflow-x: auto;
-  padding: 2px 2px 8px 2px;
-  scrollbar-width: thin;
-  scrollbar-color: #e2e8f0 transparent;
+  overflow-x: auto; /* 가로 스크롤 활성화 */
+  width: 100%;
+  padding: 4px 18px 8px 4px; /* 패딩 조정으로 스크롤바 가독성 향상 */
+  scrollbar-width: thin; /* 파이어폭스 대응 */
+  scrollbar-color: #94a3b8 #f1f5f9; /* 파이어폭스용 스크롤바/트랙 색상 */
 }
 
+/* 스크롤바가 항상 시각적으로 노출되도록 스타일링 강인화 */
 .customers-pill-scroll::-webkit-scrollbar {
-  height: 4px;
+  height: 6px; /* 스크롤바 두께 */
+  display: block;
+}
+
+.customers-pill-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9; /* 회색 톤 트랙 배경을 제공하여 스크롤 영역이 있음을 암시 */
+  border-radius: 4px;
 }
 
 .customers-pill-scroll::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 2px;
+  background-color: #cbd5e1; /* 스크롤바 핸들 색상 */
+  border-radius: 4px;
+  border: 1px solid #f1f5f9; /* 트랙과 구분을 위한 테두리 */
+}
+
+.customers-pill-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8; /* 호버 시 조금 더 짙은 색으로 변경 */
 }
 
 .customer-pill-card {
@@ -2183,12 +2214,12 @@
   gap: 8px;
   background-color: #f8fafc;
   border: 1px solid var(--main-border);
-  padding: 4px 12px;
+  padding: 4px 10px; /* 좌우 패딩을 줄여 폭을 콤팩트하게 만듦 */
   border-radius: 24px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
-  min-width: 110px;
+  min-width: 90px; /* 최소 너비를 110px에서 90px로 조정하여 화면 잘림 방지 */
   box-sizing: border-box;
 }
 
@@ -2212,11 +2243,11 @@
 }
 
 .avatar-circle.visit {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #84baf6, #4b92e7);
 }
 
 .avatar-circle.risk {
-  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  background: linear-gradient(135deg, #f88686, #ef5252);
 }
 
 .pill-info {
@@ -2346,7 +2377,7 @@
   border-radius: 8px;
   background-color: #f8fafc;
   border: 1px solid var(--main-border);
-  border-left: 4px solid #3b82f6;
+  border-left: 1px solid #3b82f6;
   cursor: pointer;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -2365,7 +2396,7 @@
 }
 
 .briefing-time {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--main-text-muted);
 }
@@ -2377,13 +2408,31 @@
 }
 
 .vip-tag {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
   background-color: #e0f2fe;
   color: #0369a1;
   padding: 0.5px 3px;
   border-radius: 3px;
   margin-left: 2px;
+}
+
+.risk-tag-new {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0.5px 3px;
+  border-radius: 3px;
+  margin-left: 4px;
+}
+
+.risk-tag-new.danger {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.risk-tag-new.warning {
+  background-color: #fffbeb;
+  color: #d97706;
 }
 
 .briefing-risk-wrap {
@@ -2394,7 +2443,7 @@
 }
 
 .risk-badge {
-  font-size: 7.5px;
+  font-size: 9px;
   font-weight: 800;
   padding: 1px 4px;
   border-radius: 3px;
@@ -2406,13 +2455,12 @@
 }
 
 .risk-text {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--main-text-body);
 }
 
 .briefing-proposal {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--main-text-muted);
   font-weight: 500;
 }
@@ -2461,13 +2509,13 @@
 }
 
 .notif-date {
-  font-size: 8.5px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--main-text-muted);
 }
 
 .notif-category {
-  font-size: 8.5px;
+  font-size: 10.5px;
   font-weight: 800;
   color: #a855f7;
 }
@@ -2480,13 +2528,36 @@
 }
 
 .notif-item-content {
-  font-size: 9.5px;
+  font-size: 11.5px;
   color: var(--main-text-body);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
+}
+
+/* 알림 세부 내용 회색 박스 스타일링 */
+.notif-item-details {
+  margin-top: 10px;
+  background-color: #f1f5f9; /* 회색 배경 */
+  border: 1px solid #e2e8f0; /* 부드러운 테두리 */
+  border-radius: 8px; /* 모서리 라운딩 */
+  padding: 10px 12px; /* 패딩 */
+  animation: slideDownDetail 0.2s ease-out;
+  box-sizing: border-box;
+}
+
+.notif-detail-line {
+  font-size: 11.5px; /* 인사이트 글자크기 통일 규격 */
+  color: var(--main-text-body);
+  margin-bottom: 5px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.notif-detail-line:last-child {
+  margin-bottom: 0;
 }
 
 @keyframes slideDown {
@@ -3053,7 +3124,7 @@
 /* Premium Customer Detail Panel (2x2 Grid) - Extra Compact Version */
 .premium-customer-detail-panel {
   background-color: #ffffff;
-  border: 1.5px solid #eae6ff;
+  border: 1.5px solid #e2e8f0;
   border-radius: 12px;
   padding: 10px 14px;
   margin-top: 8px;
@@ -3082,14 +3153,23 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
   font-weight: 800;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  flex-shrink: 0;
+}
+
+.avatar-circle-large.visit {
+  background: linear-gradient(135deg, #84baf6, #4b92e7);
+  box-shadow: 0 2px 8px rgba(75, 146, 231, 0.2);
+}
+
+.avatar-circle-large.risk {
+  background: linear-gradient(135deg, #f88686, #ef5252);
+  box-shadow: 0 2px 8px rgba(239, 82, 82, 0.2);
 }
 
 .customer-meta {
@@ -3189,7 +3269,7 @@
 
 .insight-card {
   background-color: white;
-  border: 1px solid #eae6ff;
+  border: 1px solid #f1f5f9;
   border-radius: 8px;
   padding: 10px 12px;
   display: flex;
@@ -3220,7 +3300,7 @@
 .card-title {
   font-size: 12px;
   font-weight: 800;
-  color: #4f46e5;
+  color: #0f172a;
 }
 
 .risk-status-badge {
@@ -3231,18 +3311,18 @@
 }
 
 .risk-status-badge.good {
-  background-color: #dcfce7;
-  color: #15803d;
+  background-color: #f0fdf4;
+  color: #166534;
 }
 
 .risk-status-badge.warning {
-  background-color: #fef3c7;
-  color: #d97706;
+  background-color: #fffbeb;
+  color: #9a3412;
 }
 
 .risk-status-badge.danger {
-  background-color: #fee2e2;
-  color: #ef4444;
+  background-color: #fff1f2;
+  color: #9f1239;
 }
 
 .card-body-text {
@@ -3285,25 +3365,25 @@
 }
 
 .product-status-badge {
-  font-size: 9.5px;
+  font-size: 11.5px;
   font-weight: 700;
   padding: 1px 4px;
   border-radius: 3px;
 }
 
 .product-status-badge.owned {
-  background-color: #e0f2fe;
+  background-color: #f0f9ff;
   color: #0369a1;
 }
 
 .product-status-badge.recommend {
-  background-color: #dcfce7;
-  color: #15803d;
+  background-color: #f0fdf4;
+  color: #166534;
 }
 
 .product-status-badge.unsuitable {
-  background-color: #fee2e2;
-  color: #ef4444;
+  background-color: #fff1f2;
+  color: #9f1239;
 }
 
 .product-reason-text {
@@ -3318,24 +3398,24 @@
 .features-tags-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
   padding-top: 2px;
 }
 
 .feature-tag-pill {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   background-color: #f8fafc;
   color: #475569;
   padding: 2px 8px;
   border-radius: 4px;
-  border: 1px solid #eae6ff;
+  border: none;
   transition: all 0.2s;
 }
 
 .feature-tag-pill:hover {
-  background-color: #eae6ff;
-  transform: translateY(-1px);
+  opacity: 0.85;
+  transform: translateY(-0.5px);
 }
 
 /* Asset summary inside portfolio card */
@@ -3346,13 +3426,13 @@
 }
 
 .asset-total-label {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #475569;
 }
 
 .asset-total-value {
-  font-size: 13px;
+  font-size: 11.5px;
   font-weight: 900;
   color: #1e1b4b;
   margin-left: 4px;
@@ -3396,7 +3476,7 @@
   background-color: #f0fdf4;
   color: #16a34a;
 }
-.trend-dot {
+.news-title-badge .trend-dot {
   background-color: #22c55e;
 }
 
@@ -3404,7 +3484,7 @@
   background-color: #faf5ff;
   color: #7c3aed;
 }
-.product-dot {
+.news-title-badge .product-dot {
   background-color: #a855f7;
 }
 
@@ -3457,13 +3537,13 @@
 }
 
 .indicator-rolling-item .indicator-change.up {
-  color: #16a34a;
-  background-color: #dcfce7;
+  color: #ef4444;
+  background-color: #fee2e2;
 }
 
 .indicator-rolling-item .indicator-change.down {
-  color: #ef4444;
-  background-color: #fee2e2;
+  color: #2563eb;
+  background-color: #dbeafe;
 }
 
 .indicator-rolling-item .indicator-change.flat {
@@ -3955,4 +4035,307 @@
   transform: translateY(-0.5px);
   box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
 }
+
+/* ==========================================================================
+   AI Insight Highlight Styling (Highlighter & Badges)
+   ========================================================================== */
+.insight-highlight {
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  display: inline-block;
+  margin: 0 2px;
+  font-size: 12.5px;
+}
+.insight-highlight.percentage {
+  background-color: transparent;
+  color: #ea580c;
+  font-weight: 800;
+  padding: 0;
+  margin: 0 1px;
+  display: inline;
+}
+.insight-highlight.tendency {
+  background-color: transparent;
+  color: #8b5cf6;
+  font-weight: 800;
+  padding: 0;
+  margin: 0 1px;
+  display: inline;
+}
+.insight-highlight.keyword {
+  display: inline;
+  padding: 0 2px;
+  background: linear-gradient(to top, rgba(254, 240, 138, 0.75) 45%, transparent 45%);
+  color: var(--main-text-title);
+}
+
+/* ==========================================================================
+   Briefing Modal Overlay & Card Styling
+   ========================================================================== */
+.briefing-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 40px;
+}
+
+.briefing-modal-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid var(--main-border);
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 50px -12px rgba(15, 23, 42, 0.15);
+  animation: modalFadeIn 0.3s ease-out;
+  overflow: hidden;
+  position: relative;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.briefing-modal-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--main-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+}
+
+.briefing-modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.briefing-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.briefing-modal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.briefing-modal-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.briefing-modal-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.briefing-modal-close-btn:hover {
+  background-color: #e2e8f0;
+}
+
+.briefing-modal-body {
+  padding: 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: transparent;
+  text-align: left;
+}
+
+.briefing-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.briefing-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.briefing-section-card {
+  background-color: rgba(248, 250, 252, 0.6);
+  border: 1px solid var(--main-border);
+  border-radius: 16px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.04);
+}
+
+.briefing-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #334155;
+  margin: 0;
+}
+
+.briefing-text.font-semibold {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.briefing-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.briefing-list li {
+  position: relative;
+  padding-left: 12px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.briefing-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #64748b;
+}
+
+.briefing-list li.indent {
+  padding-left: 24px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.briefing-list li.indent::before {
+  content: "";
+}
+
+.briefing-list li.indent-2 {
+  padding-left: 36px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.briefing-list li.indent-2::before {
+  content: "-";
+  position: absolute;
+  left: 24px;
+}
+
+.briefing-list li.bullet-title {
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 6px;
+}
+
+.briefing-list li.bullet-title::before {
+  content: "•";
+  color: #0f172a;
+}
+
+/* Resizer handle for the briefing modal popup */
+.briefing-modal-resizer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  cursor: se-resize;
+  background-image: linear-gradient(135deg, transparent 50%, #94a3b8 50%);
+  border-bottom-right-radius: 16px;
+  z-index: 1010;
+  transition: all 0.2s ease;
+}
+
+.briefing-modal-resizer:hover {
+  background-image: linear-gradient(135deg, transparent 50%, #0284c7 50%);
+}
+
+/* Collapsed bottom split container & cards when customer details are expanded */
+.bottom-sub-split.collapsed {
+  flex: 0 0 auto;
+  height: 48px;
+  min-height: 48px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.bottom-sub-split.collapsed .sub-split-card {
+  height: 48px;
+  min-height: 48px;
+  padding: 8px 18px !important;
+  overflow: hidden;
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.bottom-sub-split.collapsed .sub-split-card:hover {
+  background-color: #f1f5f9;
+  border-color: var(--primary-color);
+}
+
+.bottom-sub-split.collapsed .bottom-card-header {
+  margin-bottom: 0 !important;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+/* 주요 고객 상세 정보 카드 높이 제한 및 내부 스크롤 적용 */
+.key-customers-card-new.has-expanded {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(100% - 60px);
+  overflow: hidden;
+}
+
+.key-customers-card-new.has-expanded .premium-customer-detail-panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
 
