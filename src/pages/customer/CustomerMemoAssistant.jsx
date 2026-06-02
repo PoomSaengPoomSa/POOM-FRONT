@@ -457,7 +457,7 @@ export default function CustomerMemoAssistant() {
               <div 
                 className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} 
                 key={c.id} 
-                onClick={() => setSelectedCustomerId(c.id)} 
+                onClick={() => { setSelectedCustomerId(c.id); setIsListCollapsed(true); }} 
                 style={{ 
                   cursor: 'pointer',
                   padding: isNarrow ? '10px 8px' : '12px 16px',
