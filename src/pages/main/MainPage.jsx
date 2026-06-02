@@ -1011,7 +1011,7 @@ export default function MainPage() {
       });
     });
 
-    return list.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    return list.sort((a, b) => a.sortKey.replace(" ", "T").localeCompare(b.sortKey.replace(" ", "T")));
   }, [events, allAiTodos, selectedDate, todoViewMode, ignoredAiTodoIds]);
 
   const mergedCustomerList = useMemo(() => {
@@ -1388,7 +1388,7 @@ export default function MainPage() {
                           <div className="pill-info">
                             <span className="pill-name">{c.name}</span>
                             <span className={`pill-badge ${isChurnRisk ? "risk-high" : "visit-badge"}`}>
-                              {isChurnRisk ? `AI: ${churnItem.grade}` : "오늘 방문"}
+                              {isChurnRisk ? `이탈 ${churnItem.grade}` : "오늘 방문"}
                             </span>
                           </div>
                         </div>
