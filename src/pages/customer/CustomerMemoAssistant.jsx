@@ -243,6 +243,15 @@ export default function CustomerMemoAssistant() {
   const selectedCustomer = (allCustomersList.concat(todayCustomersList).find(c => c.id === selectedCustomerId) || currentList[0]) || { name: "로딩중...", color: "gray", initial: "고" };
 
   const [activeTab, setActiveTab] = useState("simulator"); // "memo" or "simulator"
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const tab = queryParams.get("tab");
+    if (tab === "simulator" || tab === "memo") {
+      setActiveTab(tab);
+    }
+  }, [location.search]);
+
   const [listWidth, setListWidth] = useState(240);
   const [isDragging, setIsDragging] = useState(false);
   const isNarrow = listWidth < 200;
