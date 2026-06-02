@@ -207,21 +207,22 @@ export default function CustomerMemoAssistant() {
   };
 
   const handleSaveReport = async () => {
-    if (!selectedCustomerId || !memoText.trim() || !generatedReport?.cm_id) {
-      alert("AI 보고서를 먼저 생성한 후에 저장할 수 있습니다.");
+    if (!selectedCustomerId || !memoText.trim()) {
+      alert("상담 메모를 입력해주세요.");
       return;
     }
     
     const reportContent = {
-      main_content: generatedReport.main_content,
-      special_remarks: generatedReport.special_remarks,
-      follow_up: generatedReport.follow_up,
-      summary: generatedReport.summary || ""
+      main_content: generatedReport?.main_content || "",
+      special_remarks: generatedReport?.special_remarks || "",
+      follow_up: generatedReport?.follow_up || "",
+      summary: generatedReport?.summary || ""
     };
 
     try {
       await api.customer.saveReport(selectedCustomerId, {
-        cm_id: generatedReport.cm_id,
+        cm_id: generatedReport?.cm_id || null,
+        memo: memoText,
         content: reportContent
       });
 
