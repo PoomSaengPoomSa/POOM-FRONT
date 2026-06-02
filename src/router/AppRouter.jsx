@@ -84,7 +84,7 @@ export default function AppRouter() {
         <Route path="/customer-management-memo-assistant" element={<CustomerMemoAssistant />} />
         <Route path="/customer-management-visit-briefing" element={<CustomerVisitBriefing />} />
         <Route path="/customer-management-profile" element={<CustomerProfile />} />
-        <Route path="/customer-management-dashboard-2" element={<CustomerDashboard />} />
+        <Route path="/customer-management-dashboard" element={<CustomerDashboard />} />
 
         {/* Phase 4 & 5 Trend Routes */}
         <Route path="/trend-archive" element={<TrendArchive />} />
