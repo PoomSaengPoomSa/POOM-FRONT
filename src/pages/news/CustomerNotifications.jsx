@@ -1,11 +1,55 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Calendar as CalendarIcon, MoreHorizontal } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
 import { api } from "../../api";
 import "./News.css";
 
+function HistoryItem({ hist }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div 
+      onClick={() => setIsOpen(!isOpen)}
+      style={{ 
+        borderBottom: '1px solid #e2e8f0', 
+        paddingBottom: '12px', 
+        cursor: 'pointer',
+        userSelect: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+        marginTop: '6px'
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: '13px', fontWeight: '700', color: '#1e293b' }}>
+          📅 {hist.date} - AI 요약: <span style={{ color: '#0284c7' }}>{hist.summary}</span>
+        </span>
+        <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '600' }}>
+          {isOpen ? "▲ 접기" : "▼ 상세 상담내용 보기"}
+        </span>
+      </div>
+      {isOpen && (
+        <div style={{ 
+          marginTop: '6px', 
+          padding: '10px 14px', 
+          backgroundColor: '#f8fafc', 
+          borderRadius: '8px', 
+          fontSize: '12.5px', 
+          color: '#475569',
+          lineHeight: '1.6',
+          borderLeft: '4px solid #3b82f6',
+          whiteSpace: 'pre-wrap'
+        }}>
+          {hist.content}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function CustomerNotifications() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("today");
   const [activeDetailId, setActiveDetailId] = useState(null);
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
@@ -13,6 +57,7 @@ export default function CustomerNotifications() {
   const [modalSize, setModalSize] = useState({ width: 850, height: 650 });
   const [notificationsList, setNotificationsList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showOlder, setShowOlder] = useState(false);
 
   const location = useLocation();
 
@@ -110,7 +155,8 @@ export default function CustomerNotifications() {
       summary: [],
       preference: [],
       assets: [],
-      notes: []
+      notes: [],
+      history: []
     };
     
     let currentSection = null;
@@ -120,20 +166,41 @@ export default function CustomerNotifications() {
       const trimmed = line.trim();
       if (!trimmed) continue;
       
-      // 섹션 마커 매칭 지원
-      if (trimmed.includes("Quick Summary") || trimmed.includes("요약")) {
+      // 섹션 마커 매칭 지원 (대괄호 마커 기준으로 엄격하게 매칭하여 일반 본문의 단어 오매칭 방지)
+      if (trimmed === "[Quick Summary]" || trimmed.startsWith("[Quick Summary") || trimmed === "[요약]") {
         currentSection = "summary";
         hasDynamicData = true;
-      } else if (trimmed.includes("Preference") || trimmed.includes("고객 정보") || trimmed.includes("선호도")) {
+      } else if (trimmed === "[고객 정보 & Preference]" || trimmed.startsWith("[고객 정보") || trimmed === "[선호도]") {
         currentSection = "preference";
         hasDynamicData = true;
-      } else if (trimmed.includes("자산 현황") || trimmed.includes("거래 내역") || trimmed.includes("자산")) {
+      } else if (trimmed === "[자산 현황 & 최근 거래 내역]" || trimmed.startsWith("[자산 현황") || trimmed === "[자산]") {
         currentSection = "assets";
         hasDynamicData = true;
-      } else if (trimmed.includes("특이사항") || trimmed.includes("체크 사항") || trimmed.includes("주의") || trimmed.includes("특이 사항")) {
+      } else if (trimmed === "[핵심 특이사항]" || trimmed.startsWith("[핵심 특이사항") || trimmed === "[특이사항]") {
         currentSection = "notes";
         hasDynamicData = true;
       } else if (currentSection) {
+        // 이전 상담 내역 전용 파싱
+        if (currentSection === "notes" && (trimmed.includes("상담 내용:") || trimmed.includes("상담 히스토리"))) {
+          let match = trimmed.match(/^-\s*\[(\d{4}-\d{2}-\d{2})\]\s*상담 내용:\s*(.*?)\s*\|\s*AI 요약:\s*(.*)$/);
+          if (!match) {
+            match = trimmed.match(/^\[(\d{4}-\d{2}-\d{2})\]\s*상담 내용:\s*(.*?)\s*\|\s*AI 요약:\s*(.*)$/);
+          }
+          if (match) {
+            result.history.push({
+              date: match[1],
+              content: match[2],
+              summary: match[3]
+            });
+            continue;
+          }
+        }
+        
+        // 헤더 문구는 Notes 본문에서 제외
+        if (trimmed.includes("이전 상담 히스토리 요약")) {
+          continue;
+        }
+        
         result[currentSection].push(trimmed);
       }
     }
@@ -143,7 +210,16 @@ export default function CustomerNotifications() {
   };
 
 
-  const filteredNotifications = notificationsList;
+  const filteredNotifications = notificationsList.filter(notif => {
+    if (activeTab === "today") {
+      return notif.today;
+    } else {
+      if (showOlder) return true;
+      return notif.days_diff <= 2;
+    }
+  });
+
+  const hasOlder = notificationsList.some(notif => notif.days_diff > 2);
 
   const handleCardClick = (notif) => {
     if (notif.isBriefing) {
@@ -168,13 +244,13 @@ export default function CustomerNotifications() {
             <div className="news-alert-tabs">
               <button 
                 className={`news-alert-tab ${activeTab === 'today' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('today'); setActiveDetailId(null); }}
+                onClick={() => { setActiveTab('today'); setActiveDetailId(null); setShowOlder(false); }}
               >
                 오늘
               </button>
               <button 
                 className={`news-alert-tab ${activeTab === 'all' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('all'); setActiveDetailId(null); }}
+                onClick={() => { setActiveTab('all'); setActiveDetailId(null); setShowOlder(false); }}
               >
                 전체
               </button>
@@ -221,11 +297,65 @@ export default function CustomerNotifications() {
                           {line}
                         </div>
                       ))}
+                      {notif.c_id && (
+                        <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'flex-end' }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/customer-management-registration-1?c_id=${notif.c_id}`);
+                            }}
+                            style={{
+                              padding: '6px 12px',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              color: '#3b82f6',
+                              backgroundColor: 'white',
+                              border: '1px solid #3b82f6',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseOver={(e) => {
+                              e.target.style.backgroundColor = '#3b82f6';
+                              e.target.style.color = 'white';
+                            }}
+                            onMouseOut={(e) => {
+                              e.target.style.backgroundColor = 'white';
+                              e.target.style.color = '#3b82f6';
+                            }}
+                          >
+                            고객 프로필 보기
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               );
             })}
+              {activeTab === "all" && !showOlder && hasOlder && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px', marginBottom: '8px' }}>
+                  <button 
+                    onClick={() => setShowOlder(true)}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '12.5px',
+                      fontWeight: '600',
+                      color: '#64748b',
+                      backgroundColor: '#f1f5f9',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '20px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                    }}
+                    onMouseOver={(e) => { e.target.style.backgroundColor = '#e2e8f0'; e.target.style.color = '#334155'; }}
+                    onMouseOut={(e) => { e.target.style.backgroundColor = '#f1f5f9'; e.target.style.color = '#64748b'; }}
+                  >
+                    ▼ 이전 알림 보기
+                  </button>
+                </div>
+              )}
           </div>
         </div>
       </div>
@@ -240,9 +370,34 @@ export default function CustomerNotifications() {
           >
             {/* Header */}
             <div className="briefing-modal-header">
-              <div className="briefing-modal-header-left">
+              <div className="briefing-modal-header-left" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span className="news-alert-badge badge-green">방문 예정 브리핑</span>
                 <h2 className="briefing-modal-title">{selectedBriefing ? selectedBriefing.content : "방문 예정 브리핑"}</h2>
+                {selectedBriefing?.c_id && (
+                  <button 
+                    onClick={() => {
+                      setIsBriefingOpen(false);
+                      setSelectedBriefing(null);
+                      navigate(`/customer-management-registration-1?c_id=${selectedBriefing.c_id}`);
+                    }}
+                    style={{
+                      marginLeft: '12px',
+                      padding: '4px 10px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      color: 'white',
+                      backgroundColor: '#3b82f6',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseOver={(e) => e.target.style.backgroundColor = '#2563eb'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                  >
+                    고객 프로필 보기
+                  </button>
+                )}
               </div>
               <div className="briefing-modal-header-right">
                 <span className="briefing-modal-date">{selectedBriefing ? selectedBriefing.date : ""}</span>
@@ -275,8 +430,6 @@ export default function CustomerNotifications() {
                         <h3 className="briefing-section-title">고객 기본 정보 & Preference</h3>
                         <div className="briefing-section-card">
                           <ul className="briefing-list">
-                            <li>고객명/등급: {getCustomerName(selectedBriefing.content)} 고객 (VIP)</li>
-                            <li>담당 PB: 김재욱 팀장</li>
                             {briefingData.preference.map((line, idx) => (
                               <li key={idx} className={line.startsWith("-") ? "" : "indent"}>{line.startsWith("-") ? line.substring(1).trim() : line}</li>
                             ))}
@@ -307,68 +460,38 @@ export default function CustomerNotifications() {
                           </ul>
                         </div>
                       </div>
+
+                      {/* 이전 상담 히스토리 요약 Section (토글식 리스트) */}
+                      {briefingData.history && briefingData.history.length > 0 && (
+                        <div className="briefing-section">
+                          <h3 className="briefing-section-title">이전 상담 히스토리 요약 (클릭 시 상세 접고 펴기)</h3>
+                          <div className="briefing-section-card" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            {briefingData.history.map((hist, idx) => (
+                              <HistoryItem key={idx} hist={hist} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </>
                   );
                 }
 
-                // FALLBACK: 하드코딩 Mockup 레이아웃 (기존 디자인 유지 보장)
+                // FALLBACK: 비정형 데이터 렌더링 (하드코딩 데이터 대신 실제 알림 본문 노출)
                 return (
-                  <>
-                    {/* Quick Summary Section */}
-                    <div className="briefing-section">
-                      <h3 className="briefing-section-title">Quick Summary</h3>
-                      <div className="briefing-section-card">
-                        <p className="briefing-text font-semibold">금리 민감도가 매우 높은 2억 원 만기 재가입 대상 VIP 고객입니다.</p>
-                        <p className="briefing-text font-semibold">타행 이탈 징후가 있으니 당행 특판 및 연계 상품(뉴플러스/채권형)을 통한 방어가 최우선 과제입니다.</p>
-                      </div>
+                  <div className="briefing-section">
+                    <h3 className="briefing-section-title">브리핑 내용</h3>
+                    <div className="briefing-section-card" style={{ padding: '20px', lineHeight: '1.8', color: '#334155' }}>
+                      {selectedBriefing?.expandedContent && selectedBriefing.expandedContent.length > 0 ? (
+                        selectedBriefing.expandedContent.map((line, idx) => (
+                          <p key={idx} className="briefing-text" style={{ marginBottom: '8px' }}>
+                            {line}
+                          </p>
+                        ))
+                      ) : (
+                        <p className="briefing-text">{selectedBriefing?.content || "브리핑 내용이 없습니다."}</p>
+                      )}
                     </div>
-
-                    {/* 고객 기본 정보 & Preference Section */}
-                    <div className="briefing-section">
-                      <h3 className="briefing-section-title">고객 기본 정보 & Preference</h3>
-                      <div className="briefing-section-card">
-                        <ul className="briefing-list">
-                          <li>고객명/등급: {selectedBriefing ? getCustomerName(selectedBriefing.content) : "김민준"} 고객 (VIP)</li>
-                          <li>담당 PB: 김재욱 팀장</li>
-                          <li>음료/편의 선호도 (★필독):</li>
-                          <li className="indent">☕ 아이스 아메리카노(연하게) 선호.</li>
-                          <li className="indent">❌ 비타500 절대 금지 (과거 제공 시 특유의 약품 냄새와 단맛을 싫어한다고 명확히 기재됨. 웰컴 드링크 준비 시 주의).</li>
-                          <li className="indent">📰 대기 시간 발생 시 경제지(A일보) 제공 선호.</li>
-                        </ul>
-                      </div>
-                    </div>
-
-                    {/* 자산 현황 & 최근 거래 내역 Section */}
-                    <div className="briefing-section">
-                      <h3 className="briefing-section-title">자산 현황 & 최근 거래 내역</h3>
-                      <div className="briefing-section-card">
-                        <ul className="briefing-list">
-                          <li>총 자산: 3억 2,000만 원 (전월 대비 ▼8%, 약 3,000만 원 감소)</li>
-                          <li>보유 상품 상세:</li>
-                          <li className="indent-2">정기예금: 2억 원 (금일 만기 도래)</li>
-                          <li className="indent-2">공모 펀드: 5,000만 원 (글로벌 기술주 중심)</li>
-                          <li className="indent-2">ISA: 3,000만 원</li>
-                          <li>최근 자금 흐름:</li>
-                          <li className="indent">2025.04.28 타행(신한은행)으로 3,000만 원 송금 확인 (이탈 자금 분석 필요).</li>
-                        </ul>
-                      </div>
-                    </div>
-
-                    {/* 핵심 특이사항 & 상담 전 필수 체크 Section */}
-                    <div className="briefing-section">
-                      <h3 className="briefing-section-title">핵심 특이사항 & 상담 전 필수 체크</h3>
-                      <div className="briefing-section-card">
-                        <ul className="briefing-list">
-                          <li className="bullet-title">극도의 금리 민감 성향:</li>
-                          <li className="indent">지난주 경쟁사(국민·신한)의 우대금리 이벤트를 직접 언급하며 비교 문의한 이력 있음. 0.1%p 차이에도 민감하게 반응하는 스타일.</li>
-                          <li className="bullet-title">투자 성향 변화 조짐:</li>
-                          <li className="indent">2025.04.15 유선 상담 당시, 기존 보유 중인 해외 펀드의 변동성에 피로감을 토로하며 일부 환매 후 안정적인 채권형 자산이나 고금리 예금으로 갈아탈 의향을 비춤.</li>
-                          <li className="bullet-title">커뮤니케이션 스타일:</li>
-                          <li className="indent">결론부터 듣는 것을 좋아하는 두괄식 성향. 복잡한 상품 구조 설명보다는 ‘세후 실질 수익률’과 ‘리스크 방어력’을 숫자로 정확히 제시할 때 만족도가 높음.</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </>
+                  </div>
                 );
               })()}
             </div>
