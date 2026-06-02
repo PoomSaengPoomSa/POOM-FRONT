@@ -21,6 +21,27 @@ export default function NewsArchive() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedNewsItem, setSelectedNewsItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const [dashboardData, setDashboardData] = useState(null);
+  const [activeBriefingTab, setActiveBriefingTab] = useState("economy");
+
+  const renderSummaryList = (summaryText) => {
+    if (!summaryText) return <li>실시간 AI 요약 브리핑을 준비 중입니다.</li>;
+    
+    const lines = summaryText
+      .split("\n")
+      .map(line => line.replace(/^-\s*/, "").trim())
+      .filter(line => line.length > 0);
+      
+    if (lines.length === 0) {
+      return <li>실시간 AI 요약 브리핑을 준비 중입니다.</li>;
+    }
+    
+    return lines.map((line, idx) => (
+      <li key={idx}>{line}</li>
+    ));
+  };
+
   // API 호출 연동 (카테고리, 검색어, 페이지 변경 시 트리거)
   useEffect(() => {
     setIsLoading(true);
@@ -44,6 +65,28 @@ export default function NewsArchive() {
         setIsLoading(false);
       });
   }, [selectedCategory, searchQuery, currentPage]);
+
+  // 대시보드 AI 브리핑 데이터 로드
+  useEffect(() => {
+    api.trend.getDashboard()
+      .then(data => {
+        setDashboardData(data);
+      })
+      .catch(err => {
+        console.error("대시보드 AI 브리핑 로드 실패:", err);
+      });
+  }, []);
+
+  // 뉴스 아카이브 카테고리 탭 클릭 시 AI 실시간 브리핑 탭도 유기적으로 함께 스위칭
+  useEffect(() => {
+    if (selectedCategory === "경제") {
+      setActiveBriefingTab("economy");
+    } else if (selectedCategory === "정치") {
+      setActiveBriefingTab("politics");
+    } else if (selectedCategory === "사회") {
+      setActiveBriefingTab("itScience");
+    }
+  }, [selectedCategory]);
 
   // 뉴스 클릭 시 상세 조회 호출
   const handleNewsClick = (item) => {
@@ -75,7 +118,84 @@ export default function NewsArchive() {
       {/* Main Content */}
       <div className="trend-main">
         <div className="trend-section-box" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 24, marginTop: 0 }}>뉴스 아카이브</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 20, marginTop: 0 }}>뉴스 아카이브</h1>
+          
+          {/* AI 실시간 뉴스 브리핑 박스 */}
+          {dashboardData?.aiSummaries && (
+            <div className="ai-news-briefing-box" style={{ marginBottom: 20 }}>
+              <div className="ai-news-briefing-header">
+                <div className="ai-news-briefing-title-row">
+                  <div className="ai-news-briefing-badge">
+                    <span className="ai-news-briefing-badge-icon">🤖</span>
+                    <span>AI 실시간 브리핑</span>
+                  </div>
+                  <span className="ai-news-briefing-title-text">오늘의 핵심 이슈 요약</span>
+                  <span className="pulse-spark"></span>
+                </div>
+                
+                {/* 세그먼트 컨트롤 탭 */}
+                <div style={{ display: 'flex', gap: 4, background: '#f1f5f9', padding: 2, borderRadius: 10 }}>
+                  <button 
+                    onClick={() => setActiveBriefingTab("economy")}
+                    style={{ 
+                      border: 'none', 
+                      background: activeBriefingTab === 'economy' ? '#ffffff' : 'transparent',
+                      color: activeBriefingTab === 'economy' ? '#0284c7' : '#64748b',
+                      fontSize: 12, 
+                      fontWeight: activeBriefingTab === 'economy' ? 700 : 600,
+                      padding: '5px 12px',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      boxShadow: activeBriefingTab === 'economy' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    경제
+                  </button>
+                  <button 
+                    onClick={() => setActiveBriefingTab("politics")}
+                    style={{ 
+                      border: 'none', 
+                      background: activeBriefingTab === 'politics' ? '#ffffff' : 'transparent',
+                      color: activeBriefingTab === 'politics' ? '#0284c7' : '#64748b',
+                      fontSize: 12, 
+                      fontWeight: activeBriefingTab === 'politics' ? 700 : 600,
+                      padding: '5px 12px',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      boxShadow: activeBriefingTab === 'politics' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    정치
+                  </button>
+                  <button 
+                    onClick={() => setActiveBriefingTab("itScience")}
+                    style={{ 
+                      border: 'none', 
+                      background: activeBriefingTab === 'itScience' ? '#ffffff' : 'transparent',
+                      color: activeBriefingTab === 'itScience' ? '#0284c7' : '#64748b',
+                      fontSize: 12, 
+                      fontWeight: activeBriefingTab === 'itScience' ? 700 : 600,
+                      padding: '5px 12px',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      boxShadow: activeBriefingTab === 'itScience' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    사회
+                  </button>
+                </div>
+              </div>
+              
+              <div className="ai-news-briefing-content">
+                <ul className="ai-news-briefing-list">
+                  {renderSummaryList(dashboardData.aiSummaries[activeBriefingTab])}
+                </ul>
+              </div>
+            </div>
+          )}
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
             <div className="trend-tabs" style={{ marginBottom: 0 }}>
