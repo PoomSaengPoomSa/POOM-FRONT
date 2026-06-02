@@ -41,7 +41,7 @@ export default function LoginNew() {
       if (user.role === "admin") {
         navigate("/admin-system-dashboard");
       } else {
-        navigate("/daily-calendar");
+        navigate("/main");
       }
     } catch (err) {
       setIsSubmitting(false);

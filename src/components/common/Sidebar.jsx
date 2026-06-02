@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, TrendingUp, Contact, BarChart2, Bell, LogOut } from "lucide-react";
+import { Calendar, TrendingUp, Contact, BarChart2, Bell, LogOut, LayoutDashboard } from "lucide-react";
 import { api } from "../../api";
 
 export default function Sidebar({ type = "cal" }) {
@@ -70,7 +70,7 @@ export default function Sidebar({ type = "cal" }) {
   // Retrieve or initialize sidebar width
   const [width, setWidth] = useState(() => {
     const saved = localStorage.getItem("sidebarWidth");
-    return saved ? parseInt(saved, 10) : 240;
+    return saved ? parseInt(saved, 10) : 180;
   });
 
   const isResizing = useRef(false);
@@ -88,8 +88,8 @@ export default function Sidebar({ type = "cal" }) {
 
   const handleMouseMove = (e) => {
     if (!isResizing.current) return;
-    // Set boundary limits: Min 70px, Max 400px
-    const newWidth = Math.max(70, Math.min(400, e.clientX));
+    // Set boundary limits: Min 50px, Max 240px
+    const newWidth = Math.max(50, Math.min(240, e.clientX));
     setWidth(newWidth);
     localStorage.setItem("sidebarWidth", newWidth.toString());
   };
@@ -110,7 +110,9 @@ export default function Sidebar({ type = "cal" }) {
     };
   }, []);
 
-  const isCollapsed = width < 160;
+  const isCollapsed = width < 100;
+
+  const isMainActive = path === '/main';
 
   const isCalendarActive =
     path.includes('/calendar') ||
@@ -138,7 +140,7 @@ export default function Sidebar({ type = "cal" }) {
     <div
       className={`${prefix}-sidebar sidebar-container ${isCollapsed ? 'collapsed' : ''}`}
       style={{
-        width: isCollapsed ? '70px' : `${width}px`,
+        width: isCollapsed ? '60px' : `${width}px`,
         position: 'relative',
         transition: resizingActive ? 'none' : 'width 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
       }}
@@ -170,8 +172,8 @@ export default function Sidebar({ type = "cal" }) {
 
         /* Collapsed overrides */
         .sidebar-container.collapsed {
-          min-width: 70px !important;
-          max-width: 70px !important;
+          min-width: 60px !important;
+          max-width: 60px !important;
         }
 
         .sidebar-container.collapsed .menu-text {
@@ -201,7 +203,7 @@ export default function Sidebar({ type = "cal" }) {
         /* Floating Tooltip design */
         .sidebar-tooltip {
           position: absolute;
-          left: 80px;
+          left: 70px;
           background-color: #0f172ad9; /* Premium dark glassmorphism */
           backdrop-filter: blur(8px);
           color: #ffffff;
@@ -250,10 +252,10 @@ export default function Sidebar({ type = "cal" }) {
         }
 
         /* Centered badge layout for collapsed view */
-        .sidebar-container.collapsed .sidebar-badge {
+        .sidebar-badge {
           position: absolute !important;
           top: 4px !important;
-          right: 12px !important;
+          right: 8px !important;
           margin-left: 0 !important;
           font-size: 9px !important;
           padding: 0 !important;
@@ -294,21 +296,21 @@ export default function Sidebar({ type = "cal" }) {
 
       {/* Sidebar Logo */}
       <Link
-        to="/daily-calendar"
+        to="/main"
         className={`${prefix}-logo`}
         style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           height: "60px",
-          padding: isCollapsed ? "16px 8px" : "32px 24px",
+          padding: isCollapsed ? "16px 4px" : "24px 16px",
           boxSizing: 'border-box',
           textDecoration: 'none'
         }}
       >
         {isCollapsed ? (
           /* Premium POOM Smile Logo SVG */
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
+          <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
             <circle cx="14" cy="15" r="3.5" fill="#0284c7" />
             <circle cx="26" cy="15" r="3.5" fill="#0284c7" />
             <path d="M 11 24 A 9 9 0 0 0 29 24" stroke="#0284c7" strokeWidth="3.5" strokeLinecap="round" fill="none" />
@@ -318,7 +320,7 @@ export default function Sidebar({ type = "cal" }) {
             src="/poom-logo.png"
             alt="POOM Logo"
             style={{
-              height: "40px",
+              height: "32px",
               maxWidth: "100%",
               objectFit: "contain",
               cursor: 'pointer'
@@ -329,10 +331,10 @@ export default function Sidebar({ type = "cal" }) {
 
       {/* Sidebar Navigation Menu */}
       <div className={`${prefix}-menu`} style={{ marginTop: isCollapsed ? '16px' : '32px' }}>
-        <Link to="/daily-calendar" className={`${prefix}-menu-item sidebar-menu-item ${isCalendarActive ? 'active' : ''}`}>
-          <Calendar size={20} />
-          {!isCollapsed && <span className="menu-text">캘린더</span>}
-          {isCollapsed && <span className="sidebar-tooltip">캘린더</span>}
+        <Link to="/main" className={`${prefix}-menu-item sidebar-menu-item ${isMainActive ? 'active' : ''}`}>
+          <LayoutDashboard size={20} />
+          {!isCollapsed && <span className="menu-text">Main</span>}
+          {isCollapsed && <span className="sidebar-tooltip">Main</span>}
         </Link>
         <Link to="/customer-management-registration-1" className={`${prefix}-menu-item sidebar-menu-item ${isCustomerActive ? 'active' : ''}`}>
           <TrendingUp size={20} />
@@ -403,7 +405,24 @@ export default function Sidebar({ type = "cal" }) {
           <Bell size={20} />
           {!isCollapsed && <span className="menu-text">알림</span>}
           {todayCount > 0 && (
-            <span className={`${prefix}-badge sidebar-badge`} style={{ backgroundColor: '#fee2e2', color: '#ef4444', marginLeft: 'auto' }}>
+            <span 
+              className={`sidebar-bell-badge ${isCollapsed ? 'sidebar-badge' : ''}`} 
+              style={{ 
+                backgroundColor: '#fee2e2', 
+                color: '#ef4444', 
+                marginLeft: isCollapsed ? '0' : 'auto',
+                fontSize: '11px',
+                fontWeight: '700',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '18px',
+                minWidth: '18px',
+                boxSizing: 'border-box'
+              }}
+            >
               {todayCount}
             </span>
           )}

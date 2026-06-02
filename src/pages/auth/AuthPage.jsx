@@ -8,7 +8,7 @@ export default function AuthPage() {
   return (
     <div className={styles.root}>
       <Bg1
-        onLogin={() => navigate("/daily-calendar")}
+        onLogin={() => navigate("/main")}
         onSignUp={() => navigate("/auth/signup")}
       />
     </div>
