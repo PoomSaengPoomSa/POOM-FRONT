@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
-import { Calendar, TrendingUp, Users, Bell, Search, Plus, LogOut, ChevronDown, MessageSquare, Download, Share2, Printer, Settings } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Search, Plus, LogOut, ChevronDown, MessageSquare, Download, Share2, Printer, Settings, ChevronLeft, ChevronRight } from "lucide-react";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import Sidebar from "../../components/common/Sidebar";
 import { api } from "../../api";
@@ -27,6 +27,7 @@ export default function CustomerDashboard() {
   const location = useLocation();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isListCollapsed, setIsListCollapsed] = useState(false);
   const [customersList, setCustomersList] = useState([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -193,10 +194,42 @@ export default function CustomerDashboard() {
       <div className="cust-main">
 
         {/* Left Panel */}
-        <div className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
-          <div className="cust-list-header">
+        <div 
+          className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}
+          style={{ 
+            width: isListCollapsed ? 0 : '240px', 
+            flexShrink: 0, 
+            padding: isListCollapsed ? 0 : '24px',
+            overflow: 'hidden',
+            border: isListCollapsed ? 'none' : '1px solid var(--cust-glass-border)',
+            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+          }}
+        >
+          <div className="cust-list-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <h2 className="cust-list-title">나의 고객</h2>
-            <button className="cust-add-btn" onClick={() => setIsModalOpen(true)}><Plus size={16} /></button>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <button className="cust-add-btn" onClick={() => setIsModalOpen(true)}><Plus size={16} /></button>
+              <button 
+                onClick={() => setIsListCollapsed(true)}
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  background: '#f1f5f9',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#64748b',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#e2e8f0'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#f1f5f9'}
+              >
+                <ChevronLeft size={14} />
+              </button>
+            </div>
           </div>
           
           <div className="cust-search">
@@ -228,6 +261,50 @@ export default function CustomerDashboard() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Collapse Toggle Trigger Area */}
+        <div 
+          className="cust-resizer" 
+          style={{ 
+            width: isListCollapsed ? '16px' : '8px', 
+            cursor: 'default',
+            position: 'relative',
+            background: 'transparent',
+            flexShrink: 0
+          }}
+        >
+          {isListCollapsed && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsListCollapsed(false);
+              }}
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 100,
+                color: '#0284c7',
+                transition: 'transform 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'}
+            >
+              <ChevronRight size={14} />
+            </button>
+          )}
         </div>
 
         {/* Right Detail Panel */}
@@ -336,45 +413,122 @@ export default function CustomerDashboard() {
                   </div>
 
                   {/* 2. 이탈 위험 수준 */}
-                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 24, display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                      <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>이탈 위험 수준</h3>
-                      <span style={{ fontSize: 14, color: churnUI.headerColor, fontWeight: 700 }}>{churnUI.label}</span>
-                    </div>
-                    <div style={{ background: churnUI.bg, borderRadius: 12, padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20, boxShadow: churnUI.boxShadow }}>
-                      <div style={{ fontSize: 28, marginBottom: 2 }}>{churnUI.emoji}</div>
-                      <div style={{ fontSize: 18, fontWeight: 700, color: 'white' }}>{churnRisk?.grade || "양호"}</div>
+                  <div style={{ 
+                    background: '#ffffff', 
+                    border: '1px solid rgba(226, 232, 240, 0.8)', 
+                    borderRadius: 16, 
+                    padding: 24, 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.03)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 18 }}>🎯</span>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: 0 }}>이탈 위험 수준</h3>
+                      </div>
+                      <span style={{ 
+                        fontSize: 11, 
+                        background: churnUI.headerColor + '15', 
+                        color: churnUI.headerColor, 
+                        fontWeight: 800, 
+                        padding: '4px 10px', 
+                        borderRadius: 20,
+                        border: `1.5px solid ${churnUI.headerColor}30`
+                      }}>
+                        위험도 {churnUI.label}
+                      </span>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 8px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <span style={{ fontSize: 11, color: '#94a3b8', width: 50, textAlign: 'right' }}>방문 간격</span>
+                    {/* 위험도 종합 뱃지 (그라디언트 글래스) */}
+                    <div style={{ 
+                      background: `linear-gradient(135deg, ${churnUI.bg}f0 0%, ${churnUI.bg}d0 100%)`, 
+                      borderRadius: 12, 
+                      padding: '18px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 16,
+                      marginBottom: 20, 
+                      boxShadow: churnUI.boxShadow,
+                      color: 'white',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{ fontSize: 32 }}>{churnUI.emoji}</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <span style={{ fontSize: 16, fontWeight: 800, letterSpacing: '0.5px' }}>{churnRisk?.grade || "양호"} 상태</span>
+                        <span style={{ fontSize: 11, opacity: 0.9, fontWeight: 500 }}>{churnUI.subtitle}</span>
+                      </div>
+                    </div>
+
+                    {/* 4대 세부 위험 요소 매트릭스 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20, background: '#f8fafc', padding: '16px', borderRadius: 12, border: '1px solid #f1f5f9' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <span style={{ fontSize: 12, width: 60, fontWeight: 700, color: '#475569' }}>방문 간격</span>
                         <div style={{ flex: 1, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
                           <div style={{ width: `${subMetrics.visit}%`, height: '100%', background: churnUI.bg, borderRadius: 3, transition: 'width 0.3s ease' }}></div>
                         </div>
-                        <span style={{ fontSize: 12, color: churnUI.bg, fontWeight: 600, width: 20 }}>{subMetrics.visit}</span>
+                        <span style={{ fontSize: 12, color: '#1e293b', fontWeight: 700, width: 24, textAlign: 'right' }}>{subMetrics.visit}</span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <span style={{ fontSize: 11, color: '#94a3b8', width: 50, textAlign: 'right' }}>메모 감정</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <span style={{ fontSize: 12, width: 60, fontWeight: 700, color: '#475569' }}>메모 감정</span>
                         <div style={{ flex: 1, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
                           <div style={{ width: `${subMetrics.emotion}%`, height: '100%', background: churnUI.bg, borderRadius: 3, transition: 'width 0.3s ease' }}></div>
                         </div>
-                        <span style={{ fontSize: 12, color: churnUI.bg, fontWeight: 600, width: 20 }}>{subMetrics.emotion}</span>
+                        <span style={{ fontSize: 12, color: '#1e293b', fontWeight: 700, width: 24, textAlign: 'right' }}>{subMetrics.emotion}</span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <span style={{ fontSize: 11, color: '#94a3b8', width: 50, textAlign: 'right' }}>자산 변화</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <span style={{ fontSize: 12, width: 60, fontWeight: 700, color: '#475569' }}>자산 변화</span>
                         <div style={{ flex: 1, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
                           <div style={{ width: `${subMetrics.asset}%`, height: '100%', background: churnUI.bg, borderRadius: 3, transition: 'width 0.3s ease' }}></div>
                         </div>
-                        <span style={{ fontSize: 12, color: churnUI.bg, fontWeight: 600, width: 20 }}>{subMetrics.asset}</span>
+                        <span style={{ fontSize: 12, color: '#1e293b', fontWeight: 700, width: 24, textAlign: 'right' }}>{subMetrics.asset}</span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <span style={{ fontSize: 11, color: '#94a3b8', width: 50, textAlign: 'right' }}>응답 속도</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <span style={{ fontSize: 12, width: 60, fontWeight: 700, color: '#475569' }}>응답 속도</span>
                         <div style={{ flex: 1, height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
                           <div style={{ width: `${subMetrics.response}%`, height: '100%', background: churnUI.bg, borderRadius: 3, transition: 'width 0.3s ease' }}></div>
                         </div>
-                        <span style={{ fontSize: 12, color: churnUI.bg, fontWeight: 600, width: 20 }}>{subMetrics.response}</span>
+                        <span style={{ fontSize: 12, color: '#1e293b', fontWeight: 700, width: 24, textAlign: 'right' }}>{subMetrics.response}</span>
                       </div>
+                    </div>
+
+                    {/* 💡 AI 이탈 방지 행동 가이드 */}
+                    <div style={{ 
+                      background: churnRisk?.grade === "위험" ? '#fef2f2' : churnRisk?.grade === "주의" ? '#fffbeb' : '#f0fdf4', 
+                      border: `1px dashed ${churnRisk?.grade === "위험" ? '#fca5a5' : churnRisk?.grade === "주의" ? '#fcd34d' : '#bbf7d0'}`, 
+                      borderRadius: 12, 
+                      padding: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 13 }}>💡</span>
+                        <span style={{ 
+                          fontSize: 12, 
+                          fontWeight: 800, 
+                          color: churnRisk?.grade === "위험" ? '#b91c1c' : churnRisk?.grade === "주의" ? '#b45309' : '#166534' 
+                        }}>
+                          AI 이탈 방지 행동 가이드
+                        </span>
+                      </div>
+                      <p style={{ 
+                        fontSize: 11, 
+                        color: churnRisk?.grade === "위험" ? '#7f1d1d' : churnRisk?.grade === "주의" ? '#78350f' : '#14532d', 
+                        lineHeight: 1.6, 
+                        fontWeight: 600, 
+                        margin: 0 
+                      }}>
+                        {churnRisk?.grade === "위험" ? (
+                          "최근 자산 이탈 징후가 포착되었습니다. 즉시 유선 연락을 조율하고, 대체 포트폴리오 리밸런싱 제안서(세제 혜택 위주)를 준비하여 방문 대면 상담을 진행하십시오."
+                        ) : churnRisk?.grade === "주의" ? (
+                          "내방 주기 경과 및 대화 지표 중립화 징후가 보입니다. 1주일 내로 안부 전화를 취하고, 고객 관심사 기반의 시장 동향 자료를 가볍게 전달하는 것을 권장합니다."
+                        ) : (
+                          "현재 모든 관계 지표가 안정적입니다. 정기 금융 트렌드 메세지를 주기적으로 발송하여 최상의 신뢰 관계를 유지하십시오."
+                        )}
+                      </p>
                     </div>
                   </div>
 

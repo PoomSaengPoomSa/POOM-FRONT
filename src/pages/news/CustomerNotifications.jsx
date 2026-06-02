@@ -5,15 +5,34 @@ import Sidebar from "../../components/common/Sidebar";
 import { api } from "../../api";
 import "./News.css";
 
-function HistoryItem({ hist }) {
+function HistoryItem({ hist, c_id }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [fullMemo, setFullMemo] = useState("");
+  const [loadingFull, setLoadingFull] = useState(false);
+  const [showFull, setShowFull] = useState(false);
+
+  const fetchFullMemo = async (e) => {
+    e.stopPropagation();
+    if (!c_id || !hist.cm_id) return;
+    setLoadingFull(true);
+    try {
+      const data = await api.customer.getMemoDetail(c_id, hist.cm_id);
+      if (data && data.memo) {
+        setFullMemo(data.memo);
+        setShowFull(true);
+      }
+    } catch (err) {
+      console.error("Failed to fetch full memo:", err);
+    } finally {
+      setLoadingFull(false);
+    }
+  };
+
   return (
     <div 
-      onClick={() => setIsOpen(!isOpen)}
       style={{ 
         borderBottom: '1px solid #e2e8f0', 
         paddingBottom: '12px', 
-        cursor: 'pointer',
         userSelect: 'none',
         display: 'flex',
         flexDirection: 'column',
@@ -21,7 +40,10 @@ function HistoryItem({ hist }) {
         marginTop: '6px'
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+      >
         <span style={{ fontSize: '13px', fontWeight: '700', color: '#1e293b' }}>
           📅 {hist.date} - AI 요약: <span style={{ color: '#0284c7' }}>{hist.summary}</span>
         </span>
@@ -39,9 +61,48 @@ function HistoryItem({ hist }) {
           color: '#475569',
           lineHeight: '1.6',
           borderLeft: '4px solid #3b82f6',
-          whiteSpace: 'pre-wrap'
         }}>
-          {hist.content}
+          <div>
+            {showFull ? (
+              <div style={{ whiteSpace: 'pre-wrap' }}>{fullMemo}</div>
+            ) : (
+              <div>
+                <span>{hist.content}</span>
+                {hist.cm_id && c_id && (
+                  <span 
+                    onClick={fetchFullMemo}
+                    style={{ 
+                      marginLeft: '8px', 
+                      color: '#2563eb', 
+                      cursor: 'pointer', 
+                      textDecoration: 'underline',
+                      fontWeight: '600' 
+                    }}
+                  >
+                    {loadingFull ? "[불러오는 중...]" : "[원본 전체보기]"}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+          {showFull && (
+            <div 
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowFull(false);
+              }}
+              style={{ 
+                marginTop: '8px', 
+                color: '#64748b', 
+                cursor: 'pointer', 
+                fontSize: '11.5px',
+                textDecoration: 'underline',
+                textAlign: 'right'
+              }}
+            >
+              간략히 보기
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -182,15 +243,16 @@ export default function CustomerNotifications() {
       } else if (currentSection) {
         // 이전 상담 내역 전용 파싱
         if (currentSection === "notes" && (trimmed.includes("상담 내용:") || trimmed.includes("상담 히스토리"))) {
-          let match = trimmed.match(/^-\s*\[(\d{4}-\d{2}-\d{2})\]\s*상담 내용:\s*(.*?)\s*\|\s*AI 요약:\s*(.*)$/);
+          let match = trimmed.match(/^-\s*\[(\d{4}-\d{2}-\d{2})\]\s*상담 내용:\s*(.*?)\s*\|\s*AI 요약:\s*(.*?)(?:\s*\|\s*ID:\s*(\d+))?$/);
           if (!match) {
-            match = trimmed.match(/^\[(\d{4}-\d{2}-\d{2})\]\s*상담 내용:\s*(.*?)\s*\|\s*AI 요약:\s*(.*)$/);
+            match = trimmed.match(/^\[(\d{4}-\d{2}-\d{2})\]\s*상담 내용:\s*(.*?)\s*\|\s*AI 요약:\s*(.*?)(?:\s*\|\s*ID:\s*(\d+))?$/);
           }
           if (match) {
             result.history.push({
               date: match[1],
               content: match[2],
-              summary: match[3]
+              summary: match[3],
+              cm_id: match[4] ? parseInt(match[4], 10) : null
             });
             continue;
           }
@@ -462,16 +524,20 @@ export default function CustomerNotifications() {
                       </div>
 
                       {/* 이전 상담 히스토리 요약 Section (토글식 리스트) */}
-                      {briefingData.history && briefingData.history.length > 0 && (
-                        <div className="briefing-section">
-                          <h3 className="briefing-section-title">이전 상담 히스토리 요약 (클릭 시 상세 접고 펴기)</h3>
-                          <div className="briefing-section-card" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {briefingData.history.map((hist, idx) => (
-                              <HistoryItem key={idx} hist={hist} />
-                            ))}
-                          </div>
+                      <div className="briefing-section">
+                        <h3 className="briefing-section-title">이전 상담 히스토리 요약 (클릭 시 상세 접고 펴기)</h3>
+                        <div className="briefing-section-card" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {briefingData.history && briefingData.history.length > 0 ? (
+                            briefingData.history.map((hist, idx) => (
+                              <HistoryItem key={idx} hist={hist} c_id={selectedBriefing?.c_id} />
+                            ))
+                          ) : (
+                            <div style={{ padding: '8px 0', textAlign: 'center', color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>
+                              이전 상담 이력이 존재하지 않습니다.
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </>
                   );
                 }
