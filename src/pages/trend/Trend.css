@@ -73,7 +73,7 @@
 /* Main Content Area */
 .trend-main {
   flex: 1;
-  padding: 16px 32px;
+  padding: 12px 24px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -86,7 +86,7 @@
   font-size: 24px;
   font-weight: 700;
   color: var(--trend-text-main);
-  margin: 0 0 32px 0;
+  margin: 0 0 20px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -94,11 +94,11 @@
 
 .trend-section-box {
   background-color: rgba(255, 255, 255, 0.85);
-  border-radius: 24px;
-  padding: 24px 32px;
+  border-radius: 20px;
+  padding: 16px 24px;
   box-shadow: var(--trend-panel-shadow);
   border: 1px solid var(--trend-glass-border);
-  margin-bottom: 32px;
+  margin-bottom: 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -107,14 +107,14 @@
 
 .trend-section-box:hover {
   background-color: rgba(255, 255, 255, 0.92);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .trend-section-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--trend-text-main);
-  margin: 0 0 24px 0;
+  margin: 0 0 16px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -125,7 +125,7 @@
 .trend-news-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 20px;
   flex: 1;
 }
 
@@ -135,12 +135,12 @@
 }
 
 .trend-news-col-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--trend-text-main);
-  padding-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--trend-border);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -149,95 +149,171 @@
 .trend-news-item {
   font-size: 12px;
   color: var(--trend-text-main);
-  line-height: 1.5;
-  margin-bottom: 24px;
+  line-height: 1.4;
+  margin-bottom: 16px;
 }
 
 .trend-indicator-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 20px;
   flex: 1;
 }
 
-.indicator-card {
+/* 가로 컴팩트 카드 (Horizontal Slim Card) */
+.indicator-card.horizontal-card {
   background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 125px;
+  min-height: 125px;
   border: 1px solid var(--trend-glass-border);
   box-shadow: var(--trend-panel-shadow);
   transition: all 0.25s ease;
+  overflow: hidden;
 }
 
-.indicator-card:hover {
+.indicator-card.horizontal-card:hover {
   background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
 }
 
-.indicator-title {
+.indicator-card-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1.1;
+  min-width: 0;
+}
+
+.indicator-card-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex: 0.9;
+  min-width: 0;
+  padding-left: 12px;
+}
+
+.indicator-title-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--trend-text-main);
-  margin-bottom: 24px;
-  justify-content: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .indicator-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  flex-shrink: 0;
 }
 
-.indicator-stats {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 24px;
-}
-
-.indicator-stat-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.indicator-stat-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--trend-text-muted);
-}
-
-.indicator-stat-value {
-  font-size: 24px;
+.indicator-name-main {
+  font-size: 16px;
   font-weight: 700;
   color: var(--trend-text-main);
+  white-space: nowrap;
 }
 
-.indicator-stat-value.large {
-  font-size: 36px;
+.indicator-name-sub {
+  font-size: 11px;
+  color: var(--trend-text-muted);
+  font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
-.indicator-stat-change {
+.indicator-large-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--trend-text-main);
+  line-height: 1;
+}
+
+.indicator-right-value-row {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
+  align-items: baseline;
+  gap: 1px;
+  line-height: 1;
 }
 
-.indicator-stat-change.up { color: #ef4444; }
+.indicator-right-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--trend-text-main);
+  font-family: 'Outfit', 'Inter', sans-serif;
+  line-height: 1;
+}
+
+.indicator-right-unit {
+  font-size: 15px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+.indicator-predict-label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.indicator-prediction-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-block;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+
+.indicator-pill-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.indicator-pill-badge.pill-up {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.indicator-pill-badge.pill-down {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.indicator-sparkline-container {
+  width: 90px;
+  height: 35px;
+  margin: 4px 0;
+  flex-shrink: 0;
+}
+
+.indicator-sparkline-svg {
+  width: 100%;
+  height: 100%;
+}
+
 .indicator-stat-change.down { color: #3b82f6; }
 
 /* Economic Indicator Sub-pages */
@@ -465,3 +541,238 @@
   border-color: #0284c7;
   transform: translateY(-2px);
 }
+
+/* Realtime Trend Bar styles */
+.realtime-trend-bar {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 20px;
+  background: rgba(248, 250, 252, 0.9);
+  border-radius: 16px;
+  border: 1px solid var(--trend-border);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
+  margin-bottom: 12px;
+}
+
+.realtime-trend-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.realtime-trend-bullet {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #2563eb;
+}
+
+.realtime-trend-title-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.realtime-trend-list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.realtime-trend-item {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 110px;
+  padding: 0 8px;
+}
+
+.realtime-trend-item-name {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.realtime-trend-item-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.realtime-trend-item-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  font-family: 'Inter', sans-serif;
+}
+
+.realtime-trend-item-unit {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+.realtime-trend-item-rate {
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 6px;
+}
+
+.trend-color-up {
+  color: #16a34a !important;
+}
+
+.trend-color-down {
+  color: #ef4444 !important;
+}
+
+.trend-color-flat {
+  color: #64748b !important;
+}
+
+.realtime-trend-divider {
+  width: 1px;
+  height: 20px;
+  background-color: #e2e8f0;
+}
+
+/* AI News Briefing Box */
+.ai-news-briefing-box {
+  background: linear-gradient(135deg, rgba(240, 249, 255, 0.6) 0%, rgba(255, 255, 255, 0.7) 100%);
+  border-radius: 16px;
+  border: 1px dashed #bae6fd;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.03);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.ai-news-briefing-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #0284c7, #38bdf8);
+}
+
+.ai-news-briefing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.ai-news-briefing-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-news-briefing-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  box-shadow: 0 2px 5px rgba(14, 165, 233, 0.05);
+}
+
+.ai-news-briefing-badge-icon {
+  animation: float-bot 2.5s ease-in-out infinite;
+}
+
+.ai-news-briefing-title-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ai-news-briefing-timestamp {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.ai-news-briefing-content {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #334155;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.ai-news-briefing-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.ai-news-briefing-list li {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 8px;
+}
+
+.ai-news-briefing-list li:last-child {
+  margin-bottom: 0;
+}
+
+.ai-news-briefing-list li::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  color: #0284c7;
+  font-weight: bold;
+}
+
+/* Animations */
+@keyframes float-bot {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+
+.pulse-spark {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #0284c7;
+  box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+  animation: pulse-spark-effect 1.8s infinite;
+}
+
+@keyframes pulse-spark-effect {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(14, 165, 233, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
+  }
+}
+
+

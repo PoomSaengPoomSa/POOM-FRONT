@@ -13,6 +13,24 @@ export default function TrendArchive() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedNewsItem, setSelectedNewsItem] = useState(null);
   const [isLoadingNewsDetail, setIsLoadingNewsDetail] = useState(false);
+  const [activeBriefingTab, setActiveBriefingTab] = useState("economy");
+
+  const renderSummaryList = (summaryText) => {
+    if (!summaryText) return <li>실시간 AI 요약 브리핑을 준비 중입니다.</li>;
+    
+    const lines = summaryText
+      .split("\n")
+      .map(line => line.replace(/^-\s*/, "").trim())
+      .filter(line => line.length > 0);
+      
+    if (lines.length === 0) {
+      return <li>실시간 AI 요약 브리핑을 준비 중입니다.</li>;
+    }
+    
+    return lines.map((line, idx) => (
+      <li key={idx}>{line}</li>
+    ));
+  };
 
   useEffect(() => {
     setIsLoading(true);
@@ -69,57 +87,6 @@ export default function TrendArchive() {
 
       {/* Main Content */}
       <div className="trend-main">
-        {/* News Archive Section */}
-        <div className="trend-section-box">
-          <Link to="/news-archive" style={{ textDecoration: 'none' }}>
-            <h2 className="trend-section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>뉴스 아카이브</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#0ea5e9', fontWeight: 600, background: '#f0f9ff', padding: '6px 12px', borderRadius: 20 }}>
-                자세히 보기 <ChevronRight size={16} />
-              </div>
-            </h2>
-          </Link>
-
-          <div className="trend-news-grid">
-            {isLoading ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#64748b', gridColumn: 'span 3' }}>데이터를 불러오는 중입니다...</div>
-            ) : (
-              <>
-                <div className="trend-news-col">
-                  <div className="trend-news-col-title">경제 <ChevronDown size={16} color="#cbd5e1" /></div>
-                  {newsItems.economy.length === 0 ? (
-                    <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
-                  ) : (
-                    newsItems.economy.map((item, i) => (
-                      <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
-                    ))
-                  )}
-                </div>
-                <div className="trend-news-col">
-                  <div className="trend-news-col-title">정치 <ChevronDown size={16} color="#cbd5e1" /></div>
-                  {newsItems.politics.length === 0 ? (
-                    <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
-                  ) : (
-                    newsItems.politics.map((item, i) => (
-                      <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
-                    ))
-                  )}
-                </div>
-                <div className="trend-news-col">
-                  <div className="trend-news-col-title">사회 <ChevronDown size={16} color="#cbd5e1" /></div>
-                  {(newsItems.itScience || newsItems.it).length === 0 ? (
-                    <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
-                  ) : (
-                    (newsItems.itScience || newsItems.it).map((item, i) => (
-                      <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
-                    ))
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-
         {/* Economic Indicator Archive Section */}
         <div className="trend-section-box">
           <Link to="/economic-indicator-archive" style={{ textDecoration: 'none' }}>
@@ -131,105 +98,158 @@ export default function TrendArchive() {
             </h2>
           </Link>
 
+          {/* 실시간 트렌드 요약 바 */}
+          <div className="realtime-trend-bar">
+            <div className="realtime-trend-title-container">
+              <span className="realtime-trend-bullet"></span>
+              <span className="realtime-trend-title-text">실시간 트렌드</span>
+            </div>
+            
+            <div className="realtime-trend-list">
+              {(dashboardData?.realtimeTrends || []).map((item, idx, arr) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                  <div className="realtime-trend-item">
+                    <span className="realtime-trend-item-name">{item.name}</span>
+                    <div className="realtime-trend-item-value-row">
+                      <span className="realtime-trend-item-value">{item.value}</span>
+                      {item.unit && <span className="realtime-trend-item-unit">{item.unit}</span>}
+                      <span className={`realtime-trend-item-rate ${item.direction === 'up' ? 'trend-color-up' : item.direction === 'down' ? 'trend-color-down' : 'trend-color-flat'}`}>
+                        {item.direction === 'up' ? '↑ ' : item.direction === 'down' ? '↓ ' : '▬ '}
+                        {item.rate}
+                      </span>
+                    </div>
+                  </div>
+                  {idx < arr.length - 1 && <div className="realtime-trend-divider"></div>}
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="trend-indicator-grid">
-            {/* Gold (이중 분류 - 상승/하락) */}
-            <div className="indicator-card" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="indicator-title">
-                <div className="indicator-icon"><Activity size={20} color="#0f172a" /></div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span>금값</span>
-                  <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>Gold Price</span>
+            {/* Gold (금값) */}
+            <div className="indicator-card horizontal-card">
+              <div className="indicator-card-left" style={{ justifyContent: 'space-between' }}>
+                <div className="indicator-title-row">
+                  <div className="indicator-icon"><Activity size={20} color="#0f172a" /></div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="indicator-name-main">금값</span>
+                    <span className="indicator-name-sub">Gold Price</span>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: goldProbRise > goldProbFall ? '#ef4444' : '#3b82f6', marginTop: 'auto', marginBottom: 2 }}>
+                  예측: {goldPredText}
                 </div>
               </div>
-              <div style={{ margin: '8px 0 8px 0', fontSize: 12, color: 'var(--trend-text-muted)', fontWeight: 600 }}>내일 예측</div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+
+              <div className="indicator-card-right" style={{ justifyContent: 'flex-start', gap: 6 }}>
+                <span className="indicator-predict-label" style={{ marginBottom: 4 }}>내일 예측</span>
                 {/* 상승 */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>상승</span>
+                <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, width: '100%' }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 28 }}>상승</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
                     <div style={{ width: `${goldProbRise ?? 0}%`, height: '100%', background: '#ef4444', borderRadius: 3 }}></div>
                   </div>
-                  <span style={{ fontWeight: 700, color: '#ef4444', width: 28, textAlign: 'right' }}>
+                  <span style={{ fontWeight: 700, color: '#ef4444', width: 30, textAlign: 'right' }}>
                     {goldProbRise !== null && goldProbRise !== undefined ? `${goldProbRise}%` : "-"}
                   </span>
                 </div>
                 {/* 하락 */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>하락</span>
+                <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, width: '100%' }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 28 }}>하락</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
                     <div style={{ width: `${goldProbFall ?? 0}%`, height: '100%', background: '#3b82f6', borderRadius: 3 }}></div>
                   </div>
-                  <span style={{ fontWeight: 700, color: '#3b82f6', width: 28, textAlign: 'right' }}>
+                  <span style={{ fontWeight: 700, color: '#3b82f6', width: 30, textAlign: 'right' }}>
                     {goldProbFall !== null && goldProbFall !== undefined ? `${goldProbFall}%` : "-"}
                   </span>
                 </div>
               </div>
-              
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--trend-text-main)', borderTop: '1px solid var(--trend-border)', paddingTop: 8, marginTop: 'auto' }}>
-                예측: <span style={{ color: goldPredText.includes('동률') ? '#94a3b8' : goldPredText.includes('상승') ? '#ef4444' : goldPredText.includes('하락') ? '#3b82f6' : '#94a3b8' }}>{goldPredText}</span>
-              </div>
             </div>
 
-            {/* Real Estate (회귀 - 시계열) */}
-            <div className="indicator-card" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="indicator-title">
-                <div className="indicator-icon"><Home size={20} color="#0f172a" /></div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span>부동산 가격지수</span>
-                  <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>Real Estate Price</span>
+            {/* Real Estate (부동산 가격지수) */}
+            <div className="indicator-card horizontal-card" style={{ position: 'relative' }}>
+              <div className="indicator-card-left" style={{ justifyContent: 'space-between', zIndex: 1 }}>
+                <div className="indicator-title-row">
+                  <div className="indicator-icon"><Home size={20} color="#0f172a" /></div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="indicator-name-main">부동산 가격지수</span>
+                    <span className="indicator-name-sub">Real Estate Price</span>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', gap: 12, marginBottom: 2 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>지난 달</span>
+                    <span style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>
+                      {isLoading ? "..." : (indicators?.realEstate?.yesterday ?? "-")}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>이번 달</span>
+                    <span style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>
+                      {isLoading ? "..." : (indicators?.realEstate?.today ?? "-")}
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div style={{ margin: '8px 0 8px 0', fontSize: 12, color: 'var(--trend-text-muted)', fontWeight: 600 }}>다음달 예측</div>
-              
-              <div className="indicator-stats" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span className="indicator-stat-label">지난 달</span>
-                  <span className="indicator-stat-value" style={{ fontSize: 13, color: 'var(--trend-text-muted)', fontWeight: 500 }}>{isLoading ? "..." : (indicators?.realEstate?.yesterday ?? "-")}</span>
-                </div>
-                <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span className="indicator-stat-label">이번 달</span>
-                  <span className="indicator-stat-value" style={{ fontSize: 13, color: 'var(--trend-text-muted)', fontWeight: 500 }}>{isLoading ? "..." : (indicators?.realEstate?.today ?? "-")}</span>
-                </div>
-                <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-                  <span className="indicator-stat-label" style={{ color: '#3b82f6', fontWeight: 700 }}>다음 달</span>
-                  <span className="indicator-stat-value large" style={{ fontSize: 36, fontWeight: 700, lineHeight: 1, color: '#3b82f6' }}>{isLoading ? "..." : (indicators?.realEstate?.tomorrow ?? "-")}</span>
-                  {!isLoading && indicators?.realEstate && indicators.realEstate.changeRate !== undefined && indicators.realEstate.changeDirection && (
-                    <span className={`indicator-stat-change ${indicators.realEstate.changeDirection}`} style={{
-                      position: 'absolute', bottom: -18, 
-                      background: indicators.realEstate.changeDirection === 'up' ? '#dcfce7' : indicators.realEstate.changeDirection === 'down' ? '#fee2e2' : '#f1f5f9',
-                      color: indicators.realEstate.changeDirection === 'up' ? '#16a34a' : indicators.realEstate.changeDirection === 'down' ? '#ef4444' : '#64748b',
-                      padding: '1px 6px', borderRadius: 4, fontSize: 9, fontWeight: 700
+
+              <div className="indicator-card-right" style={{ justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 1 }}>
+                <span className="indicator-predict-label">다음달 예측</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: 'auto', marginBottom: 2 }}>
+                  <span style={{ fontSize: 24, fontWeight: 800, color: '#2563eb', fontFamily: "'Inter', sans-serif", lineHeight: 1.1 }}>
+                    {isLoading ? "..." : (indicators?.realEstate?.tomorrow ?? "-")}
+                  </span>
+                  {!isLoading && indicators?.realEstate && indicators.realEstate.changeRate !== undefined && (
+                    <span style={{ 
+                      fontSize: 11, 
+                      fontWeight: 700, 
+                      color: indicators.realEstate.changeDirection === 'up' ? '#ef4444' : '#3b82f6',
+                      marginTop: 2 
                     }}>
-                      {indicators.realEstate.changeDirection === 'up' ? '▲ +' : indicators.realEstate.changeDirection === 'down' ? '▼ -' : '▬ '}
+                      {indicators.realEstate.changeDirection === 'up' ? '▲ +' : '▼ -'}
                       {Math.abs(indicators.realEstate.changeRate)}%
                     </span>
                   )}
                 </div>
               </div>
-              <div style={{ height: 40, marginTop: 'auto' }}>
-                <svg viewBox="0 0 100 30" style={{ width: '100%', height: '100%', fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
-                  <path d="M 0 15 Q 25 15 50 25 T 100 20" />
-                  <circle cx="50" cy="25" r="3" fill="#3b82f6" />
+              
+              {/* Background Micro Sparkline */}
+              <div style={{ 
+                position: 'absolute', 
+                left: 0, 
+                right: 0, 
+                bottom: 0, 
+                height: 32, 
+                opacity: 0.35, 
+                pointerEvents: 'none' 
+              }}>
+                <svg viewBox="0 0 100 35" style={{ width: '100%', height: '100%', fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
+                  <path d="M 0 25 Q 20 28 40 20 T 70 24 T 100 15" />
+                  <circle cx="100" cy="15" r="3" fill="#3b82f6" />
                 </svg>
               </div>
             </div>
 
-            {/* Base Rate (다중 분류 - 인하/동결/인상) */}
-            <div className="indicator-card" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="indicator-title">
-                <div className="indicator-icon"><DollarSign size={20} color="#0f172a" /></div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span>기준 금리</span>
-                  <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>Base Rate</span>
+            {/* Base Rate (기준 금리) */}
+            <div className="indicator-card horizontal-card">
+              <div className="indicator-card-left" style={{ justifyContent: 'space-between' }}>
+                <div className="indicator-title-row">
+                  <div className="indicator-icon"><DollarSign size={20} color="#0f172a" /></div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="indicator-name-main">기준 금리</span>
+                    <span className="indicator-name-sub">Base Rate</span>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#475569', marginTop: 'auto', marginBottom: 2 }}>
+                  예측: {brPredText.replace(" 가능성 높음", "")} 가능성 높음
                 </div>
               </div>
-              <div style={{ margin: '8px 0 8px 0', fontSize: 12, color: 'var(--trend-text-muted)', fontWeight: 600 }}>다음달 예측</div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+
+              <div className="indicator-card-right" style={{ justifyContent: 'flex-start', gap: 4 }}>
+                <span className="indicator-predict-label" style={{ marginBottom: 4 }}>다음달 예측</span>
                 {/* 인하 */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>인하</span>
+                <div style={{ display: 'flex', alignItems: 'center', fontSize: 11, width: '100%' }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 28 }}>인하</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
                     <div style={{ width: `${brProbCut ?? 0}%`, height: '100%', background: '#3b82f6', borderRadius: 3 }}></div>
                   </div>
@@ -238,18 +258,18 @@ export default function TrendArchive() {
                   </span>
                 </div>
                 {/* 동결 */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>동결</span>
+                <div style={{ display: 'flex', alignItems: 'center', fontSize: 11, width: '100%' }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 28 }}>동결</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
                     <div style={{ width: `${brProbFreeze ?? 0}%`, height: '100%', background: '#94a3b8', borderRadius: 3 }}></div>
                   </div>
-                  <span style={{ fontWeight: 700, color: 'var(--trend-text-muted)', width: 28, textAlign: 'right' }}>
+                  <span style={{ fontWeight: 700, color: '#64748b', width: 28, textAlign: 'right' }}>
                     {brProbFreeze !== null && brProbFreeze !== undefined ? `${brProbFreeze}%` : "-"}
                   </span>
                 </div>
                 {/* 인상 */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
-                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 24 }}>인상</span>
+                <div style={{ display: 'flex', alignItems: 'center', fontSize: 11, width: '100%' }}>
+                  <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 28 }}>인상</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
                     <div style={{ width: `${brProbHike ?? 0}%`, height: '100%', background: '#ef4444', borderRadius: 3 }}></div>
                   </div>
@@ -258,14 +278,137 @@ export default function TrendArchive() {
                   </span>
                 </div>
               </div>
-              
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--trend-text-main)', borderTop: '1px solid var(--trend-border)', paddingTop: 8, marginTop: 'auto' }}>
-                예측: <span style={{ color: brPredText.includes('인상') ? '#ef4444' : brPredText.includes('인하') ? '#3b82f6' : '#94a3b8' }}>{brPredText}</span>
-              </div>
             </div>
           </div>
         </div>
 
+        {/* News Archive Section */}
+        <div className="trend-section-box">
+          <Link to="/news-archive" style={{ textDecoration: 'none' }}>
+            <h2 className="trend-section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>뉴스 아카이브</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#0ea5e9', fontWeight: 600, background: '#f0f9ff', padding: '6px 12px', borderRadius: 20 }}>
+                자세히 보기 <ChevronRight size={16} />
+              </div>
+            </h2>
+          </Link>
+
+          {/* AI 실시간 뉴스 브리핑 박스 */}
+          {!isLoading && dashboardData?.aiSummaries && (
+            <div className="ai-news-briefing-box">
+              <div className="ai-news-briefing-header">
+                <div className="ai-news-briefing-title-row">
+                  <div className="ai-news-briefing-badge">
+                    <span className="ai-news-briefing-badge-icon">🤖</span>
+                    <span>AI 실시간 브리핑</span>
+                  </div>
+                  <span className="ai-news-briefing-title-text">오늘의 핵심 이슈 요약</span>
+                  <span className="pulse-spark"></span>
+                </div>
+                
+                {/* 세그먼트 컨트롤 탭 */}
+                <div style={{ display: 'flex', gap: 4, background: '#f1f5f9', padding: 2, borderRadius: 10 }}>
+                  <button 
+                    onClick={() => setActiveBriefingTab("economy")}
+                    style={{ 
+                      border: 'none', 
+                      background: activeBriefingTab === 'economy' ? '#ffffff' : 'transparent',
+                      color: activeBriefingTab === 'economy' ? '#0284c7' : '#64748b',
+                      fontSize: 12, 
+                      fontWeight: activeBriefingTab === 'economy' ? 700 : 600,
+                      padding: '5px 12px',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      boxShadow: activeBriefingTab === 'economy' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    경제
+                  </button>
+                  <button 
+                    onClick={() => setActiveBriefingTab("politics")}
+                    style={{ 
+                      border: 'none', 
+                      background: activeBriefingTab === 'politics' ? '#ffffff' : 'transparent',
+                      color: activeBriefingTab === 'politics' ? '#0284c7' : '#64748b',
+                      fontSize: 12, 
+                      fontWeight: activeBriefingTab === 'politics' ? 700 : 600,
+                      padding: '5px 12px',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      boxShadow: activeBriefingTab === 'politics' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    정치
+                  </button>
+                  <button 
+                    onClick={() => setActiveBriefingTab("itScience")}
+                    style={{ 
+                      border: 'none', 
+                      background: activeBriefingTab === 'itScience' ? '#ffffff' : 'transparent',
+                      color: activeBriefingTab === 'itScience' ? '#0284c7' : '#64748b',
+                      fontSize: 12, 
+                      fontWeight: activeBriefingTab === 'itScience' ? 700 : 600,
+                      padding: '5px 12px',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      boxShadow: activeBriefingTab === 'itScience' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    사회
+                  </button>
+                </div>
+              </div>
+              
+              <div className="ai-news-briefing-content">
+                <ul className="ai-news-briefing-list">
+                  {renderSummaryList(dashboardData.aiSummaries[activeBriefingTab])}
+                </ul>
+              </div>
+            </div>
+          )}
+
+          <div className="trend-news-grid">
+            {isLoading ? (
+              <div style={{ padding: 40, textAlign: 'center', color: '#64748b', gridColumn: 'span 3' }}>데이터를 불러오는 중입니다...</div>
+            ) : (
+              <>
+                <div className="trend-news-col">
+                  <div className="trend-news-col-title">경제 <ChevronDown size={16} color="#cbd5e1" /></div>
+                  {newsItems.economy.length === 0 ? (
+                    <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
+                  ) : (
+                    newsItems.economy.slice(0, 3).map((item, i) => (
+                      <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
+                    ))
+                  )}
+                </div>
+                <div className="trend-news-col">
+                  <div className="trend-news-col-title">정치 <ChevronDown size={16} color="#cbd5e1" /></div>
+                  {newsItems.politics.length === 0 ? (
+                    <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
+                  ) : (
+                    newsItems.politics.slice(0, 3).map((item, i) => (
+                      <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
+                    ))
+                  )}
+                </div>
+                <div className="trend-news-col">
+                  <div className="trend-news-col-title">사회 <ChevronDown size={16} color="#cbd5e1" /></div>
+                  {(newsItems.itScience || newsItems.it).length === 0 ? (
+                    <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
+                  ) : (
+                    (newsItems.itScience || newsItems.it).slice(0, 3).map((item, i) => (
+                      <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
+                    ))
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Modal Overlay */}
