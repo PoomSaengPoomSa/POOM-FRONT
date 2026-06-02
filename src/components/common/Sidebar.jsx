@@ -409,7 +409,7 @@ export default function Sidebar({ type = "cal" }) {
           </Link>
 
           {/* 서브메뉴 (아래 탭) */}
-          {!isCollapsed && (isAssistantHovered || isAssistantActive) && (
+          {!isCollapsed && isAssistantHovered && (
             <div
               className="assistant-submenu"
               style={{
@@ -464,7 +464,7 @@ export default function Sidebar({ type = "cal" }) {
           </Link>
 
           {/* 서브메뉴 (아래 탭) */}
-          {!isCollapsed && (isTrendHovered || isTrendActive) && (
+          {!isCollapsed && isTrendHovered && (
             <div
               className="trend-submenu"
               style={{
