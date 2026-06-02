@@ -6,7 +6,6 @@ import AuthPage from "../pages/auth/AuthPage.jsx";
 import SignUpPage from "../pages/auth/SignUpPage.jsx";
 
 
-import CalendarPage from "../pages/calendar/CalendarPage.jsx";
 import ProfilePage from "../pages/profile/ProfilePage.jsx";
 import EconomyPage from "../pages/economy/EconomyPage.jsx";
 import MemoPage from "../pages/memo/MemoPage.jsx";
@@ -22,8 +21,7 @@ import NotificationMessageDraft from "../pages/news/NotificationMessageDraft.jsx
 // Phase 2: Auth and Calendar New Pages
 import SignUpNew from "../pages/auth/SignUpNew.jsx";
 import LoginNew from "../pages/auth/LoginNew.jsx";
-import WeeklyCalendar from "../pages/calendar/WeeklyCalendar.jsx";
-import MonthlyCalendar from "../pages/calendar/MonthlyCalendar.jsx";
+
 import MainPage from "../pages/main/MainPage.jsx";
 
 // Phase 3: Customer Management and News Bucket Pages
@@ -36,7 +34,6 @@ import CustomerProfile from "../pages/customer/CustomerProfile.jsx";
 import CustomerDashboard from "../pages/customer/CustomerDashboard.jsx";
 
 // Phase 4: Calendar (Day) and Trend Archives
-import DailyCalendar from "../pages/calendar/DailyCalendar.jsx";
 import { CalendarProvider } from "../pages/calendar/CalendarContext.jsx";
 import TrendArchive from "../pages/trend/TrendArchive.jsx";
 import EconomicIndicatorArchive from "../pages/trend/EconomicIndicatorArchive.jsx";
@@ -63,7 +60,7 @@ export default function AppRouter() {
 
       <Route element={<AppLayout />}>
 
-        <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/calendar" element={<Navigate to="/monthly-calendar" replace />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/economy" element={<EconomyPage />} />
         <Route path="/memo" element={<MemoPage />} />
@@ -78,9 +75,6 @@ export default function AppRouter() {
         {/* Phase 2 Calendar Routes */}
         <Route element={<CalendarProvider><Outlet /></CalendarProvider>}>
           <Route path="/main" element={<MainPage />} />
-          <Route path="/daily-calendar" element={<DailyCalendar />} />
-          <Route path="/weekly-calendar" element={<WeeklyCalendar />} />
-          <Route path="/monthly-calendar" element={<MonthlyCalendar />} />
         </Route>
 
         {/* Phase 3 & 5 Customer Management Routes */}

@@ -45,7 +45,7 @@
 }
 
 .header-title {
-  font-size: 20px; /* Reduced from 28px */
+  font-size: 22px;
   font-weight: 800;
   color: var(--main-text-title);
   margin: 0;
@@ -53,7 +53,7 @@
 }
 
 .header-subtitle {
-  font-size: 11px; /* Reduced from 14px */
+  font-size: 13px;
   color: var(--main-text-muted);
   margin: 2px 0 0 0;
 }
@@ -63,7 +63,7 @@
   border: 1px solid var(--main-border);
   padding: 4px 12px; /* Reduced padding */
   border-radius: 12px;
-  font-size: 11px; /* Reduced from 13px */
+  font-size: 13px;
   font-weight: 600;
   color: var(--main-text-body);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
@@ -102,13 +102,13 @@
 }
 
 .kpi-title-korean {
-  font-size: 13px; /* Reduced from 16px */
+  font-size: 15px;
   font-weight: 700;
   color: var(--main-text-title);
 }
 
 .kpi-subtitle-korean {
-  font-size: 10px; /* Reduced from 13px */
+  font-size: 12px;
   font-weight: 600;
   color: var(--primary-color);
   background-color: var(--primary-bg-light);
@@ -151,13 +151,13 @@
 }
 
 .kpi-label-text {
-  font-size: 10px; /* Reduced from 12px */
+  font-size: 12px;
   font-weight: 600;
   color: var(--main-text-muted);
 }
 
 .kpi-stat-value {
-  font-size: 18px; /* Reduced from 24px */
+  font-size: 20px;
   font-weight: 800;
   color: var(--main-text-title);
   margin-bottom: 4px;
@@ -165,7 +165,7 @@
 }
 
 .kpi-unit {
-  font-size: 10px; /* Reduced from 13px */
+  font-size: 12px;
   font-weight: 500;
   color: var(--main-text-muted);
   margin-left: 2px;
@@ -243,7 +243,7 @@
 }
 
 .section-title {
-  font-size: 14px; /* Reduced from 18px */
+  font-size: 16px;
   font-weight: 800;
   color: var(--main-text-title);
   margin: 0;
@@ -251,7 +251,7 @@
 }
 
 .section-title-desc {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--main-text-muted);
 }
 
@@ -286,7 +286,7 @@
   border: 1px solid var(--main-border);
   border-radius: 8px;
   padding: 4px 10px; /* Tighter padding from 10px 16px */
-  min-width: 125px; /* More compact card width */
+  min-width: 140px; /* More compact card width */
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
@@ -301,14 +301,14 @@
 
 .profile-avatar-wrap {
   position: relative;
-  width: 30px; /* Reduced avatar size from 42px */
-  height: 30px;
+  width: 32px; /* Reduced avatar size from 42px */
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 11px;
+  font-size: 12px;
   color: white;
   flex-shrink: 0;
 }
@@ -325,7 +325,7 @@
   position: absolute;
   bottom: -3px;
   right: -3px;
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 700;
   padding: 0px 3px;
   border-radius: 3px;
@@ -346,18 +346,25 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
+  min-width: 0;
 }
 
 .profile-name {
-  font-size: 12px; /* Tighter text sizes */
+  font-size: 14px;
   font-weight: 700;
   color: var(--main-text-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .profile-subtext {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--main-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .profile-subtext.text-danger {
@@ -366,7 +373,7 @@
 
 .customers-loading, .customers-empty {
   padding: 12px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 /* 3. Combined Bottom Layout Grid - Compact Heights - Side-by-Side */
@@ -424,7 +431,7 @@
 }
 
 .bottom-card-title {
-  font-size: 13px; /* Reduced from 16px */
+  font-size: 15px;
   font-weight: 800;
   color: var(--main-text-title);
   margin: 0;
@@ -436,7 +443,7 @@
   border: none;
   padding: 4px 10px;
   border-radius: 12px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -614,7 +621,7 @@
 }
 
 .todo-title {
-  font-size: 12px; /* Tighter fonts */
+  font-size: 14px;
   font-weight: 700;
   color: var(--main-text-title);
   white-space: nowrap;
@@ -623,7 +630,7 @@
 }
 
 .todo-memo {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--main-text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -662,7 +669,7 @@
   color: var(--main-text-muted);
   padding: 2px 6px;
   border-radius: 8px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -675,7 +682,7 @@
 
 .todo-empty-state {
   padding: 20px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 /* Right Stack (Trend & Notifications) */
@@ -687,7 +694,7 @@
 }
 
 .arrow-link {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .trend-summary-content {
@@ -697,7 +704,7 @@
 }
 
 .summary-paragraph {
-  font-size: 11px; /* Tighter description */
+  font-size: 13px; /* Tighter description */
   line-height: 1.4;
 }
 
@@ -710,11 +717,11 @@
 }
 
 .indicator-label {
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .indicator-value {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 /* iPhone-Style Compact Notifications Container */
@@ -745,19 +752,19 @@
 }
 
 .app-name {
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .ios-card-time {
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .ios-card-title {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .ios-card-desc {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.3;
 }
 
@@ -1571,5 +1578,2381 @@
 .trend-loading-spinner {
   font-size: 20px;
   color: var(--kpi-green);
+}
+
+
+/* ==========================================================================
+   POOM Premium Dashboard Mockup Layout Style Customizations
+   ========================================================================== */
+
+/* 1. Top Header Band: KPI & News */
+/* Stacked Top Band Layout (2 Rows) */
+.main-dashboard-top-band-stacked {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--main-border);
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
+  box-sizing: border-box;
+  gap: 8px;
+}
+
+.top-band-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.top-band-row.kpi-combined-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.top-band-row.news-row {
+  gap: 12px;
+}
+
+.top-band-row-divider {
+  height: 1px;
+  background-color: #f1f5f9;
+  width: 100%;
+}
+
+.top-band-divider {
+  width: 1px;
+  height: 28px;
+  background-color: var(--main-border);
+  flex-shrink: 0;
+  margin: 0 24px; /* 개인/지점 디바이스 분할 마진 */
+}
+
+/* 개별 KPI 그룹 */
+.top-kpi-group {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.top-kpi-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-kpi-type {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.top-kpi-type.personal {
+  background-color: var(--primary-bg-light);
+  color: #0369a1;
+}
+
+.top-kpi-type.branch {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.top-kpi-pb-name, .top-kpi-branch-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--main-text-title);
+  white-space: nowrap;
+}
+
+.top-kpi-metrics {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* 가로 공간 균일 분할 간격 */
+  white-space: nowrap;
+}
+
+.top-metric-item {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* 폰트 크기 미세 조정 및 강조 */
+.metric-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--main-text-title);
+}
+.metric-value {
+  font-size: 15px;
+  font-weight: 900;
+  color: #0ea5e9; /* 파란색 브랜드 컬러 강조 */
+}
+.metric-goal-text {
+  font-size: 12px;
+  color: var(--main-text-muted);
+  font-weight: 500;
+}
+
+.metric-unit {
+  font-size: 11px;
+  color: var(--main-text-muted);
+  font-weight: 600;
+  margin-left: 1px;
+}
+
+.metric-rate {
+  font-size: 9px;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.metric-rate.green {
+  color: #16a34a;
+}
+
+/* 주요 뉴스 영역 */
+.news-title-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #3b82f6;
+  background-color: #dbeafe;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.news-title-badge .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  display: inline-block;
+}
+
+.news-carousel-wrap {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.news-item-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  min-width: 0;
+  width: 100%;
+}
+
+.news-item-link:hover {
+  opacity: 0.85;
+}
+
+.news-source {
+  font-weight: 800;
+  color: #3b82f6;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.news-title-text {
+  color: var(--main-text-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  max-width: 90%; /* 아랫줄로 완전히 분리되었으므로, 가로폭을 크게 확보 */
+}
+
+/* 2. Main Resizable Layout Body */
+.main-dashboard-body-layout {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.dashboard-body-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Resizer splitter bar */
+.dashboard-resizer {
+  width: 14px;
+  cursor: col-resize;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 100;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.dashboard-resizer:hover, .dashboard-resizer.active {
+  background-color: rgba(14, 165, 233, 0.05);
+}
+
+.dashboard-resizer::after {
+  content: '';
+  width: 2px;
+  height: 100px;
+  background-color: #cbd5e1;
+  border-radius: 1px;
+  transition: all 0.2s ease;
+}
+
+.dashboard-resizer:hover::after, .dashboard-resizer.active::after {
+  background-color: var(--primary-color);
+  width: 3px;
+  height: 180px;
+}
+
+/* 3. Left Column: 일정관리 */
+.schedule-card-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.schedule-tabs-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 4px;
+}
+
+.schedule-tabs {
+  display: flex;
+  background-color: #f1f5f9;
+  padding: 2.5px;
+  border-radius: 8px;
+  gap: 2px;
+}
+
+.schedule-tab-btn {
+  background: transparent;
+  border: none;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--main-text-muted);
+  padding: 4px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.schedule-tab-btn:hover {
+  color: var(--main-text-title);
+}
+
+.schedule-tab-btn.active {
+  background-color: white;
+  color: var(--main-text-title);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.schedule-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+.daily-timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.new-timeline-row {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  min-width: 0;
+}
+
+.new-timeline-time {
+  width: 48px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--main-text-title);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+}
+
+.new-schedule-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--main-border);
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.005);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.my-todo-card {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* 체크박스와 텍스트 사이 간격 */
+  transition: all 0.2s ease;
+}
+
+.my-todo-card.color-pink { border-left-color: #ef4444; }
+.my-todo-card.color-yellow { border-left-color: #f59e0b; }
+.my-todo-card.color-green { border-left-color: #10b981; }
+.my-todo-card.color-blue { border-left-color: #3b82f6; }
+
+/* 원형 체크박스 기본 디자인 */
+.round-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: white;
+}
+
+/* 체크박스 호버 효과 */
+.round-checkbox:hover {
+  border-color: #3b82f6;
+  background-color: #f0f9ff;
+}
+
+/* 체크박스 선택됨(완료) 상태 */
+.round-checkbox.checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* CSS로 직접 그린 하얀색 체크(✔) 모양 */
+.round-checkbox.checked .check-mark {
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+/* 할 일 완료 시 카드의 시각적 변화 (취소선 및 투명도) */
+.my-todo-card.is-completed {
+  opacity: 0.55;
+  background-color: #f8fafc;
+  border-left-color: #cbd5e1 !important; /* 완료 시 포인트 컬러 회색으로 변경 */
+}
+
+.my-todo-card.is-completed .schedule-title {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+.my-todo-card.is-completed .schedule-memo {
+  text-decoration: line-through;
+}
+
+/* 새로 추가된 직접 일정 등록 버튼 스타일 */
+.btn-add-schedule {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn-add-schedule:hover {
+  opacity: 0.85;
+}
+
+/* ==========================================================================
+   AI To Do Card Styling (회색톤으로 변경)
+   ========================================================================== */
+.ai-todo-card.diagonal-stripes {
+  /* 잔잔한 회색 사선 배경으로 미확정(제안) 상태임을 표현 */
+  background: repeating-linear-gradient(
+    45deg,
+    #f8fafc,
+    #f8fafc 10px,
+    #f1f5f9 10px,
+    #f1f5f9 20px
+  );
+  border: 1px dashed #cbd5e1;
+  border-left: 4px solid #94a3b8;
+}
+
+/* AI 제안 텍스트 색상 차분하게 변경 */
+.ai-todo-card .schedule-title {
+  color: #475569;
+}
+
+.ai-todo-card .schedule-memo {
+  color: #94a3b8;
+}
+
+/* AI 추천 등록 태그 색상 변경 (기존 보라색 -> 회색) */
+.schedule-source-tag.ai {
+  background-color: #f1f5f9;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid #e2e8f0;
+}
+
+/* My To Do 등록 버튼 (선택 버튼) 스타일 조정 */
+.todo-checkbox-pill {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.todo-checkbox-pill:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.schedule-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.schedule-info-group:hover {
+  opacity: 0.75;
+}
+
+.schedule-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.schedule-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--main-text-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.schedule-source-tag {
+  font-size: 7.5px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background-color: #f1f5f9;
+  color: var(--main-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.schedule-source-tag.ai {
+  background-color: #f3e8ff;
+  color: #7e22ce;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.schedule-memo {
+  font-size: 9.5px;
+  color: var(--main-text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 4. Right Column: 주요 고객 관리 (Pill Style) */
+.key-customers-card-new {
+  background-color: white;
+  border: 1px solid var(--main-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.005);
+}
+
+.btn-all-customers {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.btn-all-customers:hover {
+  opacity: 0.8;
+}
+
+.customers-pill-list-wrap {
+  width: 100%;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.customers-pill-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 2px 2px 8px 2px;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+
+.customers-pill-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.customers-pill-scroll::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 2px;
+}
+
+.customer-pill-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f8fafc;
+  border: 1px solid var(--main-border);
+  padding: 4px 12px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  min-width: 110px;
+  box-sizing: border-box;
+}
+
+.customer-pill-card:hover, .customer-pill-card.active {
+  background-color: white;
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+}
+
+.avatar-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+}
+
+.avatar-circle.visit {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.avatar-circle.risk {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+.pill-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.pill-name {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--main-text-title);
+  white-space: nowrap;
+}
+
+.pill-badge {
+  font-size: 7.5px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pill-badge.visit-badge {
+  color: #2563eb;
+}
+
+.pill-badge.risk-high {
+  color: #ef4444;
+}
+
+.pill-badge.risk-warning {
+  color: #d97706;
+}
+
+/* AI Mini Insights Panel */
+.ai-customer-insights-panel.expanded-mini {
+  margin-top: 10px;
+  background-color: #faf5ff;
+  border: 1px dashed #d8b4fe;
+  border-radius: 8px;
+  padding: 10px 14px;
+  animation: slideDown 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.insights-mini-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.insight-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #7e22ce;
+}
+
+.btn-close-insights-mini {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #a855f7;
+  padding: 1px;
+}
+
+.insights-mini-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mini-insight-row {
+  font-size: 9.5px;
+  color: #581c87;
+  line-height: 1.35;
+}
+
+/* 5. 방문 브리핑 & 알림 (하단 2분할) */
+.bottom-sub-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.sub-split-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-count-indicator, .header-date-indicator {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--main-text-muted);
+  background-color: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.briefing-list-container, .notifications-simple-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 2px;
+  scrollbar-width: thin;
+}
+
+.briefing-empty, .notif-empty {
+  padding: 24px;
+  font-size: 10.5px;
+  color: var(--main-text-muted);
+  text-align: center;
+  font-weight: 500;
+}
+
+/* 방문 브리핑 카드 */
+.briefing-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  border: 1px solid var(--main-border);
+  border-left: 4px solid #3b82f6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.briefing-card:hover {
+  background-color: white;
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.briefing-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.briefing-time {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--main-text-muted);
+}
+
+.briefing-name {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--main-text-title);
+}
+
+.vip-tag {
+  font-size: 8px;
+  font-weight: 700;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  padding: 0.5px 3px;
+  border-radius: 3px;
+  margin-left: 2px;
+}
+
+.briefing-risk-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 1px;
+}
+
+.risk-badge {
+  font-size: 7.5px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.risk-badge.red {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.risk-text {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--main-text-body);
+}
+
+.briefing-proposal {
+  font-size: 9px;
+  color: var(--main-text-muted);
+  font-weight: 500;
+}
+
+/* 알림 카드 */
+.notifications-card-new {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.005);
+}
+
+.notif-badge-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.simple-notif-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 4px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.simple-notif-item:last-child {
+  border-bottom: none;
+}
+
+.simple-notif-item:hover {
+  background-color: #f8fafc;
+}
+
+.notif-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notif-date {
+  font-size: 8.5px;
+  font-weight: 700;
+  color: var(--main-text-muted);
+}
+
+.notif-category {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #a855f7;
+}
+
+.notif-item-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--main-text-title);
+  margin: 0;
+}
+
+.notif-item-content {
+  font-size: 9.5px;
+  color: var(--main-text-body);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Redesigned Schedule Management Styles (Match user mockup)
+   ========================================================================== */
+
+/* Overrides for Header and Tabs */
+.schedule-card-container .header-date-indicator {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.header-today-indicator {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  background-color: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.header-today-indicator:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  border-color: #94a3b8;
+}
+
+.monthly-date.is-today {
+  border: 1.5px solid var(--primary-color);
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.monthly-date.is-today.active {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.schedule-tabs-container {
+  border-bottom: 1.5px solid #f1f5f9;
+  margin-bottom: 16px;
+  padding-bottom: 0;
+  display: flex;
+  width: 100%;
+}
+
+.schedule-tabs {
+  display: flex;
+  width: 100%;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  gap: 0;
+}
+
+.schedule-tab-btn {
+  flex: 1;
+  text-align: center;
+  background: transparent;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  padding: 10px 0;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s ease;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1.5px;
+  border-radius: 0;
+}
+
+.schedule-tab-btn:hover {
+  color: #64748b;
+}
+
+.schedule-tab-btn.active {
+  color: #2563eb;
+  border-bottom: 3px solid #2563eb;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* Redesigned Weekly Calendar */
+.new-weekly-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.weekly-header-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  text-align: center;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid #f8fafc;
+}
+
+.weekly-header-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 4px;
+}
+
+.weekly-day-name {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.weekly-date-number {
+  font-size: 13.5px;
+  color: #334155;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+}
+
+.weekly-date-number.active {
+  background-color: #2563eb;
+  color: white;
+  font-weight: 700;
+}
+
+.weekly-body-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  flex: 1;
+  min-height: 280px;
+}
+
+.weekly-column-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+  cursor: pointer;
+  padding: 4px 2px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.weekly-column-cell:hover {
+  background-color: #f8fafc;
+}
+
+.weekly-event-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 8px;
+  border-radius: 6px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.weekly-event-badge.color-blue {
+  background-color: #ebf5ff;
+  color: #2563eb;
+}
+
+.weekly-event-badge.color-pink {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.weekly-event-badge.color-yellow {
+  background-color: #fef9c3;
+  color: #ca8a04;
+}
+
+.weekly-event-badge.color-green {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+.weekly-event-badge.color-purple {
+  background-color: #faf5ff;
+  color: #9333ea;
+  border: 1px dashed #d8b4fe;
+}
+
+/* Redesigned Monthly Calendar Container */
+.main-mini-monthly-calendar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.monthly-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.monthly-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 6px;
+  padding: 5px;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.15s ease;
+}
+
+.monthly-nav-btn:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+.monthly-nav-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.monthly-grid-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: 700;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.monthly-grid-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.monthly-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0;
+  cursor: pointer;
+  position: relative;
+  min-height: 38px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.monthly-cell:hover {
+  background-color: #f1f5f9;
+}
+
+.monthly-cell.muted {
+  opacity: 0.25;
+}
+
+.monthly-date {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #334155;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+}
+
+.monthly-date.active {
+  background-color: #2563eb;
+  color: white;
+  font-weight: 700;
+}
+
+.monthly-dot {
+  width: 4px;
+  height: 4px;
+  background-color: #2563eb;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 2px;
+}
+
+/* Redesigned Selected Date Schedule List below Calendar */
+.monthly-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 4px;
+}
+
+.monthly-schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.monthly-schedule-item:hover {
+  background-color: #f1f5f9;
+}
+
+.schedule-indicator-bar {
+  width: 3.5px;
+  height: 15px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.indicator-blue {
+  background-color: #2563eb;
+}
+
+.indicator-red {
+  background-color: #ef4444;
+}
+
+.indicator-orange {
+  background-color: #f59e0b;
+}
+
+.indicator-green {
+  background-color: #10b981;
+}
+
+.indicator-purple {
+  background-color: #a855f7;
+}
+
+.schedule-item-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  min-width: 45px;
+  white-space: nowrap;
+}
+
+.schedule-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.monthly-schedule-empty {
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  padding: 24px 0;
+  font-weight: 500;
+}
+
+/* 일정 상세 모달 커스텀 배지 스타일 */
+.modal-product-type-badge.badge-ai {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+}
+
+.modal-product-type-badge.badge-color-blue {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.modal-product-type-badge.badge-color-pink {
+  background-color: #fce7f3;
+  color: #db2777;
+}
+
+.modal-product-type-badge.badge-color-yellow {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.modal-product-type-badge.badge-color-green {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.modal-product-type-badge.badge-color-purple {
+  background-color: #f3e8ff;
+  color: #7c3aed;
+}
+
+/* 일정 상세 카드 내 시간 정보 글자 크기 조정 */
+.schedule-detail-card .modal-info-row .info-value.highlight {
+  font-size: 14px;
+  color: var(--main-text-title);
+  font-weight: 700;
+}
+
+/* To Do Tab Checklist Layout */
+.todo-tab-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.todo-checklist-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.todo-checklist-row:hover {
+  border-color: #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.todo-checklist-row.completed {
+  opacity: 0.55;
+  background-color: #f8fafc;
+}
+
+.todo-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.todo-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.todo-checklist-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.todo-checklist-sub {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metric-goal-unit {
+  font-size: 9px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-left: 1px;
+}
+
+/* Weekly View Layout Corrections (No borders, no overlaps, soft color tones) */
+.weekly-header-cell, .weekly-column-cell {
+  border: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  box-shadow: none !important;
+}
+
+.weekly-header-row {
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.weekly-body-row {
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.weekly-column-cell {
+  min-width: 0 !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.weekly-event-badge {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  padding: 5px 6px !important;
+  font-size: 10.5px !important;
+  border-radius: 6px !important;
+}
+
+/* Unified and Harmonious Pastel Colors */
+.weekly-event-badge.color-blue {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+}
+
+.weekly-event-badge.color-pink {
+  background-color: #fff1f2 !important;
+  color: #e11d48 !important;
+}
+
+.weekly-event-badge.color-green {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+}
+
+.weekly-event-badge.color-purple {
+  background-color: #faf5ff !important;
+  color: #6d28d9 !important;
+  border: 1px dashed #d8b4fe !important;
+}
+
+/* Premium Customer Detail Panel (2x2 Grid) - Extra Compact Version */
+.premium-customer-detail-panel {
+  background-color: #ffffff;
+  border: 1.5px solid #eae6ff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-top: 8px;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeInSlide 0.3s ease-out forwards;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid #eae6ff;
+  padding-bottom: 6px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar-circle-large {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.customer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.customer-name-large {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e1b4b;
+}
+
+.customer-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tag-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.tag-badge.grade {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.tag-badge.tendency {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.tag-badge.job {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-go-profile {
+  background-color: #6366f1;
+  color: white !important;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-go-profile:hover {
+  background-color: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.btn-close-panel {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close-panel:hover {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.panel-grid-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .panel-grid-2x2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.insight-card {
+  background-color: white;
+  border: 1px solid #eae6ff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.01);
+  min-height: 95px;
+}
+
+.insight-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #eae6ff;
+  padding-bottom: 4px;
+}
+
+.card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.spark-emoji {
+  font-size: 12px;
+}
+
+.card-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #4f46e5;
+}
+
+.risk-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.risk-status-badge.good {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.risk-status-badge.warning {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.risk-status-badge.danger {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.card-body-text {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: #475569;
+  margin: 0;
+  word-break: keep-all;
+}
+
+/* Product list inside card */
+.product-match-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  max-height: 120px;
+}
+
+.product-match-item {
+  background-color: #f8fafc;
+  border: 1px solid #eae6ff;
+  border-radius: 6px;
+  padding: 5px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.product-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-name {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.product-status-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.product-status-badge.owned {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.product-status-badge.recommend {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.product-status-badge.unsuitable {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.product-reason-text {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #64748b;
+  margin: 0;
+  word-break: keep-all;
+}
+
+/* Features tags container */
+.features-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.feature-tag-pill {
+  font-size: 11px;
+  font-weight: 700;
+  background-color: #f8fafc;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #eae6ff;
+  transition: all 0.2s;
+}
+
+.feature-tag-pill:hover {
+  background-color: #eae6ff;
+  transform: translateY(-1px);
+}
+
+/* Asset summary inside portfolio card */
+.portfolio-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.asset-total-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.asset-total-value {
+  font-size: 13px;
+  font-weight: 900;
+  color: #1e1b4b;
+  margin-left: 4px;
+}
+
+/* ────────────────────────────────────────────────────────
+   3초 순환 롤링 배너 및 상세설명 모달 CSS 추가
+   ──────────────────────────────────────────────────────── */
+
+.rolling-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  min-height: 48px;
+  max-height: 48px;
+  padding: 0 16px;
+  background: white;
+  border: 1px solid var(--main-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.rolling-row:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.04);
+}
+
+.news-badge {
+  background-color: #f0f9ff;
+  color: #0284c7;
+}
+.news-dot {
+  background-color: #0ea5e9;
+}
+
+.trend-badge {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+.trend-dot {
+  background-color: #22c55e;
+}
+
+.product-badge {
+  background-color: #faf5ff;
+  color: #7c3aed;
+}
+.product-dot {
+  background-color: #a855f7;
+}
+
+/* 실시간 트렌드 경제지표 가로형 롤링 레이아웃 */
+.indicators-rolling-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  margin: 0 24px;
+  justify-content: space-around;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.indicators-rolling-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.indicator-rolling-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.indicator-rolling-item .indicator-name {
+  font-weight: 600;
+  color: var(--main-text-muted);
+}
+
+.indicator-rolling-item .indicator-value {
+  font-weight: 800;
+  color: var(--main-text-title);
+  font-family: 'Inter', sans-serif;
+}
+
+.indicator-rolling-item .indicator-unit {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--main-text-muted);
+  margin-left: 1px;
+}
+
+.indicator-rolling-item .indicator-change {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.indicator-rolling-item .indicator-change.up {
+  color: #16a34a;
+  background-color: #dcfce7;
+}
+
+.indicator-rolling-item .indicator-change.down {
+  color: #ef4444;
+  background-color: #fee2e2;
+}
+
+.indicator-rolling-item .indicator-change.flat {
+  color: #64748b;
+  background-color: #f1f5f9;
+}
+
+.indicator-rolling-divider {
+  width: 1px;
+  height: 14px;
+  background-color: var(--main-border);
+}
+
+/* 주력 상품 가로 리스트 롤링 레이아웃 */
+.products-rolling-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  margin: 0 24px;
+  justify-content: flex-start;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.products-rolling-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.product-rolling-item-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  background-color: #f8fafc;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--main-border);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.product-rolling-item-link:hover {
+  color: #7c3aed;
+  background-color: #faf5ff;
+  border-color: #d8b4fe;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.08);
+}
+
+.rolling-empty-text {
+  font-size: 13px;
+  color: var(--main-text-muted);
+  font-style: italic;
+  margin-left: 8px;
+}
+
+/* 우측 롤링 네비게이션 도트 */
+.rolling-nav-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.rolling-nav-dots .nav-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rolling-nav-dots .nav-dot:hover {
+  background-color: #94a3b8;
+}
+
+.rolling-nav-dots .nav-dot.active {
+  width: 14px;
+  border-radius: 3px;
+  background-color: var(--primary-color);
+}
+
+/* ────────────────────────────────────────────────────────
+   주력 상품 상세 오버레이 모달
+   ──────────────────────────────────────────────────────── */
+.product-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.product-detail-modal-card {
+  width: 520px;
+  max-width: 90%;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.product-detail-modal-card .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--main-border);
+}
+
+.modal-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-product-type-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #7c3aed;
+  background-color: #faf5ff;
+  padding: 2px 8px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.modal-product-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--main-text-title);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.btn-close-modal {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: rotate(90deg);
+}
+
+.product-detail-modal-card .modal-body {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* 로딩 스피너 */
+.modal-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  gap: 16px;
+  color: var(--main-text-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.modal-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3.5px solid #f1f5f9;
+  border-top: 3.5px solid #7c3aed;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.modal-info-row {
+  display: flex;
+  gap: 20px;
+  background-color: #f8fafc;
+  border: 1px solid var(--main-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-info-row .info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.modal-info-row .info-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--main-text-muted);
+}
+
+.modal-info-row .info-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--main-text-title);
+}
+
+.modal-info-row .info-value.highlight {
+  font-size: 16px;
+  color: #7c3aed;
+  font-weight: 900;
+}
+
+.info-value-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--main-text-muted);
+}
+
+.modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.modal-section .section-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--main-text-title);
+  margin: 0;
+  border-left: 3px solid #7c3aed;
+  padding-left: 8px;
+}
+
+.modal-section .section-content {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--main-text-body);
+  margin: 0;
+  word-break: keep-all;
+}
+
+.description-text {
+  background-color: #fafafa;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+}
+
+.features-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.features-tags .feature-tag {
+  font-size: 12px;
+  font-weight: 700;
+  color: #7c3aed;
+  background-color: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.suitable-customers-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.suitable-customer-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: white;
+  border: 1px solid var(--main-border);
+  padding: 6px 12px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.suitable-customer-pill:hover {
+  background-color: #faf5ff;
+  border-color: #ddd6fe;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(124, 58, 237, 0.08);
+}
+
+.suitable-customer-pill .cust-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--main-text-title);
+}
+
+.suitable-customer-pill .cust-grade {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #9333ea;
+  background-color: #f3e8ff;
+  padding: 1px 6px;
+  border-radius: 12px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ────────────────────────────────────────────────────────
+   일정관리 개편 (AI 체크박스 및 삭제 X 버튼) CSS 추가
+   ──────────────────────────────────────────────────────── */
+
+.ai-todo-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.ai-todo-card .round-checkbox {
+  border-color: #93c5fd; /* AI 추천 카드 점선 테두리에 맞춘 색상 */
+}
+
+.ai-todo-card .round-checkbox:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+/* My To Do 및 AI 추천 카드 내 삭제(X) 버튼 스타일 */
+.todo-delete-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.todo-delete-btn:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+/* 액션 버튼 그룹 정렬 */
+.todo-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ────────────────────────────────────────────────────────
+   커스텀 삭제/숨김 컨펌 다이얼로그 모달 CSS 추가
+   ──────────────────────────────────────────────────────── */
+.custom-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(8px);
+  z-index: 10005; /* 다른 팝업보다 더 최상위에 오도록 설정 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.custom-confirm-card {
+  width: 380px;
+  max-width: 90%;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.custom-confirm-card .confirm-header {
+  padding: 20px 24px 12px 24px;
+}
+
+.confirm-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--main-text-title);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.custom-confirm-card .confirm-body {
+  padding: 0 24px 20px 24px;
+}
+
+.confirm-message {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--main-text-body);
+  margin: 0;
+  word-break: keep-all;
+}
+
+.custom-confirm-card .confirm-footer {
+  display: flex;
+  padding: 12px 24px;
+  background-color: #f8fafc;
+  border-top: 1px solid var(--main-border);
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-confirm-cancel {
+  background-color: white;
+  border: 1px solid var(--main-border);
+  color: #475569;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-confirm-cancel:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn-confirm-action {
+  background-color: #ef4444; /* 삭제/숨기기 등의 Action은 경고성 빨간색 적용 */
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.15);
+}
+
+.btn-confirm-action:hover {
+  background-color: #dc2626;
+  transform: translateY(-0.5px);
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
 }
 
