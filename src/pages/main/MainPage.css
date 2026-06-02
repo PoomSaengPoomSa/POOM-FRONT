@@ -7,8 +7,8 @@
   --main-text-muted: #64748b;
   --main-border: #e2e8f0;
   
-  --primary-color: #0ea5e9;
-  --primary-bg-light: #e0f2fe;
+  --primary-color: #0284c7;
+  --primary-bg-light: #f0f9ff;
   
   --kpi-green: #10b981;
   --kpi-red: #ef4444;
@@ -20,22 +20,28 @@
 
 .main-layout {
   display: flex;
-  height: 100vh; /* Lock height to viewport to prevent outer scroll */
-  background-color: var(--main-bg);
+  height: 100vh;
+  /* Lock height to viewport to prevent outer scroll */
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow: hidden;
 }
 
 .main-content {
   flex: 1;
-  padding: 16px 24px; /* Reduced padding */
-  overflow-y: auto; /* Allow inner scrolling if needed but keep compact */
+  padding: 16px 24px;
+  /* Reduced padding */
+  overflow-y: auto;
+  /* Allow inner scrolling if needed but keep compact */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Tighter gap between components */
+  gap: 12px;
+  /* Tighter gap between components */
   height: 100vh;
 }
+
+
 
 /* Header - Compact */
 .main-header {
@@ -61,13 +67,16 @@
 .current-date-tag {
   background-color: white;
   border: 1px solid var(--main-border);
-  padding: 4px 12px; /* Reduced padding */
+  padding: 4px 12px;
+  /* Reduced padding */
   border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
   color: var(--main-text-body);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
+
+
 
 /* 1. Compact Full-Width KPI Dashboard Section */
 .kpi-dashboard-section {
@@ -80,8 +89,10 @@
 .kpi-card {
   background: white;
   border: 1px solid var(--main-border);
-  border-radius: 12px; /* More compact rounding */
-  padding: 12px 16px; /* Greatly reduced padding from 24px */
+  border-radius: 12px;
+  /* More compact rounding */
+  padding: 12px 16px;
+  /* Greatly reduced padding from 24px */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
@@ -97,8 +108,8 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--main-border);
-  padding-bottom: 6px; /* Reduced padding */
-  margin-bottom: 10px; /* Reduced margin */
+  padding-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .kpi-title-korean {
@@ -119,7 +130,7 @@
 .kpi-stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px; /* Reduced gap */
+  gap: 12px;
 }
 
 .kpi-stat-item {
@@ -138,7 +149,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px; /* Reduced from 22px */
+  width: 18px;
+  /* Reduced from 22px */
   height: 18px;
   border-radius: 4px;
   background-color: var(--primary-bg-light);
@@ -172,7 +184,8 @@
 }
 
 .kpi-progress-bar-container {
-  height: 4px; /* Tighter progress bar */
+  height: 4px;
+  /* Tighter progress bar */
   background-color: #f1f5f9;
   border-radius: 2px;
   overflow: hidden;
@@ -197,7 +210,8 @@
 .kpi-progress-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 9px; /* Reduced from 11px */
+  font-size: 9px;
+  /* Reduced from 11px */
   font-weight: 600;
   color: var(--main-text-muted);
   margin-bottom: 2px;
@@ -208,7 +222,8 @@
 }
 
 .kpi-trend {
-  font-size: 9px; /* Reduced from 11px */
+  font-size: 9px;
+  /* Reduced from 11px */
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -222,6 +237,8 @@
 .kpi-trend.red {
   color: var(--kpi-red);
 }
+
+
 
 /* 2. Compact Key Customers Section */
 .key-customers-section {
@@ -262,7 +279,8 @@
 
 .customers-scroll-container {
   display: flex;
-  gap: 10px; /* Tighter gap */
+  gap: 10px;
+  /* Tighter gap */
   overflow-x: auto;
   padding: 2px 2px 6px 2px;
   scrollbar-width: thin;
@@ -281,12 +299,15 @@
 .customer-profile-card {
   display: flex;
   align-items: center;
-  gap: 8px; /* Tighter gap */
+  gap: 8px;
+  /* Tighter gap */
   background: var(--main-bg);
   border: 1px solid var(--main-border);
   border-radius: 8px;
-  padding: 4px 10px; /* Tighter padding from 10px 16px */
-  min-width: 140px; /* More compact card width */
+  padding: 4px 10px;
+  /* Tighter padding from 10px 16px */
+  min-width: 140px;
+  /* More compact card width */
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
@@ -301,7 +322,8 @@
 
 .profile-avatar-wrap {
   position: relative;
-  width: 32px; /* Reduced avatar size from 42px */
+  width: 32px;
+  /* Reduced avatar size from 42px */
   height: 32px;
   border-radius: 50%;
   display: flex;
@@ -314,7 +336,7 @@
 }
 
 .blue-bg {
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  background: linear-gradient(135deg, #0284c7, #0369a1);
 }
 
 .red-bg {
@@ -375,6 +397,8 @@
   padding: 12px;
   font-size: 13px;
 }
+
+
 
 /* 3. Combined Bottom Layout Grid - Compact Heights - Side-by-Side */
 .bottom-dashboard-grid {
@@ -438,7 +462,7 @@
 .bottom-card-title {
   font-size: 15px;
   font-weight: 800;
-  color: var(--main-text-title);
+  color: var(--main-text-title);  
   margin: 0;
 }
 
@@ -461,6 +485,8 @@
   width: 10px !important;
   height: 10px !important;
 }
+
+
 
 /* Daily Calendar Style Timeline View */
 .todo-unified-list.daily-timeline-view {
@@ -489,7 +515,8 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  width: 48px; /* Tighter timeline width */
+  width: 48px;
+  /* Tighter timeline width */
   flex-shrink: 0;
   padding-top: 10px;
 }
@@ -525,7 +552,7 @@
 }
 
 .ai-node {
-  background-color: #3b82f6;
+  background-color: #0284c7;
   width: 12px;
   height: 12px;
   top: 34px;
@@ -533,7 +560,7 @@
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
 }
 
 .ai-node svg {
@@ -557,6 +584,8 @@
   min-width: 0;
 }
 
+
+
 /* Card item inside timeline */
 .unified-todo-item {
   display: flex;
@@ -575,6 +604,8 @@
   border-left: 3px solid var(--primary-color);
 }
 
+
+
 /* Diagonal stripes for AI To Do */
 .ai-todo-style.diagonal-stripes {
   background: repeating-linear-gradient(
@@ -585,7 +616,7 @@
     rgba(255, 255, 255, 0.75) 16px
   );
   border: 1px dashed #93c5fd;
-  border-left: 3px solid #3b82f6;
+  border-left: 3px solid #0284c7;
 }
 
 .todo-badge-wrap {
@@ -596,7 +627,8 @@
 }
 
 .todo-tag {
-  font-size: 8px; /* Tiny badges */
+  font-size: 8px;
+  /* Tiny badges */
   font-weight: 700;
   padding: 1px 4px;
   border-radius: 3px;
@@ -608,8 +640,8 @@
   gap: 2px;
   font-size: 8px;
   font-weight: 700;
-  color: #3b82f6;
-  background-color: #dbeafe;
+  color: #0284c7;
+  background-color: #f0f9ff;
   padding: 1px 4px;
   border-radius: 3px;
 }
@@ -670,13 +702,14 @@
   top: 50%;
   transform: translateY(-50%);
   background: white;
-  border: 1px solid var(--main-border);
-  color: var(--main-text-muted);
-  padding: 2px 6px;
-  border-radius: 8px;
-  font-size: 11px;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .todo-checkbox-pill.checked {
@@ -689,6 +722,8 @@
   padding: 20px;
   font-size: 13px;
 }
+
+
 
 /* Right Stack (Trend & Notifications) */
 .bottom-dashboard-right-stack {
@@ -705,11 +740,12 @@
 .trend-summary-content {
   display: flex;
   flex-direction: column;
-  gap: 8px; /* Tighter gap */
+  gap: 8px;
 }
 
 .summary-paragraph {
-  font-size: 13px; /* Tighter description */
+  font-size: 13px;
+  /* Tighter description */
   line-height: 1.4;
 }
 
@@ -717,7 +753,8 @@
   background-color: var(--main-bg);
   border: 1px solid var(--main-border);
   border-radius: 8px;
-  padding: 6px 8px; /* Tighter padding */
+  padding: 6px 8px;
+  /* Tighter padding */
   gap: 2px;
 }
 
@@ -729,6 +766,8 @@
   font-size: 12px;
 }
 
+
+
 /* iPhone-Style Compact Notifications Container */
 .ios-notifications-list {
   flex: 1;
@@ -739,8 +778,10 @@
 .ios-stack {
   display: flex;
   flex-direction: column;
-  gap: 8px; /* Tighter gap */
+  gap: 8px;
 }
+
+
 
 /* iOS Notification Card Glassmorphism - Compact */
 .ios-card {
@@ -778,6 +819,8 @@
   font-size: 11px;
 }
 
+
+
 /* Responsiveness overrides */
 @media (max-width: 1200px) {
   .bottom-dashboard-grid {
@@ -793,6 +836,8 @@
     height: auto;
   }
 }
+
+
 
 /* Premium AI Highlight Styling for Main Dashboard */
 .ai-insight-glow-card {
@@ -860,6 +905,8 @@
   box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
 }
 
+
+
 /* AI Churn Card Glow effects in Main Page */
 .customer-profile-card.churn-risk {
   border-color: rgba(239, 68, 68, 0.25) !important;
@@ -872,6 +919,8 @@
   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.08) !important;
 }
 
+
+
 /* Active customer card glow selection styling */
 .customer-profile-card.active-glow {
   border-color: #8b5cf6 !important;
@@ -879,6 +928,8 @@
   background: white !important;
   transform: scale(1.02);
 }
+
+
 
 /* Expanded customer insights panel styling */
 .ai-customer-insights-panel {
@@ -1022,6 +1073,8 @@
   gap: 12px;
 }
 
+
+
 @media (max-width: 600px) {
   .ai-insights-grid {
     grid-template-columns: 1fr;
@@ -1093,16 +1146,18 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  overflow-y: auto;
+  max-height: 120px;
 }
 
 .product-match-item {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  background-color: #fcfcff;
-  border: 1px solid rgba(139, 92, 246, 0.05);
-  border-radius: 4px;
-  padding: 6px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 5px 8px;
 }
 
 .product-item-header {
@@ -1112,9 +1167,9 @@
 }
 
 .product-name {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--main-text-title);
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #1e293b;
 }
 
 .product-status {
@@ -1219,6 +1274,8 @@
   padding: 8px;
 }
 
+
+
 /* ==========================================================================
    Restructured 50:50 Dual-Column Dashboard Layout
    ========================================================================== */
@@ -1238,6 +1295,8 @@
   gap: 12px;
   min-height: 0;
 }
+
+
 
 /* ==========================================================================
    KPI Combined Tabbed Container Styles
@@ -1401,6 +1460,8 @@
   color: var(--kpi-red);
 }
 
+
+
 /* ==========================================================================
    Trend Archive Predictions Card Styles
    ========================================================================== */
@@ -1502,7 +1563,7 @@
 }
 
 .prob-fill.bg-blue {
-  background-color: #3b82f6;
+  background-color: #0284c7;
 }
 
 .prob-fill.bg-muted {
@@ -1530,12 +1591,14 @@
 }
 
 .text-blue {
-  color: #3b82f6;
+  color: #0284c7;
 }
 
 .real-estate-content {
   justify-content: space-between;
 }
+
+
 
 /* ==========================================================================
    AI To Do Switched Timeline Tab Styles
@@ -1584,6 +1647,8 @@
   font-size: 20px;
   color: var(--kpi-green);
 }
+
+
 
 
 /* ==========================================================================
@@ -1640,8 +1705,10 @@
   height: 28px;
   background-color: var(--main-border);
   flex-shrink: 0;
-  margin: 0 24px; /* 개인/지점 디바이스 분할 마진 */
+  margin: 0 24px;
 }
+
+
 
 /* 개별 KPI 그룹 */
 .top-kpi-group {
@@ -1668,13 +1735,13 @@
 }
 
 .top-kpi-type.personal {
-  background-color: var(--primary-bg-light);
-  color: #0369a1;
+  background-color: #f0f9ff;
+  color: #0284c7;
 }
 
 .top-kpi-type.branch {
-  background-color: #dcfce7;
-  color: #15803d;
+  background-color: #f0f9ff;
+  color: #0284c7;
 }
 
 .top-kpi-pb-name, .top-kpi-branch-name {
@@ -1687,7 +1754,8 @@
 .top-kpi-metrics {
   display: flex;
   align-items: center;
-  gap: 16px; /* 가로 공간 균일 분할 간격 */
+  gap: 16px;
+  /* 가로 공간 균일 분할 간격 */
   white-space: nowrap;
 }
 
@@ -1698,17 +1766,21 @@
   white-space: nowrap;
 }
 
+
+
 /* 폰트 크기 미세 조정 및 강조 */
 .metric-label {
   font-size: 12px;
   font-weight: 800;
   color: var(--main-text-title);
 }
+
 .metric-value {
   font-size: 15px;
   font-weight: 900;
-  color: #0ea5e9; /* 파란색 브랜드 컬러 강조 */
+  color: #0284c7;
 }
+
 .metric-goal-text {
   font-size: 12px;
   color: var(--main-text-muted);
@@ -1732,6 +1804,8 @@
   color: #16a34a;
 }
 
+
+
 /* 주요 뉴스 영역 */
 .news-title-badge {
   display: flex;
@@ -1739,8 +1813,8 @@
   gap: 5px;
   font-size: 10px;
   font-weight: 800;
-  color: #3b82f6;
-  background-color: #dbeafe;
+  color: #0284c7;
+  background-color: #f0f9ff;
   padding: 2.5px 8px;
   border-radius: 6px;
   white-space: nowrap;
@@ -1751,7 +1825,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background-color: #3b82f6;
+  background-color: #0284c7;
   display: inline-block;
 }
 
@@ -1782,7 +1856,7 @@
 
 .news-source {
   font-weight: 800;
-  color: #3b82f6;
+  color: #0284c7;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -1793,8 +1867,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
-  max-width: 90%; /* 아랫줄로 완전히 분리되었으므로, 가로폭을 크게 확보 */
+  max-width: 90%;
 }
+
+
 
 /* 2. Main Resizable Layout Body */
 .main-dashboard-body-layout {
@@ -1814,6 +1890,8 @@
   min-width: 0;
   box-sizing: border-box;
 }
+
+
 
 /* Resizer splitter bar */
 .dashboard-resizer {
@@ -1848,6 +1926,8 @@
   height: 180px;
 }
 
+
+
 /* 3. Left Column: 일정관리 */
 .schedule-card-container {
   flex: 1;
@@ -1860,38 +1940,50 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 4px;
+  margin-bottom: 16px;
+  padding-bottom: 0;
+  border-bottom: 1.5px solid #f1f5f9;
+  width: 100%;
 }
 
 .schedule-tabs {
   display: flex;
   background-color: #f1f5f9;
-  padding: 2.5px;
-  border-radius: 8px;
-  gap: 2px;
+  padding: 0;
+  border-radius: 0;
+  gap: 0;
+  width: 100%;
+  background: transparent;
 }
 
 .schedule-tab-btn {
   background: transparent;
   border: none;
-  font-size: 10.5px;
+  font-size: 13.5px;
   font-weight: 700;
-  color: var(--main-text-muted);
-  padding: 4px 18px;
-  border-radius: 6px;
+  color: #94a3b8;
+  padding: 10px 0;
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease;
+  flex: 1;
+  text-align: center;
+  position: relative;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1.5px;
 }
 
 .schedule-tab-btn:hover {
-  color: var(--main-text-title);
+  color: #64748b;
 }
 
 .schedule-tab-btn.active {
   background-color: white;
-  color: var(--main-text-title);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  color: #0284c7;
+  box-shadow: none;
+  border-bottom: 3px solid #0284c7;
+  background: transparent;
+  border-radius: 0;
 }
 
 .schedule-tab-content {
@@ -1948,14 +2040,34 @@
 .my-todo-card {
   display: flex;
   align-items: center;
-  gap: 12px; /* 체크박스와 텍스트 사이 간격 */
+  gap: 12px;
+  /* 체크박스와 텍스트 사이 간격 */
   transition: all 0.2s ease;
+  border-left: 4px solid var(--main-border);
 }
 
-.my-todo-card.color-pink { border-left-color: #ef4444; }
-.my-todo-card.color-yellow { border-left-color: #f59e0b; }
-.my-todo-card.color-green { border-left-color: #10b981; }
-.my-todo-card.color-blue { border-left-color: #3b82f6; }
+.my-todo-card.from-ai {
+  background-color: #faf8ff;
+  border-color: #ede9fe;
+  border-left-color: #a78bfa !important; /* 보라색 */
+}
+
+.my-todo-card.category-개인 {
+  background-color: #ffffff;
+  border-left-color: #94a3b8 !important; /* 회색 */
+}
+
+.my-todo-card.category-상담 {
+  background-color: #ffffff;
+  border-left-color: #0284c7 !important; /* 파란색 */
+}
+
+.my-todo-card.category-공지 {
+  background-color: #ffffff;
+  border-left-color: #10b981 !important; /* 초록색 */
+}
+
+
 
 /* 원형 체크박스 기본 디자인 */
 .round-checkbox {
@@ -1972,17 +2084,23 @@
   background-color: white;
 }
 
+
+
 /* 체크박스 호버 효과 */
 .round-checkbox:hover {
-  border-color: #3b82f6;
+  border-color: #0284c7;
   background-color: #f0f9ff;
 }
 
+
+
 /* 체크박스 선택됨(완료) 상태 */
 .round-checkbox.checked {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
+  background-color: #0284c7;
+  border-color: #0284c7;
 }
+
+
 
 /* CSS로 직접 그린 하얀색 체크(✔) 모양 */
 .round-checkbox.checked .check-mark {
@@ -1994,21 +2112,23 @@
   margin-bottom: 2px;
 }
 
+
+
 /* 할 일 완료 시 카드의 시각적 변화 (취소선 및 투명도) */
 .my-todo-card.is-completed {
-  opacity: 0.55;
+  opacity: 0.90;
   background-color: #f8fafc;
-  border-left-color: #cbd5e1 !important; /* 완료 시 포인트 컬러 회색으로 변경 */
 }
 
 .my-todo-card.is-completed .schedule-title {
-  text-decoration: line-through;
   color: #94a3b8;
 }
 
 .my-todo-card.is-completed .schedule-memo {
-  text-decoration: line-through;
+  color: #94a3b8;
 }
+
+
 
 /* 새로 추가된 직접 일정 등록 버튼 스타일 */
 .btn-add-schedule {
@@ -2030,21 +2150,18 @@
   opacity: 0.85;
 }
 
+
+
 /* ==========================================================================
    AI To Do Card Styling (회색톤으로 변경)
    ========================================================================== */
 .ai-todo-card.diagonal-stripes {
-  /* 잔잔한 회색 사선 배경으로 미확정(제안) 상태임을 표현 */
-  background: repeating-linear-gradient(
-    45deg,
-    #f8fafc,
-    #f8fafc 10px,
-    #f1f5f9 10px,
-    #f1f5f9 20px
-  );
-  border: 1px dashed #cbd5e1;
-  border-left: 1px solid #94a3b8;
+  background: #faf8ff;
+  border: 1px solid #ede9fe;
+  border-left: 4px solid #a78bfa;
 }
+
+
 
 /* AI 제안 텍스트 색상 차분하게 변경 */
 .ai-todo-card .schedule-title {
@@ -2054,6 +2171,8 @@
 .ai-todo-card .schedule-memo {
   color: #94a3b8;
 }
+
+
 
 /* AI 추천 등록 태그 색상 변경 (기존 보라색 -> 회색) */
 .schedule-source-tag.ai {
@@ -2065,22 +2184,9 @@
   border: 1px solid #e2e8f0;
 }
 
+
+
 /* My To Do 등록 버튼 (선택 버튼) 스타일 조정 */
-.todo-checkbox-pill {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: white;
-  border: 1px solid #cbd5e1;
-  color: #475569;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
 
 .todo-checkbox-pill:hover {
   background-color: var(--primary-color);
@@ -2128,13 +2234,7 @@
   flex-shrink: 0;
 }
 
-.schedule-source-tag.ai {
-  background-color: #f3e8ff;
-  color: #7e22ce;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
+
 
 .schedule-memo {
   font-size: 9.5px;
@@ -2144,6 +2244,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+
 
 /* 4. Right Column: 주요 고객 관리 (Pill Style) */
 .key-customers-card-new {
@@ -2178,14 +2280,20 @@
 
 .customers-pill-scroll {
   display: flex;
-  flex-wrap: nowrap; /* 줄바꿈 절대 방지 */
+  flex-wrap: nowrap;
+  /* 줄바꿈 절대 방지 */
   gap: 10px;
-  overflow-x: auto; /* 가로 스크롤 활성화 */
+  overflow-x: auto;
+  /* 가로 스크롤 활성화 */
   width: 100%;
-  padding: 4px 18px 8px 4px; /* 패딩 조정으로 스크롤바 가독성 향상 */
-  scrollbar-width: thin; /* 파이어폭스 대응 */
-  scrollbar-color: #94a3b8 #f1f5f9; /* 파이어폭스용 스크롤바/트랙 색상 */
+  padding: 4px 18px 8px 4px;
+  /* 패딩 조정으로 스크롤바 가독성 향상 */
+  scrollbar-width: thin;
+  /* 파이어폭스 대응 */
+  scrollbar-color: #94a3b8 #f1f5f9;
 }
+
+
 
 /* 스크롤바가 항상 시각적으로 노출되도록 스타일링 강인화 */
 .customers-pill-scroll::-webkit-scrollbar {
@@ -2194,18 +2302,20 @@
 }
 
 .customers-pill-scroll::-webkit-scrollbar-track {
-  background: #f1f5f9; /* 회색 톤 트랙 배경을 제공하여 스크롤 영역이 있음을 암시 */
+  background: #f1f5f9;
+  /* 회색 톤 트랙 배경을 제공하여 스크롤 영역이 있음을 암시 */
   border-radius: 4px;
 }
 
 .customers-pill-scroll::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1; /* 스크롤바 핸들 색상 */
+  background-color: #cbd5e1;
+  /* 스크롤바 핸들 색상 */
   border-radius: 4px;
-  border: 1px solid #f1f5f9; /* 트랙과 구분을 위한 테두리 */
+  border: 1px solid #f1f5f9;
 }
 
 .customers-pill-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8; /* 호버 시 조금 더 짙은 색으로 변경 */
+  background-color: #94a3b8;
 }
 
 .customer-pill-card {
@@ -2214,12 +2324,14 @@
   gap: 8px;
   background-color: #f8fafc;
   border: 1px solid var(--main-border);
-  padding: 4px 10px; /* 좌우 패딩을 줄여 폭을 콤팩트하게 만듦 */
+  padding: 4px 10px;
+  /* 좌우 패딩을 줄여 폭을 콤팩트하게 만듦 */
   border-radius: 24px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
-  min-width: 90px; /* 최소 너비를 110px에서 90px로 조정하여 화면 잘림 방지 */
+  min-width: 90px;
+  /* 최소 너비를 110px에서 90px로 조정하여 화면 잘림 방지 */
   box-sizing: border-box;
 }
 
@@ -2258,20 +2370,20 @@
 }
 
 .pill-name {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--main-text-title);
   white-space: nowrap;
 }
 
 .pill-badge {
-  font-size: 7.5px;
+  font-size: 9.5px;
   font-weight: 800;
   white-space: nowrap;
 }
 
 .pill-badge.visit-badge {
-  color: #2563eb;
+  color: #0284c7;
 }
 
 .pill-badge.risk-high {
@@ -2281,6 +2393,8 @@
 .pill-badge.risk-warning {
   color: #d97706;
 }
+
+
 
 /* AI Mini Insights Panel */
 .ai-customer-insights-panel.expanded-mini {
@@ -2325,6 +2439,8 @@
   line-height: 1.35;
 }
 
+
+
 /* 5. 방문 브리핑 & 알림 (하단 2분할) */
 .bottom-sub-split {
   display: grid;
@@ -2368,6 +2484,8 @@
   font-weight: 500;
 }
 
+
+
 /* 방문 브리핑 카드 */
 .briefing-card {
   display: flex;
@@ -2377,7 +2495,7 @@
   border-radius: 8px;
   background-color: #f8fafc;
   border: 1px solid var(--main-border);
-  border-left: 1px solid #3b82f6;
+  border-left: 4px solid #0284c7;
   cursor: pointer;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -2402,7 +2520,7 @@
 }
 
 .briefing-name {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--main-text-title);
 }
@@ -2465,6 +2583,8 @@
   font-weight: 500;
 }
 
+
+
 /* 알림 카드 */
 .notifications-card-new {
   box-shadow: 0 1px 2px rgba(0,0,0,0.005);
@@ -2474,8 +2594,8 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: #ef4444;
-  color: white;
+  background-color: #f1f5f9;
+  color: var(--main-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2521,7 +2641,7 @@
 }
 
 .notif-item-title {
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--main-text-title);
   margin: 0;
@@ -2537,6 +2657,8 @@
   font-weight: 500;
 }
 
+
+
 /* 알림 세부 내용 회색 박스 스타일링 */
 .notif-item-details {
   margin-top: 10px;
@@ -2549,7 +2671,8 @@
 }
 
 .notif-detail-line {
-  font-size: 11.5px; /* 인사이트 글자크기 통일 규격 */
+  font-size: 11.5px;
+  /* 인사이트 글자크기 통일 규격 */
   color: var(--main-text-body);
   margin-bottom: 5px;
   line-height: 1.45;
@@ -2559,6 +2682,8 @@
 .notif-detail-line:last-child {
   margin-bottom: 0;
 }
+
+
 
 @keyframes slideDown {
   from {
@@ -2570,6 +2695,8 @@
     transform: translateY(0);
   }
 }
+
+
 
 /* ==========================================================================
    Redesigned Schedule Management Styles (Match user mockup)
@@ -2616,51 +2743,7 @@
   border: none;
 }
 
-.schedule-tabs-container {
-  border-bottom: 1.5px solid #f1f5f9;
-  margin-bottom: 16px;
-  padding-bottom: 0;
-  display: flex;
-  width: 100%;
-}
 
-.schedule-tabs {
-  display: flex;
-  width: 100%;
-  background: transparent;
-  padding: 0;
-  border-radius: 0;
-  gap: 0;
-}
-
-.schedule-tab-btn {
-  flex: 1;
-  text-align: center;
-  background: transparent;
-  border: none;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: #94a3b8;
-  padding: 10px 0;
-  cursor: pointer;
-  position: relative;
-  transition: color 0.15s ease;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -1.5px;
-  border-radius: 0;
-}
-
-.schedule-tab-btn:hover {
-  color: #64748b;
-}
-
-.schedule-tab-btn.active {
-  color: #2563eb;
-  border-bottom: 3px solid #2563eb;
-  background: transparent;
-  box-shadow: none;
-  border-radius: 0;
-}
 
 /* Redesigned Weekly Calendar */
 .new-weekly-calendar {
@@ -2677,7 +2760,7 @@
   gap: 6px;
   text-align: center;
   padding-bottom: 8px;
-  border-bottom: 1.5px solid #f8fafc;
+  border-bottom: 1px solid #f1f5f9 !important;
 }
 
 .weekly-header-cell {
@@ -2709,17 +2792,19 @@
 }
 
 .weekly-date-number.active {
-  background-color: #2563eb;
+  background-color: #0284c7;
   color: white;
   font-weight: 700;
 }
 
 .weekly-body-row {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
   gap: 8px;
   flex: 1;
   min-height: 280px;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .weekly-column-cell {
@@ -2731,6 +2816,10 @@
   padding: 4px 2px;
   border-radius: 6px;
   transition: background-color 0.15s ease;
+  min-width: 0 !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
 .weekly-column-cell:hover {
@@ -2738,26 +2827,30 @@
 }
 
 .weekly-event-badge {
-  font-size: 11px;
+  font-size: 10.5px !important;
   font-weight: 700;
-  padding: 6px 8px;
-  border-radius: 6px;
+  padding: 5px 6px !important;
+  border-radius: 6px !important;
   text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
   max-width: 100%;
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .weekly-event-badge.color-blue {
-  background-color: #ebf5ff;
-  color: #2563eb;
+  background-color: #f0f9ff !important;
+  color: #0284c7 !important;
 }
 
 .weekly-event-badge.color-pink {
-  background-color: #fef2f2;
-  color: #ef4444;
+  background-color: #fff1f2 !important;
+  color: #e11d48 !important;
 }
 
 .weekly-event-badge.color-yellow {
@@ -2766,15 +2859,23 @@
 }
 
 .weekly-event-badge.color-green {
-  background-color: #f0fdf4;
-  color: #16a34a;
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+}
+
+.weekly-event-badge.color-gray {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border-left: 3px solid #64748b !important;
 }
 
 .weekly-event-badge.color-purple {
-  background-color: #faf5ff;
-  color: #9333ea;
-  border: 1px dashed #d8b4fe;
+  background-color: #faf5ff !important;
+  color: #6d28d9 !important;
+  border: 1px dashed #d8b4fe !important;
 }
+
+
 
 /* Redesigned Monthly Calendar Container */
 .main-mini-monthly-calendar-container {
@@ -2868,7 +2969,7 @@
 }
 
 .monthly-date.active {
-  background-color: #2563eb;
+  background-color: #0284c7;
   color: white;
   font-weight: 700;
 }
@@ -2876,11 +2977,13 @@
 .monthly-dot {
   width: 4px;
   height: 4px;
-  background-color: #2563eb;
+  background-color: #0284c7;
   border-radius: 50%;
   position: absolute;
   bottom: 2px;
 }
+
+
 
 /* Redesigned Selected Date Schedule List below Calendar */
 .monthly-schedule-list {
@@ -2913,7 +3016,7 @@
 }
 
 .indicator-blue {
-  background-color: #2563eb;
+  background-color: #0284c7;
 }
 
 .indicator-red {
@@ -2930,6 +3033,10 @@
 
 .indicator-purple {
   background-color: #a855f7;
+}
+
+.indicator-gray {
+  background-color: #64748b;
 }
 
 .schedule-item-time {
@@ -2953,6 +3060,8 @@
   padding: 24px 0;
   font-weight: 500;
 }
+
+
 
 /* 일정 상세 모달 커스텀 배지 스타일 */
 .modal-product-type-badge.badge-ai {
@@ -2985,12 +3094,21 @@
   color: #7c3aed;
 }
 
+.modal-product-type-badge.badge-color-gray {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+
+
 /* 일정 상세 카드 내 시간 정보 글자 크기 조정 */
 .schedule-detail-card .modal-info-row .info-value.highlight {
   font-size: 14px;
   color: var(--main-text-title);
   font-weight: 700;
 }
+
+
 
 /* To Do Tab Checklist Layout */
 .todo-tab-checklist {
@@ -3025,7 +3143,7 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #2563eb;
+  accent-color: #0284c7;
 }
 
 .todo-text-group {
@@ -3061,6 +3179,8 @@
   margin-left: 1px;
 }
 
+
+
 /* Weekly View Layout Corrections (No borders, no overlaps, soft color tones) */
 .weekly-header-cell, .weekly-column-cell {
   border: none !important;
@@ -3069,57 +3189,12 @@
   box-shadow: none !important;
 }
 
-.weekly-header-row {
-  border-bottom: 1px solid #f1f5f9 !important;
-}
 
-.weekly-body-row {
-  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.weekly-column-cell {
-  min-width: 0 !important;
-  width: 100% !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-}
-
-.weekly-event-badge {
-  display: block !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  padding: 5px 6px !important;
-  font-size: 10.5px !important;
-  border-radius: 6px !important;
-}
 
 /* Unified and Harmonious Pastel Colors */
-.weekly-event-badge.color-blue {
-  background-color: #eff6ff !important;
-  color: #1d4ed8 !important;
-}
 
-.weekly-event-badge.color-pink {
-  background-color: #fff1f2 !important;
-  color: #e11d48 !important;
-}
 
-.weekly-event-badge.color-green {
-  background-color: #ecfdf5 !important;
-  color: #047857 !important;
-}
 
-.weekly-event-badge.color-purple {
-  background-color: #faf5ff !important;
-  color: #6d28d9 !important;
-  border: 1px dashed #d8b4fe !important;
-}
 
 /* Premium Customer Detail Panel (2x2 Grid) - Extra Compact Version */
 .premium-customer-detail-panel {
@@ -3139,7 +3214,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1.5px solid #eae6ff;
+  border-bottom: 1.5px solid #e2e8f0;
   padding-bottom: 6px;
 }
 
@@ -3198,13 +3273,13 @@
 }
 
 .tag-badge.grade {
-  background-color: #fee2e2;
-  color: #ef4444;
+  background-color: #f1f5f9;
+  color: #475569;
 }
 
 .tag-badge.tendency {
-  background-color: #e0f2fe;
-  color: #0284c7;
+  background-color: #f1f5f9;
+  color: #475569;
 }
 
 .tag-badge.job {
@@ -3219,7 +3294,7 @@
 }
 
 .btn-go-profile {
-  background-color: #6366f1;
+  background-color: #0284c7; 
   color: white !important;
   font-size: 11px;
   font-weight: 700;
@@ -3233,7 +3308,7 @@
 }
 
 .btn-go-profile:hover {
-  background-color: #4f46e5;
+  background-color: #0369a1;
   transform: translateY(-1px);
 }
 
@@ -3261,6 +3336,8 @@
   gap: 8px;
 }
 
+
+
 @media (max-width: 768px) {
   .panel-grid-2x2 {
     grid-template-columns: 1fr;
@@ -3269,22 +3346,27 @@
 
 .insight-card {
   background-color: white;
-  border: 1px solid #f1f5f9;
+  border: 1px solid #ede9fe;
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.01);
   min-height: 95px;
+  overflow: hidden;
 }
 
 .insight-card .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px dashed #eae6ff;
-  padding-bottom: 4px;
+  border-bottom: 1px solid #8b5cf6;
+  background-color: #ede9fe;
+  padding: 6px 12px;
+}
+
+.insight-card > :not(.card-header) {
+  padding: 10px 12px;
 }
 
 .card-title-group {
@@ -3300,7 +3382,7 @@
 .card-title {
   font-size: 12px;
   font-weight: 800;
-  color: #0f172a;
+  color: #4b0edc;
 }
 
 .risk-status-badge {
@@ -3311,17 +3393,17 @@
 }
 
 .risk-status-badge.good {
-  background-color: #f0fdf4;
+  background-color: #ffffff;
   color: #166534;
 }
 
 .risk-status-badge.warning {
-  background-color: #fffbeb;
+  background-color: #ffffff;
   color: #9a3412;
 }
 
 .risk-status-badge.danger {
-  background-color: #fff1f2;
+  background-color: #ffffff;
   color: #9f1239;
 }
 
@@ -3333,42 +3415,15 @@
   word-break: keep-all;
 }
 
+
+
 /* Product list inside card */
-.product-match-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow-y: auto;
-  max-height: 120px;
-}
-
-.product-match-item {
-  background-color: #f8fafc;
-  border: 1px solid #eae6ff;
-  border-radius: 6px;
-  padding: 5px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.product-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.product-name {
-  font-size: 11.5px;
-  font-weight: 800;
-  color: #1e293b;
-}
 
 .product-status-badge {
-  font-size: 11.5px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 1px 4px;
-  border-radius: 3px;
+  padding: 1px 6px;
+  border-radius: 4px;
 }
 
 .product-status-badge.owned {
@@ -3394,6 +3449,8 @@
   word-break: keep-all;
 }
 
+
+
 /* Features tags container */
 .features-tags-container {
   display: flex;
@@ -3418,6 +3475,8 @@
   transform: translateY(-0.5px);
 }
 
+
+
 /* Asset summary inside portfolio card */
 .portfolio-body {
   display: flex;
@@ -3437,6 +3496,8 @@
   color: #1e1b4b;
   margin-left: 4px;
 }
+
+
 
 /* ────────────────────────────────────────────────────────
    3초 순환 롤링 배너 및 상세설명 모달 CSS 추가
@@ -3468,14 +3529,16 @@
   background-color: #f0f9ff;
   color: #0284c7;
 }
+
 .news-dot {
-  background-color: #0ea5e9;
+  background-color: #0284c7;
 }
 
 .trend-badge {
-  background-color: #f0fdf4;
-  color: #16a34a;
+  background-color: #e9fbef;
+  color: #199647;
 }
+
 .news-title-badge .trend-dot {
   background-color: #22c55e;
 }
@@ -3484,9 +3547,12 @@
   background-color: #faf5ff;
   color: #7c3aed;
 }
+
 .news-title-badge .product-dot {
   background-color: #a855f7;
 }
+
+
 
 /* 실시간 트렌드 경제지표 가로형 롤링 레이아웃 */
 .indicators-rolling-wrap {
@@ -3499,6 +3565,7 @@
   overflow-x: auto;
   scrollbar-width: none;
 }
+
 .indicators-rolling-wrap::-webkit-scrollbar {
   display: none;
 }
@@ -3542,8 +3609,8 @@
 }
 
 .indicator-rolling-item .indicator-change.down {
-  color: #2563eb;
-  background-color: #dbeafe;
+  color: #0284c7;
+  background-color: #f0f9ff;
 }
 
 .indicator-rolling-item .indicator-change.flat {
@@ -3557,6 +3624,8 @@
   background-color: var(--main-border);
 }
 
+
+
 /* 주력 상품 가로 리스트 롤링 레이아웃 */
 .products-rolling-wrap {
   display: flex;
@@ -3568,6 +3637,7 @@
   overflow-x: auto;
   scrollbar-width: none;
 }
+
 .products-rolling-wrap::-webkit-scrollbar {
   display: none;
 }
@@ -3600,6 +3670,8 @@
   margin-left: 8px;
 }
 
+
+
 /* 우측 롤링 네비게이션 도트 */
 .rolling-nav-dots {
   display: flex;
@@ -3625,6 +3697,8 @@
   border-radius: 3px;
   background-color: var(--primary-color);
 }
+
+
 
 /* ────────────────────────────────────────────────────────
    주력 상품 상세 오버레이 모달
@@ -3715,6 +3789,8 @@
   overflow-y: auto;
   box-sizing: border-box;
 }
+
+
 
 /* 로딩 스피너 */
 .modal-loading-container {
@@ -3872,21 +3948,29 @@
   border-radius: 12px;
 }
 
+
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
+
+
 @keyframes slideUp {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
+
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
 
 /* ────────────────────────────────────────────────────────
    일정관리 개편 (AI 체크박스 및 삭제 X 버튼) CSS 추가
@@ -3900,13 +3984,15 @@
 }
 
 .ai-todo-card .round-checkbox {
-  border-color: #93c5fd; /* AI 추천 카드 점선 테두리에 맞춘 색상 */
+  border-color: #c084fc;
 }
 
 .ai-todo-card .round-checkbox:hover {
-  border-color: #3b82f6;
-  background-color: #eff6ff;
+  border-color: #8b5cf6;
+  background-color: #f3e8ff;
 }
+
+
 
 /* My To Do 및 AI 추천 카드 내 삭제(X) 버튼 스타일 */
 .todo-delete-btn {
@@ -3928,6 +4014,8 @@
   color: #ef4444;
 }
 
+
+
 /* 액션 버튼 그룹 정렬 */
 .todo-action-buttons {
   display: flex;
@@ -3935,6 +4023,8 @@
   gap: 6px;
   flex-shrink: 0;
 }
+
+
 
 /* ────────────────────────────────────────────────────────
    커스텀 삭제/숨김 컨펌 다이얼로그 모달 CSS 추가
@@ -4018,7 +4108,8 @@
 }
 
 .btn-confirm-action {
-  background-color: #ef4444; /* 삭제/숨기기 등의 Action은 경고성 빨간색 적용 */
+  background-color: #ef4444;
+  /* 삭제/숨기기 등의 Action은 경고성 빨간색 적용 */
   border: none;
   color: white;
   padding: 8px 18px;
@@ -4036,6 +4127,8 @@
   box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
 }
 
+
+
 /* ==========================================================================
    AI Insight Highlight Styling (Highlighter & Badges)
    ========================================================================== */
@@ -4047,6 +4140,7 @@
   margin: 0 2px;
   font-size: 12.5px;
 }
+
 .insight-highlight.percentage {
   background-color: transparent;
   color: #ea580c;
@@ -4055,20 +4149,24 @@
   margin: 0 1px;
   display: inline;
 }
+
 .insight-highlight.tendency {
-  background-color: transparent;
-  color: #8b5cf6;
-  font-weight: 800;
-  padding: 0;
-  margin: 0 1px;
   display: inline;
+  padding: 0 2px;
+  background: linear-gradient(to top, rgba(254, 240, 138, 0.75) 45%, transparent 45%);
+  color: var(--main-text-title);
+  font-weight: 800;
+  margin: 0 1px;
 }
+
 .insight-highlight.keyword {
   display: inline;
   padding: 0 2px;
   background: linear-gradient(to top, rgba(254, 240, 138, 0.75) 45%, transparent 45%);
   color: var(--main-text-title);
 }
+
+
 
 /* ==========================================================================
    Briefing Modal Overlay & Card Styling
@@ -4103,6 +4201,8 @@
   overflow: hidden;
   position: relative;
 }
+
+
 
 @keyframes modalFadeIn {
   from {
@@ -4271,6 +4371,8 @@
   color: #0f172a;
 }
 
+
+
 /* Resizer handle for the briefing modal popup */
 .briefing-modal-resizer {
   position: absolute;
@@ -4288,6 +4390,8 @@
 .briefing-modal-resizer:hover {
   background-image: linear-gradient(135deg, transparent 50%, #0284c7 50%);
 }
+
+
 
 /* Collapsed bottom split container & cards when customer details are expanded */
 .bottom-sub-split.collapsed {
@@ -4323,6 +4427,8 @@
   padding-bottom: 0 !important;
 }
 
+
+
 /* 주요 고객 상세 정보 카드 높이 제한 및 내부 스크롤 적용 */
 .key-customers-card-new.has-expanded {
   flex: 1 1 auto;
@@ -4338,4 +4444,87 @@
   scrollbar-width: thin;
 }
 
+/* ==========================================================================
+   Beautiful Custom Toast & Checkbox Styles
+   ========================================================================== */
 
+/* Floating Premium Toast Dialog */
+.dashboard-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(2, 132, 199, 0.2); /* Subtle blue border for brand theme */
+  border-left: 4px solid #0284c7; /* Glowing brand blue accent */
+  box-shadow: 0 12px 30px -4px rgba(2, 132, 199, 0.08), 0 8px 12px -6px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 11000;
+  max-width: 420px;
+  animation: toast-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: auto;
+}
+
+.toast-spark {
+  color: #0284c7;
+  flex-shrink: 0;
+  animation: toast-pulse 2s infinite ease-in-out;
+}
+
+.dashboard-toast span {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+}
+
+/* Animations */
+@keyframes toast-slide-in {
+  from {
+    transform: translateY(24px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: drop-shadow(0 0 1px rgba(2, 132, 199, 0.2));
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 4px rgba(2, 132, 199, 0.6));
+  }
+}
+
+/* AI Recommendation Checkbox & Completed Card Styles */
+.ai-todo-card .round-checkbox.checked {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+}
+
+.ai-todo-card.is-completed {
+  opacity: 0.90;
+  background-color: #faf8ff !important;
+  border-color: #ede9fe !important;
+  border-left-color: #a78bfa !important; /* 회색 대신 원래의 보라색 유지 */
+}
+.ai-todo-card.is-completed .schedule-title {
+  color: #94a3b8;
+}
+
+.ai-todo-card.is-completed .schedule-memo {
+  color: #94a3b8;
+}

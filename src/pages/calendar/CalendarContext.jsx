@@ -15,6 +15,17 @@ export function CalendarProvider({ children }) {
   const [aiTodos, setAiTodos] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [toast, setToast] = useState({ show: false, message: '' });
+
+  // AI 추천 일정 로컬 삭제/숨김 목록 상태
+  const [ignoredAiTodoIds, setIgnoredAiTodoIds] = useState(new Set());
+
+  const handleIgnoreAiTodo = (id) => {
+    setIgnoredAiTodoIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  };
   
   // KPI 및 주력 상품 상태 추가
   const [personalKpi, setPersonalKpi] = useState(null);
@@ -161,9 +172,9 @@ export function CalendarProvider({ children }) {
 
         let eventColor = 'blue';
         if (sch.category === '상담') {
-          eventColor = 'pink';
+          eventColor = 'blue';
         } else if (sch.category === '개인') {
-          eventColor = 'yellow';
+          eventColor = 'gray';
         } else if (sch.category === '공지') {
           eventColor = 'green';
         }
@@ -185,6 +196,7 @@ export function CalendarProvider({ children }) {
       });
 
       setEvents(mappedEvents);
+      return mappedEvents;
     } catch (error) {
       console.error("캘린더 실시간 데이터 조회 실패:", error);
     }
@@ -279,6 +291,10 @@ export function CalendarProvider({ children }) {
 
   const deleteEvent = async (id) => {
     try {
+      const targetEvent = events.find(e => e.id === id);
+      if (targetEvent && targetEvent.at_id) {
+        handleIgnoreAiTodo(targetEvent.at_id);
+      }
       await api.schedule.delete(id);
       await fetchCalendarData();
       showToast("일정이 삭제되었습니다.");
@@ -426,7 +442,9 @@ export function CalendarProvider({ children }) {
       branchKpi,
       seasonalProducts,
       fetchKpiData,
-      fetchCalendarData
+      fetchCalendarData,
+      ignoredAiTodoIds,
+      handleIgnoreAiTodo
     }}>
       {children}
     </CalendarContext.Provider>
