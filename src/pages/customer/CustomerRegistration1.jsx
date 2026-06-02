@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
 import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, UserCircle, Settings, Trash2 } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
@@ -144,6 +144,7 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
 
 export default function CustomerRegistration1() {
   const location = useLocation();
+  const navigate = useNavigate();
   const path = location.pathname;
   const [showTodayOnly, setShowTodayOnly] = useState(true);
   const [allCustomersList, setAllCustomersList] = useState([]);
@@ -222,7 +223,12 @@ export default function CustomerRegistration1() {
           return;
         }
       }
-      setSelectedCustomer(null);
+      
+      const queryParams = new URLSearchParams(location.search);
+      const targetCId = queryParams.get("c_id") || location.state?.c_id;
+      if (!targetCId) {
+        setSelectedCustomer(null);
+      }
     } catch (error) {
       console.error("고객 목록 조회 실패:", error);
     }
@@ -232,6 +238,26 @@ export default function CustomerRegistration1() {
     setSelectedCustomer(null);
     fetchCustomers();
   }, [showTodayOnly]);
+
+  // URL Query Parameters (?c_id=) 자동 선택 처리
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const targetCId = queryParams.get("c_id") || location.state?.c_id;
+    if (targetCId) {
+      const parsedId = parseInt(targetCId, 10);
+      if (selectedCustomer?.id === parsedId) return;
+
+      const found = allCustomersList.find(c => c.id === parsedId) || todayCustomersList.find(c => c.id === parsedId);
+      if (found) {
+        setSelectedCustomer(found);
+        navigate(location.pathname, { replace: true });
+      } else {
+        if (showTodayOnly) {
+          setShowTodayOnly(false);
+        }
+      }
+    }
+  }, [location.search, location.state, allCustomersList, todayCustomersList]);
 
   useEffect(() => {
     if (!selectedCustomer) {
