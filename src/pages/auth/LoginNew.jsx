@@ -40,6 +40,8 @@ export default function LoginNew() {
 
       if (user.role === "admin") {
         navigate("/admin-system-dashboard");
+      } else if (user.position === "지점장") {
+        navigate("/admin-permission-settings");
       } else {
         navigate("/main");
       }

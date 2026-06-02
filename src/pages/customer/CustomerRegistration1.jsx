@@ -163,7 +163,7 @@ export default function CustomerRegistration1() {
   const [featureSubTab, setFeatureSubTab] = useState("전체");
   const [listWidth, setListWidth] = useState(240);
   const [isDragging, setIsDragging] = useState(false);
-  const [showWordCloud, setShowWordCloud] = useState(true);
+  const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
   const [selectedProductModal, setSelectedProductModal] = useState(null);
 
   const getDynamicWordCloudData = () => {
@@ -482,7 +482,7 @@ export default function CustomerRegistration1() {
               <div
                 className={`cust-list-item ${selectedCustomer?.id === c.id ? 'active' : ''}`}
                 key={c.id}
-                onClick={() => { setSelectedCustomer(c); setFeatureSubTab("전체"); }}
+                onClick={() => { setSelectedCustomer(c); setFeatureSubTab("전체"); setIsListCollapsed(true); }}
                 style={{
                   cursor: 'pointer',
                   padding: isNarrow ? '10px 8px' : '12px 16px',
@@ -823,7 +823,7 @@ export default function CustomerRegistration1() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>메모 기반 고객 특징</h3>
                         <button
-                          onClick={() => setShowWordCloud(!showWordCloud)}
+                          onClick={() => setIsFeatureModalOpen(true)}
                           style={{
                             padding: '4px 8px',
                             borderRadius: 6,
@@ -840,149 +840,70 @@ export default function CustomerRegistration1() {
                             transition: 'all 0.2s'
                           }}
                         >
-                          {showWordCloud ? "특징 목록 보기" : "워드클라우드 보기"}
+                          특징 목록 보기
                         </button>
                       </div>
 
-                      {showWordCloud ? (
-                        wordCloudData.length > 0 ? (
-                          /* 워드 클라우드 뷰 */
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '4px 2px', overflowY: 'auto' }}>
-                            {wordCloudData.map((tag, idx) => (
-                              <span
-                                key={idx}
-                                style={{
-                                  fontSize: tag.size,
-                                  color: tag.color,
-                                  background: tag.bg,
-                                  padding: '6px 12px',
-                                  borderRadius: 16,
-                                  fontWeight: 700,
-                                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                                  cursor: 'default',
-                                  userSelect: 'none',
-                                  transition: 'transform 0.2s',
-                                  display: 'inline-block'
-                                }}
-                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                              >
-                                {tag.text}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          /* 예외 처리 (Graceful Fallback) */
+                      {wordCloudData.length > 0 ? (
+                        /* 워드 클라우드 뷰 */
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '4px 2px', overflowY: 'auto' }}>
+                          {wordCloudData.map((tag, idx) => (
+                            <span
+                              key={idx}
+                              style={{
+                                fontSize: tag.size,
+                                color: tag.color,
+                                background: tag.bg,
+                                padding: '6px 12px',
+                                borderRadius: 16,
+                                fontWeight: 700,
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                                cursor: 'default',
+                                userSelect: 'none',
+                                transition: 'transform 0.2s',
+                                display: 'inline-block'
+                              }}
+                              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                              {tag.text}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        /* 예외 처리 (Graceful Fallback) */
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flex: 1,
+                          textAlign: 'center',
+                          padding: '16px',
+                          background: 'white',
+                          borderRadius: 12,
+                          border: '1px dashed #cbd5e1',
+                          margin: '8px 0',
+                          minHeight: 140
+                        }}>
                           <div style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: '50%',
+                            background: '#f8fafc',
                             display: 'flex',
-                            flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            flex: 1,
-                            textAlign: 'center',
-                            padding: '16px',
-                            background: 'white',
-                            borderRadius: 12,
-                            border: '1px dashed #cbd5e1',
-                            margin: '8px 0',
-                            minHeight: 140
+                            marginBottom: 8
                           }}>
-                            <div style={{
-                              width: 36,
-                              height: 36,
-                              borderRadius: '50%',
-                              background: '#f8fafc',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              marginBottom: 8
-                            }}>
-                              <span style={{ fontSize: 16, color: '#94a3b8' }}>❓</span>
-                            </div>
-                            <p style={{ fontSize: 12, fontWeight: 700, color: '#64748b', margin: '0 0 2px 0' }}>대표 관심사 키워드 미수립</p>
-                            <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, lineHeight: 1.3 }}>
-                              최근 1개월 내 상담 내역이 없거나<br />
-                              AI 분석 특징 정보가 존재하지 않습니다.
-                            </p>
+                            <span style={{ fontSize: 16, color: '#94a3b8' }}>❓</span>
                           </div>
-                        )
-                      ) : (
-                        /* 기존 카테고리 탭 및 특징 목록 */
-                        <>
-                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                            {["전체", "관계", "성향", "상품", "기호", "건강", "기타"].map((tab) => {
-                              const isActive = featureSubTab === tab;
-                              return (
-                                <button
-                                  key={tab}
-                                  onClick={() => setFeatureSubTab(tab)}
-                                  style={{
-                                    padding: '4px 10px',
-                                    borderRadius: 6,
-                                    fontSize: 11,
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    background: isActive ? '#0284c7' : 'white',
-                                    color: isActive ? 'white' : '#4b5563',
-                                    border: isActive ? '1px solid #0284c7' : '1px solid #cbd5e1',
-                                    boxShadow: isActive ? '0 1px 2px rgba(2, 132, 199, 0.2)' : 'none',
-                                  }}
-                                >
-                                  {tab}
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', paddingRight: 4, flex: 1 }}>
-                            {details.features
-                              .filter(item => featureSubTab === "전체" || item.category === featureSubTab)
-                              .map((item, idx) => (
-                                <div
-                                  key={idx}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    background: 'white',
-                                    border: '1px solid #e2e8f0',
-                                    borderRadius: 10,
-                                    padding: '10px 14px',
-                                    gap: 12,
-                                    boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      width: 48,
-                                      height: 22,
-                                      borderRadius: 4,
-                                      background: item.color || '#64748b',
-                                      color: 'white',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      fontSize: 10,
-                                      fontWeight: 700
-                                    }}
-                                  >
-                                    {item.category}
-                                  </div>
-                                  <span style={{ fontSize: 12, color: '#0f172a', fontWeight: 600, flex: 1 }}>
-                                    {item.text}
-                                  </span>
-                                  <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>
-                                    {item.date}
-                                  </span>
-                                </div>
-                              ))}
-                            {details.features.filter(item => featureSubTab === "전체" || item.category === featureSubTab).length === 0 && (
-                              <div style={{ padding: '24px 0', textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: 500 }}>
-                                해당 카테고리의 특징 메모가 없습니다.
-                              </div>
-                            )}
-                          </div>
-                        </>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: '#64748b', margin: '0 0 2px 0' }}>대표 관심사 키워드 미수립</p>
+                          <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, lineHeight: 1.3 }}>
+                            최근 1개월 내 상담 내역이 없거나<br />
+                            AI 분석 특징 정보가 존재하지 않습니다.
+                          </p>
+                        </div>
                       )}
                     </div>
 
@@ -1234,6 +1155,154 @@ export default function CustomerRegistration1() {
           initialData={editModalData}
           onSave={handleSaveCustomer}
         />
+
+        {/* 메모 기반 고객 특징 목록 상세 팝업 모달 */}
+        {isFeatureModalOpen && selectedCustomer && (
+          <div
+            className="cust-modal-overlay"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(15, 23, 42, 0.45)',
+              backdropFilter: 'blur(6px)'
+            }}
+            onClick={() => setIsFeatureModalOpen(false)}
+          >
+            <div
+              className="cust-modal"
+              style={{
+                width: 520,
+                maxHeight: '80vh',
+                padding: 24,
+                display: 'flex',
+                flexDirection: 'column',
+                background: 'white',
+                borderRadius: 16,
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                border: '1px solid #e2e8f0'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: 12, marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{
+                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                    color: 'white',
+                    fontSize: 9,
+                    fontWeight: 800,
+                    padding: '2px 6px',
+                    borderRadius: 6,
+                    letterSpacing: '0.5px'
+                  }}>AI 분석</span>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                    {selectedCustomer.name} 고객 특징 상세 목록
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setIsFeatureModalOpen(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.color = '#0f172a'}
+                  onMouseOut={(e) => e.currentTarget.style.color = '#94a3b8'}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* 카테고리 필터 탭 */}
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
+                {["전체", "관계", "성향", "상품", "기호", "건강", "기타"].map((tab) => {
+                  const isActive = featureSubTab === tab;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => setFeatureSubTab(tab)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: 6,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        background: isActive ? '#0284c7' : 'white',
+                        color: isActive ? 'white' : '#4b5563',
+                        border: isActive ? '1px solid #0284c7' : '1px solid #cbd5e1',
+                        boxShadow: isActive ? '0 2px 4px rgba(2, 132, 199, 0.15)' : 'none',
+                      }}
+                    >
+                      {tab}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* 특징 상세 메모 목록 */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', paddingRight: 4, flex: 1, minHeight: 200 }}>
+                {details?.features
+                  ?.filter(item => featureSubTab === "전체" || item.category === featureSubTab)
+                  ?.map((item, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: 10,
+                        padding: '10px 14px',
+                        gap: 12,
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.01)'
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 48,
+                          height: 22,
+                          borderRadius: 4,
+                          background: item.color || '#64748b',
+                          color: 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 10,
+                          fontWeight: 700
+                        }}
+                      >
+                        {item.category}
+                      </div>
+                      <span style={{ fontSize: 12, color: '#0f172a', fontWeight: 600, flex: 1 }}>
+                        {item.text}
+                      </span>
+                      <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>
+                        {item.date}
+                      </span>
+                    </div>
+                  ))}
+                {(details?.features || []).filter(item => featureSubTab === "전체" || item.category === featureSubTab).length === 0 && (
+                  <div style={{ padding: '40px 0', textAlign: 'center', color: '#94a3b8', fontSize: 12, fontWeight: 500 }}>
+                    해당 카테고리의 특징 메모가 없습니다.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

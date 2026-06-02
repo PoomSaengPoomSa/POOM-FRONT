@@ -86,9 +86,21 @@ export const api = {
         // 토큰 해석하여 기본 사용자 정보 추출 및 저장
         const payload = parseJwt(response.access_token);
         if (payload) {
+          let positionVal = null;
+          try {
+            // 호이스팅 안전성을 위해 api.get을 직접 사용하여 상세 유저 정보 쿼리
+            const me = await api.get("/auth/me");
+            if (me) {
+              positionVal = me.position;
+            }
+          } catch (meErr) {
+            console.error("Failed to fetch detailed profile during login:", meErr);
+          }
+
           const user = {
             id: payload.sub,
             role: payload.role,
+            position: positionVal,
             name: response.name || (payload.sub === "admin1" ? "관리자" : payload.sub),
           };
           localStorage.setItem("currentUser", JSON.stringify(user));

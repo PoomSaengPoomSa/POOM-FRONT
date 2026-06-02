@@ -1317,6 +1317,12 @@ export default function MainPage() {
                   </button>
                 </div>
               </div>
+              <div className="top-kpi-metrics">
+                <KpiMetric label="고객수" value={personalKpi?.customer_count} unit="명" goal={personalKpi?.customer_goal ?? 20} />
+                <KpiMetric label="AUM" value={personalKpi?.aum} unit="억" goal={personalKpi?.aum_goal ?? 50} />
+                <KpiMetric label="비이자이익" value={personalKpi?.non_interest} unit="만" goal={personalKpi?.non_interest_goal ?? 6000} format="number" />
+              </div>
+            </div>
 
               <div className="schedule-tabs-container">
                 <div className="schedule-tabs">

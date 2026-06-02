@@ -84,7 +84,7 @@ export default function CustomerProfile() {
 
           <div className="cust-list-items">
             {filteredCustomers.map(c => (
-              <div className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} key={c.id} onClick={() => setSelectedCustomerId(c.id)} style={{ cursor: 'pointer' }}>
+              <div className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} key={c.id} onClick={() => { setSelectedCustomerId(c.id); setIsListCollapsed(true); }} style={{ cursor: 'pointer' }}>
                 <div className={`cust-avatar ${c.color}`}>{c.initial}</div>
                 <div className="cust-item-info">
                   <span className="cust-item-name">{c.name}</span>

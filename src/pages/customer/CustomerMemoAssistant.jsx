@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
 import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, MoreVertical, PenLine, Check, Settings, ArrowUp, UserCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
@@ -9,6 +9,7 @@ import "./Customer.css";
 
 export default function CustomerMemoAssistant() {
   const location = useLocation();
+  const navigate = useNavigate();
   const path = location.pathname;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isListCollapsed, setIsListCollapsed] = useState(false);
@@ -246,6 +247,11 @@ export default function CustomerMemoAssistant() {
 
   const [activeTab, setActiveTab] = useState("simulator"); // "memo" or "simulator"
 
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+    navigate(`/customer-management-memo-assistant?tab=${tabName}`, { replace: true });
+  };
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const tab = queryParams.get("tab");
@@ -457,7 +463,7 @@ export default function CustomerMemoAssistant() {
               <div 
                 className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} 
                 key={c.id} 
-                onClick={() => setSelectedCustomerId(c.id)} 
+                onClick={() => { setSelectedCustomerId(c.id); setIsListCollapsed(true); }} 
                 style={{ 
                   cursor: 'pointer',
                   padding: isNarrow ? '10px 8px' : '12px 16px',
@@ -526,7 +532,7 @@ export default function CustomerMemoAssistant() {
         <div key={selectedCustomerId || 'empty'} className={`cust-detail-panel ${isModalOpen ? 'cust-blurred-content' : ''}`}>
           {selectedCustomerId ? (
             <>
-              <div className="cust-detail-header" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '0px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="cust-detail-header" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '0px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div className="cust-detail-profile">
                     <div className={`cust-avatar ${selectedCustomer.color}`}>{selectedCustomer.initial}</div>
@@ -535,10 +541,12 @@ export default function CustomerMemoAssistant() {
                 </div>
 
                 {/* AI Workspace Tabs */}
-                <div style={{ display: 'flex', gap: '8px', borderBottom: 'none', margin: '0 0 -1px 0' }}>
+                <div style={{ display: 'flex', gap: '0px', borderBottom: 'none', margin: '0 0 -1px 0' }}>
                   <button
-                    onClick={() => setActiveTab("simulator")}
+                    onClick={() => handleTabChange("simulator")}
                     style={{
+                      width: '160px',
+                      justifyContent: 'center',
                       padding: '8px 16px',
                       fontSize: '12px',
                       fontWeight: 700,
@@ -546,7 +554,7 @@ export default function CustomerMemoAssistant() {
                       border: 'none',
                       background: activeTab === 'simulator' ? '#f5f3ff' : 'transparent',
                       borderBottom: activeTab === 'simulator' ? '2px solid #8b5cf6' : '2px solid transparent',
-                      borderRadius: '6px 6px 0 0',
+                      borderRadius: '6px 0 0 0',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease-in-out',
                       display: 'flex',
@@ -555,11 +563,13 @@ export default function CustomerMemoAssistant() {
                     }}
                   >
                     <TrendingUp size={13} />
-                    AI 상담 시뮬레이터
+                    AI 시뮬레이터
                   </button>
                   <button
-                    onClick={() => setActiveTab("memo")}
+                    onClick={() => handleTabChange("memo")}
                     style={{
+                      width: '160px',
+                      justifyContent: 'center',
                       padding: '8px 16px',
                       fontSize: '12px',
                       fontWeight: 700,
@@ -567,7 +577,7 @@ export default function CustomerMemoAssistant() {
                       border: 'none',
                       background: activeTab === 'memo' ? '#e0f2fe' : 'transparent',
                       borderBottom: activeTab === 'memo' ? '2px solid #0284c7' : '2px solid transparent',
-                      borderRadius: '6px 6px 0 0',
+                      borderRadius: '0 6px 0 0',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease-in-out',
                       display: 'flex',
@@ -576,7 +586,7 @@ export default function CustomerMemoAssistant() {
                     }}
                   >
                     <PenLine size={13} />
-                    AI 상담 메모 어시스턴트
+                    AI 메모 어시스턴트
                   </button>
                 </div>
               </div>
@@ -825,7 +835,7 @@ export default function CustomerMemoAssistant() {
                                 <div className="timeline-dot" style={{ 
                                   borderColor: isExpanded ? '#f97316 #3b82f6 #3b82f6 #f97316' : '#0284c7',
                                   borderWidth: '2px',
-                                  color: isExpanded ? '#0f172a' : '#0284c7',
+                                  color: isExpanded ? '#0f172a' : '#0284c7'
                                 }}>
                                 </div>
                                 {!isLast && (
