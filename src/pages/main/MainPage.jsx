@@ -831,10 +831,6 @@ export default function MainPage() {
 
   // ─── AI To Do 선택 ────────────────────────────────────────
 
-  /**
-   * [FIX #1] currentUser를 상단에서 선언한 값으로 통일 (api.auth 중복 호출 제거)
-   * useCallback으로 감싸 렌더마다 함수 재생성 방지
-   */
   const handleSelectAiTodo = useCallback(async (todo) => {
     try {
       const u_id = currentUser?.id;
@@ -1311,12 +1307,6 @@ export default function MainPage() {
                   </button>
                 </div>
               </div>
-              <div className="top-kpi-metrics">
-                <KpiMetric label="고객수" value={personalKpi?.customer_count} unit="명" goal={personalKpi?.customer_goal ?? 20} />
-                <KpiMetric label="AUM" value={personalKpi?.aum} unit="억" goal={personalKpi?.aum_goal ?? 50} />
-                <KpiMetric label="비이자이익" value={personalKpi?.non_interest} unit="만" goal={personalKpi?.non_interest_goal ?? 6000} format="number" />
-              </div>
-            </div>
 
               <div className="schedule-tabs-container">
                 <div className="schedule-tabs">
