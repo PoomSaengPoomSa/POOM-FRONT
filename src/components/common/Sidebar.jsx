@@ -74,12 +74,59 @@ export default function Sidebar({ type = "cal" }) {
     return saved === "true";
   });
 
-  const toggleCollapse = () => {
-    setIsCollapsed((prev) => {
-      const next = !prev;
-      localStorage.setItem("sidebarCollapsed", String(next));
-      return next;
-    });
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const saved = localStorage.getItem("sidebarCollapsed");
+    return saved === "true" ? 60 : 200;
+  });
+
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+    const startX = e.clientX;
+    const startWidth = isCollapsed ? 60 : sidebarWidth;
+
+    const handleMouseMove = (moveEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      let newWidth = startWidth + deltaX;
+
+      if (newWidth > 200) {
+        newWidth = 200;
+      }
+
+      if (newWidth < 150) {
+        setIsCollapsed(true);
+        setSidebarWidth(60);
+        localStorage.setItem("sidebarCollapsed", "true");
+      } else {
+        setIsCollapsed(false);
+        setSidebarWidth(newWidth);
+        localStorage.setItem("sidebarCollapsed", "false");
+      }
+    };
+
+    const handleMouseUp = (upEvent) => {
+      setIsDragging(false);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+
+      const deltaX = upEvent.clientX - startX;
+      const finalWidth = startWidth + deltaX;
+
+      if (finalWidth < 150) {
+        setIsCollapsed(true);
+        setSidebarWidth(60);
+        localStorage.setItem("sidebarCollapsed", "true");
+      } else {
+        setIsCollapsed(false);
+        setSidebarWidth(200);
+        localStorage.setItem("sidebarCollapsed", "false");
+      }
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
   };
 
   const isMainActive = path === '/main';
@@ -114,45 +161,55 @@ export default function Sidebar({ type = "cal" }) {
 
   return (
     <div
-      className={`${prefix}-sidebar sidebar-container ${isCollapsed ? 'collapsed' : ''}`}
+      className={`${prefix}-sidebar sidebar-container ${isCollapsed ? 'collapsed' : ''} ${isDragging ? 'dragging' : ''}`}
       style={{
-        width: isCollapsed ? '60px' : '200px',
+        width: isCollapsed ? '60px' : `${sidebarWidth}px`,
         position: 'relative',
-        transition: 'width 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+        transition: isDragging ? 'none' : 'width 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        userSelect: isDragging ? 'none' : 'auto'
       }}
     >
-      {/* Toggle Collapse Button */}
-      <button
-        onClick={toggleCollapse}
+      {/* Sidebar Resizer Divider for Dragging */}
+      <div
+        onMouseDown={handleMouseDown}
         style={{
           position: 'absolute',
-          top: '24px',
-          right: '-12px',
-          width: '24px',
-          height: '24px',
-          borderRadius: '50%',
-          backgroundColor: '#ffffff',
-          border: '1px solid #e2e8f0',
+          top: 0,
+          right: '-4px',
+          width: '8px',
+          height: '100%',
+          cursor: 'col-resize',
+          zIndex: 1002,
+          backgroundColor: 'transparent',
           display: 'flex',
-          alignItems: 'center',
           justifyContent: 'center',
-          cursor: 'pointer',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-          zIndex: 1001,
-          transition: 'all 0.2s ease',
-          color: '#64748b'
+          alignItems: 'center',
+          userSelect: 'none'
         }}
-        className="sidebar-toggle-btn"
+        className={`sidebar-resizer ${isDragging ? 'sidebar-resizer-active' : ''}`}
       >
-        {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-      </button>
+        <div
+          className="sidebar-resizer-line"
+          style={{
+            width: '2px',
+            height: '100%',
+            backgroundColor: 'transparent',
+            transition: 'background-color 0.2s, width 0.2s'
+          }}
+        />
+      </div>
 
       <style>{`
-        /* Toggle button hover style */
-        .sidebar-toggle-btn:hover {
-          background-color: #f8fafc !important;
-          color: #0284c7 !important;
-          transform: scale(1.1);
+        /* Sidebar Resizer hover style */
+        .sidebar-resizer:hover .sidebar-resizer-line,
+        .sidebar-resizer-active .sidebar-resizer-line {
+          background-color: #0284c7 !important;
+          width: 4px !important;
+          box-shadow: 0 0 8px rgba(2, 132, 199, 0.4) !important;
+        }
+
+        .sidebar-container.dragging {
+          user-select: none !important;
         }
 
         /* Collapsed overrides */
