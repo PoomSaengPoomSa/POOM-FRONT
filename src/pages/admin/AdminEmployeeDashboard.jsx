@@ -5,26 +5,31 @@ import { LogOut, Users, Activity, CheckSquare, Calendar, ChevronUp, ShieldAlert 
 import { api } from "../../api";
 import "./Admin.css";
 
-const AdminTabs = () => {
+const AdminTabs = ({ user }) => {
   const location = useLocation();
   const path = location.pathname;
 
+  if (!user) return null;
+
+  const hasAccess = user.position === "지점장" || user.role === "Super Admin";
+  if (!hasAccess) return null;
+
   return (
     <div className="admin-tabs">
-      <Link 
-        to="/admin-permission-settings" 
+      <Link
+        to="/admin-permission-settings"
         className={`admin-tab ${path === '/admin-permission-settings' ? 'active' : ''}`}
       >
         인수인계 설정
       </Link>
-      <Link 
-        to="/admin-system-dashboard" 
+      <Link
+        to="/admin-system-dashboard"
         className={`admin-tab ${path.includes('/admin-system-dashboard') ? 'active' : ''}`}
       >
         시스템 대시보드
       </Link>
-      <Link 
-        to="/admin-employee-dashboard" 
+      <Link
+        to="/admin-employee-dashboard"
         className={`admin-tab ${path === '/admin-employee-dashboard' ? 'active' : ''}`}
       >
         직원 대시보드
@@ -75,7 +80,7 @@ const getAvatarStyleByBranch = (branchName) => {
 };
 
 const AdminHeader = ({ title }) => {
-  const [user, setUser] = useState({ name: "관리자", role: "Super Admin", branch: "" });
+  const [user, setUser] = useState({ name: "관리자", role: "Super Admin", branch: "", position: "" });
 
   useEffect(() => {
     async function fetchMe() {
@@ -85,7 +90,8 @@ const AdminHeader = ({ title }) => {
           setUser({
             name: me.name,
             role: me.role === 'admin' ? 'Super Admin' : 'PB User',
-            branch: me.branch || ''
+            branch: me.branch || '',
+            position: me.position || ''
           });
         }
       } catch (err) {
@@ -95,7 +101,8 @@ const AdminHeader = ({ title }) => {
           setUser({
             name: localUser.name || localUser.id,
             role: localUser.role === 'admin' ? 'Super Admin' : 'PB User',
-            branch: ""
+            branch: "",
+            position: ""
           });
         }
       }
@@ -107,7 +114,7 @@ const AdminHeader = ({ title }) => {
     <div className="admin-header">
       <h1 className="admin-page-title">{title}</h1>
       <div className="admin-header-right">
-        <AdminTabs />
+        <AdminTabs user={user} />
         <div className="admin-profile">
           <div className="admin-profile-info">
             <span className="admin-name">{user.name}</span>
@@ -132,6 +139,41 @@ export default function AdminEmployeeDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [esStatus, setEsStatus] = useState("정상");
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(true);
+
+  useEffect(() => {
+    async function verifyAuth() {
+      try {
+        const me = await api.auth.getMe();
+        if (!me) {
+          window.location.href = "/login";
+          return;
+        }
+
+        // PB 일반 계정은 아예 어드민 영역 접근 불가 (캘린더로 튕김)
+        if (me.role !== "admin" && me.position !== "지점장") {
+          alert("권한이 없습니다.");
+          window.location.href = "/daily-calendar";
+          return;
+        }
+
+        // 지점장은 인수인계만 가능하고 대시보드는 접근 제한 (화면 표시)
+        if (me.role !== "admin") {
+          setIsAuthorized(false);
+          setCheckingAuth(false);
+          return;
+        }
+
+        setIsAuthorized(true);
+        setCheckingAuth(false);
+      } catch (err) {
+        alert("인증 정보 조회에 실패했습니다.");
+        window.location.href = "/login";
+      }
+    }
+    verifyAuth();
+  }, []);
 
   useEffect(() => {
     document.documentElement.style.backgroundColor = "#f3f4f6";
@@ -150,6 +192,8 @@ export default function AdminEmployeeDashboard() {
   }, []);
 
   useEffect(() => {
+    if (checkingAuth || !isAuthorized) return; // 권한 확인 중이거나 권한이 없는 경우 API 폴링 하지 않음
+
     async function loadDashboardData(silent = false) {
       if (!silent) setLoading(true);
       try {
@@ -203,7 +247,62 @@ export default function AdminEmployeeDashboard() {
     }, 5000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [checkingAuth, isAuthorized]);
+
+  if (checkingAuth) {
+    return (
+      <div className="admin-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f3f4f6' }}>
+        <div style={{ textAlign: 'center', color: '#6b7280' }}>
+          <h3>권한을 확인 중입니다...</h3>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <div className="admin-container">
+        <AdminHeader title="관리자 - 직원 대시보드" />
+        <div className="admin-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: '16px',
+            padding: '48px 40px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
+            textAlign: 'center',
+            maxWidth: '480px',
+            border: '1px solid #e5e7eb'
+          }}>
+            <ShieldAlert size={56} style={{ color: '#f59e0b', margin: '0 auto 20px' }} />
+            <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#1f2937', marginBottom: '12px', letterSpacing: '-0.5px' }}>접근 권한 제한</h2>
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6', marginBottom: '28px' }}>
+              이 페이지는 슈퍼 어드민 전용 영역입니다. <br />
+              지점장 계정은 직원 대시보드 조회 권한이 제한되어 있습니다.
+            </p>
+            <button 
+              onClick={() => window.location.href = '/admin-permission-settings'}
+              style={{
+                background: '#0284c7',
+                color: '#fff',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 6px rgba(2, 132, 199, 0.15)'
+              }}
+              onMouseEnter={(e) => e.target.style.background = '#0369a1'}
+              onMouseLeave={(e) => e.target.style.background = '#0284c7'}
+            >
+              인수인계 설정으로 돌아가기
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (error && employees.length === 0) {
     return (
