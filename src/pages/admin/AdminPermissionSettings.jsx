@@ -4,9 +4,14 @@ import { LogOut, Search, X } from "lucide-react";
 import { api } from "../../api";
 import "./Admin.css";
 
-const AdminTabs = () => {
+const AdminTabs = ({ user }) => {
   const location = useLocation();
   const path = location.pathname;
+
+  if (!user) return null;
+
+  const hasAccess = user.position === "지점장" || user.role === "Super Admin";
+  if (!hasAccess) return null;
 
   return (
     <div className="admin-tabs">
@@ -74,7 +79,7 @@ const getAvatarStyleByBranch = (branchName) => {
 };
 
 const AdminHeader = ({ title }) => {
-  const [user, setUser] = useState({ name: "관리자", role: "Super Admin", branch: "" });
+  const [user, setUser] = useState({ name: "관리자", role: "Super Admin", branch: "", position: "" });
 
   useEffect(() => {
     async function fetchMe() {
@@ -84,7 +89,8 @@ const AdminHeader = ({ title }) => {
           setUser({
             name: me.name,
             role: me.role === 'admin' ? 'Super Admin' : 'PB User',
-            branch: me.branch || ''
+            branch: me.branch || '',
+            position: me.position || ''
           });
         }
       } catch (err) {
@@ -94,7 +100,8 @@ const AdminHeader = ({ title }) => {
           setUser({
             name: localUser.name || localUser.id,
             role: localUser.role === 'admin' ? 'Super Admin' : 'PB User',
-            branch: ""
+            branch: "",
+            position: ""
           });
         }
       }
@@ -106,7 +113,7 @@ const AdminHeader = ({ title }) => {
     <div className="admin-header">
       <h1 className="admin-page-title">{title}</h1>
       <div className="admin-header-right">
-        <AdminTabs />
+        <AdminTabs user={user} />
         <div className="admin-profile">
           <div className="admin-profile-info">
             <span className="admin-name">{user.name}</span>
@@ -135,6 +142,25 @@ export default function AdminPermissionSettings() {
   const [transferEmp, setTransferEmp] = useState(null);
   const [targetBranch, setTargetBranch] = useState("압구정 지점");
   const [loading, setLoading] = useState(true);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    async function verifyAuth() {
+      try {
+        const me = await api.auth.getMe();
+        if (!me || (me.role !== "admin" && me.position !== "지점장")) {
+          alert("권한이 없습니다.");
+          window.location.href = "/daily-calendar";
+          return;
+        }
+        setCheckingAuth(false);
+      } catch (err) {
+        alert("인증 정보 조회에 실패했습니다.");
+        window.location.href = "/login";
+      }
+    }
+    verifyAuth();
+  }, []);
 
   // Load employees and handover logs from database
   const loadData = async () => {
@@ -327,6 +353,16 @@ export default function AdminPermissionSettings() {
     }
     setSortConfig({ key, direction });
   };
+
+  if (checkingAuth) {
+    return (
+      <div className="admin-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f3f4f6' }}>
+        <div style={{ textAlign: 'center', color: '#6b7280' }}>
+          <h3>권한을 확인 중입니다...</h3>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-container">
