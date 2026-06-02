@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DEMO_EVENTS } from './calendarUtils';
+import { useCallback } from 'react';
 import { api } from '../../api';
 
 const CalendarContext = createContext();
@@ -68,7 +69,7 @@ export function CalendarProvider({ children }) {
   };
 
   // 실시간 캘린더 및 AI To-Do 데이터 페치
-  const fetchCalendarData = async () => {
+  const fetchCalendarData = useCallback(async () => {
     try {
       const currentUser = api.auth.getCurrentUser();
       const u_id = currentUser ? currentUser.id : null;
@@ -130,7 +131,7 @@ export function CalendarProvider({ children }) {
           c_id: todo.c_id,
           executionDate: todo.execution_date
         };
-      });
+    }, []);
 
       setAllAiTodos(mappedAiTodos.filter(t => !t.checked));
 
@@ -187,10 +188,11 @@ export function CalendarProvider({ children }) {
     } catch (error) {
       console.error("캘린더 실시간 데이터 조회 실패:", error);
     }
-  };
+  }, []);
 
   // KPI 및 주력 상품 데이터 페치
-  const fetchKpiData = async () => {
+  // KPI 및 주력 상품 데이터 페치
+  const fetchKpiData = useCallback(async () => {
     try {
       const currentUser = api.auth.getCurrentUser();
       const u_id = currentUser ? currentUser.id : "user1";
@@ -206,7 +208,7 @@ export function CalendarProvider({ children }) {
     } catch (error) {
       console.error("KPI 및 주력 상품 데이터 조회 실패:", error);
     }
-  };
+  }, []); 
 
   useEffect(() => {
     fetchCalendarData();

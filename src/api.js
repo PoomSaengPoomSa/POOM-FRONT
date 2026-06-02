@@ -155,6 +155,7 @@ export const api = {
     getList: (u_id) => api.get(`/ai-todo/${u_id ? `?u_id=${u_id}` : ""}`),
     confirm: (u_id, at_ids, target_date) => api.post("/ai-todo/confirm", { u_id, at_ids, target_date }),
     unconfirm: (at_id) => api.patch(`/ai-todo/${at_id}/unconfirm`),
+    delete: (at_id) => api.delete(`/ai-todo/${at_id}`),
   },
 
   // 5. 알림 (Notification) API

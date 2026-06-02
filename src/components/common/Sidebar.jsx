@@ -226,6 +226,14 @@ export default function Sidebar({ type = "cal" }) {
           display: none !important;
         }
 
+        .menu-text {
+          white-space: nowrap !important;
+        }
+
+        .sidebar-menu-item {
+          white-space: nowrap !important;
+        }
+
         /* Menu item centering when collapsed */
         .sidebar-container.collapsed .sidebar-menu-item {
           justify-content: center !important;

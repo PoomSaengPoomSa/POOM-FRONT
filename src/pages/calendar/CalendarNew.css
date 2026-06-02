@@ -400,46 +400,67 @@
 }
 
 /* Weekly Grid specifics */
+/* Weekly Grid specifics */
 .weekly-grid {
   display: grid;
-  grid-template-columns: 60px repeat(7, 1fr);
+  grid-template-columns: 68px repeat(7, 1fr);
   flex: 1;
+  background-color: #ffffff;
 }
 
 .weekly-header-cell {
-  padding: 16px;
+  padding: 14px 8px;
   text-align: center;
   border-bottom: 1px solid var(--cal-border);
   border-right: 1px solid var(--cal-border);
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .weekly-header-cell span {
   display: block;
-  font-size: 14px;
-  color: var(--cal-text-muted);
-  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
 }
 
 .weekly-header-cell strong {
-  display: block;
-  font-size: 20px;
-  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
 }
 
 .weekly-header-cell.today strong {
-  color: #ef4444; /* Sunday is red in design, but let's assume it's current selected if it has colored text */
+  background-color: var(--cal-primary);
+  color: white !important;
+  box-shadow: 0 4px 8px rgba(2, 132, 199, 0.2);
 }
 
 .weekly-time-col {
   border-right: 1px solid var(--cal-border);
+  background-color: #ffffff;
 }
 
 .weekly-time-cell {
   height: 60px;
-  padding: 8px;
+  padding: 4px 12px 0 0;
   font-size: 11px;
-  color: var(--cal-text-muted);
-  border-bottom: 1px solid var(--cal-border);
+  font-weight: 600;
+  color: #94a3b8;
+  border-bottom: none;
   text-align: right;
   box-sizing: border-box;
 }
@@ -451,16 +472,16 @@
 
 .weekly-grid-cell {
   height: 60px;
-  border-bottom: 1px solid var(--cal-border);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
   box-sizing: border-box;
 }
 
-/* Event Blocks */
+/* Event Blocks & AI Recommendations */
 .event-block {
   position: absolute;
   left: 4px;
   right: 4px;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 8px;
   font-size: 12px;
   font-weight: 500;
@@ -469,11 +490,58 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.event-green { background-color: #22c55e; }
-.event-blue { background-color: #6366f1; }
-.event-orange { background-color: #fb923c; }
+.event-block:hover {
+  filter: brightness(0.96) contrast(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* AI Recommended Event Stripes */
+.ai-recommended-event-stripe {
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-recommended-event-stripe:hover {
+  filter: brightness(0.96) contrast(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.ai-stripe-pink {
+  background-color: #fff1f2 !important;
+  border-left: 3px dashed #f43f5e !important;
+  color: #9f1239 !important;
+}
+
+.ai-stripe-yellow {
+  background-color: #fefce8 !important;
+  border-left: 3px dashed #ca8a04 !important;
+  color: #854d0e !important;
+}
+
+.ai-stripe-green {
+  background-color: #ecfdf5 !important;
+  border-left: 3px dashed #10b981 !important;
+  color: #065f46 !important;
+}
+
+.ai-stripe-lightblue {
+  background-color: #f0f9ff !important;
+  border-left: 3px dashed #0284c7 !important;
+  color: #075985 !important;
+}
+
+.ai-stripe-blue {
+  background-color: #eff6ff !important;
+  border-left: 3px dashed #2563eb !important;
+  color: #1e40af !important;
+}
 
 /* Monthly Grid specifics */
 .monthly-grid {
@@ -1509,9 +1577,6 @@
   to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-
- 
- 
 /* Season Product Modal */
 .product-modal-overlay {
   position: fixed;
