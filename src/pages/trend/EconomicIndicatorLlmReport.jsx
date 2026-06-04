@@ -126,21 +126,70 @@ export default function EconomicIndicatorLlmReport() {
     return `${prefix}${Math.abs(val)}${suffix}`;
   };
 
-  // Simple and premium Markdown parser/renderer in React
+  // ✅ 수정된 renderMarkdown: # (h1) 처리 추가
   const renderMarkdown = (text) => {
     if (!text) return null;
     return text.split("\n").map((line, index) => {
+      // # h1 처리 (## 보다 먼저 체크해야 함)
+      if (line.startsWith("# ") && !line.startsWith("##")) {
+        return (
+          <h2 key={index} style={{
+            fontSize: 20,
+            fontWeight: 800,
+            color: '#0f172a',
+            margin: '28px 0 14px 0',
+            borderBottom: '2px solid #3b82f6',
+            paddingBottom: '10px'
+          }}>
+            {line.replace(/^#\s*/, "").trim()}
+          </h2>
+        );
+      }
       if (line.startsWith("###")) {
-        return <h3 key={index} style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: '24px 0 12px 0', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px' }}>{line.replace("###", "").trim()}</h3>;
+        return (
+          <h3 key={index} style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: '#0f172a',
+            margin: '24px 0 12px 0',
+            borderBottom: '1px solid #e2e8f0',
+            paddingBottom: '8px'
+          }}>
+            {line.replace(/^###\s*/, "").trim()}
+          </h3>
+        );
       }
       if (line.startsWith("##")) {
-        return <h4 key={index} style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: '20px 0 10px 0' }}>{line.replace("##", "").trim()}</h4>;
+        return (
+          <h4 key={index} style={{
+            fontSize: 16,
+            fontWeight: 700,
+            color: '#1e293b',
+            margin: '20px 0 10px 0'
+          }}>
+            {line.replace(/^##\s*/, "").trim()}
+          </h4>
+        );
       }
       if (line.startsWith("**") && line.endsWith("**")) {
-        return <p key={index} style={{ fontWeight: 700, color: '#0f172a', margin: '14px 0 6px 0' }}>{line.replace(/\*\*/g, "")}</p>;
+        return (
+          <p key={index} style={{ fontWeight: 700, color: '#0f172a', margin: '14px 0 6px 0' }}>
+            {line.replace(/\*\*/g, "")}
+          </p>
+        );
       }
       if (line.startsWith("- ") || line.startsWith("* ")) {
-        return <li key={index} style={{ fontSize: 14, color: '#334155', lineHeight: 1.8, marginLeft: '20px', marginBottom: '6px' }}>{line.substring(2)}</li>;
+        return (
+          <li key={index} style={{
+            fontSize: 14,
+            color: '#334155',
+            lineHeight: 1.8,
+            marginLeft: '20px',
+            marginBottom: '6px'
+          }}>
+            {line.substring(2)}
+          </li>
+        );
       }
       if (line.trim() === "") {
         return <div key={index} style={{ height: 8 }} />;
@@ -151,12 +200,20 @@ export default function EconomicIndicatorLlmReport() {
       if (parts.length > 1) {
         return (
           <p key={index} style={{ fontSize: 14, color: '#334155', lineHeight: 1.8, margin: '6px 0' }}>
-            {parts.map((part, i) => i % 2 === 1 ? <strong key={i} style={{ color: '#0f172a', fontWeight: 700 }}>{part}</strong> : part)}
+            {parts.map((part, i) =>
+              i % 2 === 1
+                ? <strong key={i} style={{ color: '#0f172a', fontWeight: 700 }}>{part}</strong>
+                : part
+            )}
           </p>
         );
       }
 
-      return <p key={index} style={{ fontSize: 14, color: '#334155', lineHeight: 1.8, margin: '6px 0' }}>{line}</p>;
+      return (
+        <p key={index} style={{ fontSize: 14, color: '#334155', lineHeight: 1.8, margin: '6px 0' }}>
+          {line}
+        </p>
+      );
     });
   };
 
@@ -219,10 +276,26 @@ export default function EconomicIndicatorLlmReport() {
       </div>
 
       {/* Modal Overlay */}
-      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="news-arch-modal" style={{ position: 'relative', top: 'auto', left: 'auto', right: 'auto', bottom: 'auto', width: '900px', height: '80vh', maxWidth: '90%', maxHeight: '90%', padding: '40px', overflowY: 'auto', margin: 0, borderRadius: '24px', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)' }}>
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(15, 23, 42, 0.4)',
+        backdropFilter: 'blur(8px)',
+        zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center'
+      }}>
+        <div className="news-arch-modal" style={{
+          position: 'relative', top: 'auto', left: 'auto', right: 'auto', bottom: 'auto',
+          width: '900px', height: '80vh', maxWidth: '90%', maxHeight: '90%',
+          padding: '40px', overflowY: 'auto', margin: 0,
+          borderRadius: '24px', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)'
+        }}>
           <Link to="/economic-indicator-archive" style={{ position: 'absolute', top: 24, right: 24 }}>
-            <button className="news-mod-close" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', transition: 'all 0.2s' }}>
+            <button className="news-mod-close" style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 40, height: 40, borderRadius: '50%',
+              border: '1px solid #e2e8f0', background: 'white',
+              cursor: 'pointer', transition: 'all 0.2s'
+            }}>
               <X size={20} color="#64748b" />
             </button>
           </Link>
@@ -233,7 +306,10 @@ export default function EconomicIndicatorLlmReport() {
               <button
                 key={tab}
                 className={`trend-tab ${selectedTab === tab ? 'active' : ''}`}
-                style={selectedTab === tab ? { borderRadius: '8px' } : { background: 'transparent', color: '#64748b', borderRadius: '8px' }}
+                style={selectedTab === tab
+                  ? { borderRadius: '8px' }
+                  : { background: 'transparent', color: '#64748b', borderRadius: '8px' }
+                }
                 onClick={() => setSelectedTab(tab)}
               >
                 {tab}
@@ -244,20 +320,27 @@ export default function EconomicIndicatorLlmReport() {
           <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
             {selectedTab} AI 예측 모델 SHAP 분석 보고서
           </h2>
-          <div style={{ fontSize: 13, color: '#64748b', marginBottom: 32 }}>
-            {reportData ? `분석 완료: ${new Date(reportData.generatedAt).toLocaleString('ko-KR')} | 분석 모델: ${reportData.modelName} | 기반 데이터: ${reportData.dataSources.join(", ")}` : ""}
-          </div>
 
-          <div style={{ background: '#f8fafc', padding: '32px', borderRadius: 16, borderLeft: '4px solid #3b82f6' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#1e293b', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{
+            background: '#f8fafc', padding: '32px',
+            borderRadius: 16, borderLeft: '4px solid #3b82f6'
+          }}>
+            <h3 style={{
+              fontSize: 16, fontWeight: 800, color: '#1e293b',
+              margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em'
+            }}>
               {selectedTab} 추이 예측에 대한 인공지능 분석 결과
             </h3>
 
             <div style={{ fontSize: 14, color: '#334155', lineHeight: 1.8 }}>
               {isLoading || !reportData ? (
-                <div style={{ padding: '20px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
+                <div style={{ padding: '20px 0', textAlign: 'center', color: '#64748b' }}>
+                  보고서 데이터를 분석하는 중...
+                </div>
               ) : (
-                renderMarkdown(reportData.content)
+                renderMarkdown(
+                  reportData.content.replace(/(?<!\n)(#{1,6} )/g, '\n$1').trim()
+                )
               )}
             </div>
           </div>
