@@ -83,8 +83,8 @@ export default function NewsArchive() {
       setActiveBriefingTab("economy");
     } else if (selectedCategory === "정치") {
       setActiveBriefingTab("politics");
-    } else if (selectedCategory === "사회") {
-      setActiveBriefingTab("itScience");
+    } else if (selectedCategory === "국제") {
+      setActiveBriefingTab("international");
     }
   }, [selectedCategory]);
 
@@ -94,7 +94,7 @@ export default function NewsArchive() {
 
     api.trend.getNewsDetail(item.id)
       .then(detail => {
-        const colorMap = { "경제": "green", "정치": "pink", "사회": "blue", economy: "green", politics: "pink", it: "blue", "IT/과학": "blue" };
+        const colorMap = { "경제": "green", "정치": "pink", "국제": "blue", "사회": "blue", economy: "green", politics: "pink", international: "blue", it: "blue", "IT/과학": "blue" };
         setSelectedNewsItem({
           title: detail.title,
           type: item.category || "경제",
@@ -170,21 +170,21 @@ export default function NewsArchive() {
                     정치
                   </button>
                   <button 
-                    onClick={() => setActiveBriefingTab("itScience")}
+                    onClick={() => setActiveBriefingTab("international")}
                     style={{ 
                       border: 'none', 
-                      background: activeBriefingTab === 'itScience' ? '#ffffff' : 'transparent',
-                      color: activeBriefingTab === 'itScience' ? '#0284c7' : '#64748b',
+                      background: activeBriefingTab === 'international' ? '#ffffff' : 'transparent',
+                      color: activeBriefingTab === 'international' ? '#0284c7' : '#64748b',
                       fontSize: 12, 
-                      fontWeight: activeBriefingTab === 'itScience' ? 700 : 600,
+                      fontWeight: activeBriefingTab === 'international' ? 700 : 600,
                       padding: '5px 12px',
                       borderRadius: 8,
                       cursor: 'pointer',
-                      boxShadow: activeBriefingTab === 'itScience' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+                      boxShadow: activeBriefingTab === 'international' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
                       transition: 'all 0.2s ease'
                     }}
                   >
-                    사회
+                    국제
                   </button>
                 </div>
               </div>
@@ -199,7 +199,7 @@ export default function NewsArchive() {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
             <div className="trend-tabs" style={{ marginBottom: 0 }}>
-              {["전체", "경제", "정치", "사회"].map(category => (
+              {["전체", "경제", "정치", "국제"].map(category => (
                 <button 
                   key={category}
                   className={`trend-tab ${selectedCategory === category ? 'active' : ''}`}
