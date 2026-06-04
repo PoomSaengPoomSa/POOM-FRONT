@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Calendar as CalendarIcon, Search } from "lucide-react";
-import "./CalendarNew.css";
+import "./Calendar.css";
 import MiniCalendarPicker from "./MiniCalendarPicker";
 import { useCalendar } from "./CalendarContext";
 
-export default function ScheduleRegistrationModal({ isOpen, onClose }) {
-  const { addEvent, events } = useCalendar();
+export default function ScheduleRegistrationModal({ isOpen, onClose, editEvent }) {
+  const { addEvent, events, updateEvent } = useCalendar();
   const [category, setCategory] = useState("상담");
   const [color, setColor] = useState("blue");
   
@@ -19,6 +19,88 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
   const [errors, setErrors] = useState({ title: false, startDate: false, startTime: false, endDate: false, endTime: false });
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (editEvent) {
+        setTitle(editEvent.title || "");
+        setCategory(editEvent.category || "상담");
+        setColor(editEvent.color || "blue");
+        setCustomer(editEvent.customer || "");
+        setMemo(editEvent.memo || "");
+        setErrors({ title: false, startDate: false, startTime: false, endDate: false, endTime: false });
+
+        // Parse start time and date
+        if (editEvent.startTime) {
+          const normalizedStart = editEvent.startTime.replace(/-/g, '/');
+          const parts = normalizedStart.split(" ");
+          if (parts.length >= 2) {
+            setStartDate(parts[0]);
+            setStartTime(parts[1]);
+          } else {
+            const tParts = normalizedStart.split("T");
+            if (tParts.length >= 2) {
+              setStartDate(tParts[0]);
+              setStartTime(tParts[1].substring(0, 5));
+            } else {
+              setStartDate(normalizedStart);
+              setStartTime("10:00");
+            }
+          }
+        } else {
+          setStartDate("");
+          setStartTime("");
+        }
+
+        // Parse end time and date
+        if (editEvent.endTime) {
+          const normalizedEnd = editEvent.endTime.replace(/-/g, '/');
+          const parts = normalizedEnd.split(" ");
+          if (parts.length >= 2) {
+            setEndDate(parts[0]);
+            setEndTime(parts[1]);
+          } else {
+            const tParts = normalizedEnd.split("T");
+            if (tParts.length >= 2) {
+              setEndDate(tParts[0]);
+              setEndTime(tParts[1].substring(0, 5));
+            } else {
+              setEndDate(normalizedEnd);
+              setEndTime("11:00");
+            }
+          }
+        } else if (editEvent.startTime) {
+          const normalizedStart = editEvent.startTime.replace(/-/g, '/');
+          const parts = normalizedStart.split(" ");
+          const sDate = parts[0] || normalizedStart.split("T")[0];
+          setEndDate(sDate);
+          
+          let sTime = "10:00";
+          if (parts.length >= 2) sTime = parts[1];
+          else if (normalizedStart.includes("T")) sTime = normalizedStart.split("T")[1].substring(0, 5);
+          
+          const [h, m] = sTime.split(":");
+          const nextH = String((parseInt(h, 10) + 1) % 24).padStart(2, '0');
+          setEndTime(`${nextH}:${m}`);
+        } else {
+          setEndDate("");
+          setEndTime("");
+        }
+      } else {
+        // Normal registration: reset to defaults
+        setCategory("상담");
+        setColor("blue");
+        setTitle("");
+        setStartDate("");
+        setStartTime("");
+        setEndDate("");
+        setEndTime("");
+        setCustomer("");
+        setMemo("");
+        setErrors({ title: false, startDate: false, startTime: false, endDate: false, endTime: false });
+      }
+    }
+  }, [isOpen, editEvent]);
 
   const handleDateSelect = (date, setter, isEnd = false) => {
     const yyyy = date.getFullYear();
@@ -42,18 +124,6 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
   };
 
   if (!isOpen) {
-    if (title || startDate || startTime || endDate || endTime || errors.title || errors.startDate || errors.startTime || errors.endDate || errors.endTime || showStartPicker || showEndPicker || customer || memo) {
-      setTitle("");
-      setStartDate("");
-      setStartTime("");
-      setEndDate("");
-      setEndTime("");
-      setCustomer("");
-      setMemo("");
-      setErrors({ title: false, startDate: false, startTime: false, endDate: false, endTime: false });
-      setShowStartPicker(false);
-      setShowEndPicker(false);
-    }
     return null;
   }
 
@@ -83,6 +153,9 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
       const endDateTime = new Date(`${endDate} ${endTime}`);
 
       const isOverlap = events.some(e => {
+        if (editEvent && editEvent.type === 'my' && e.id === editEvent.id) {
+          return false;
+        }
         const eStart = new Date(e.startTime);
         const eEnd = new Date(e.endTime);
         return startDateTime < eEnd && endDateTime > eStart;
@@ -93,15 +166,28 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
         return;
       }
 
-      addEvent({
-        title,
-        startTime: `${startDate} ${startTime}`,
-        endTime: `${endDate} ${endTime}`,
-        category,
-        color,
-        customer,
-        memo
-      });
+      if (editEvent && editEvent.type === 'my') {
+        updateEvent({
+          id: editEvent.id,
+          title,
+          startTime: `${startDate} ${startTime}`,
+          endTime: `${endDate} ${endTime}`,
+          category,
+          color,
+          customer,
+          memo
+        });
+      } else {
+        addEvent({
+          title,
+          startTime: `${startDate} ${startTime}`,
+          endTime: `${endDate} ${endTime}`,
+          category,
+          color,
+          customer,
+          memo
+        });
+      }
       onClose();
     }
   };
@@ -110,7 +196,7 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
     <div className="cal-modal-overlay">
       <div className="cal-modal">
         <button className="cal-modal-close" onClick={onClose}><X size={16} /></button>
-        <h2 className="cal-modal-title">일정 등록</h2>
+        <h2 className="cal-modal-title">{editEvent && editEvent.type === 'my' ? "일정 수정" : "일정 등록"}</h2>
 
         <div className="cal-modal-content">
           <div className="cal-form-section-title">일정 정보</div>
@@ -120,15 +206,15 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
             <div className="cal-category-tabs">
               <button 
                 className={`cal-category-tab ${category === "상담" ? "active" : ""}`}
-                onClick={() => setCategory("상담")}
+                onClick={() => { setCategory("상담"); setColor("blue"); }}
               >상담</button>
               <button 
                 className={`cal-category-tab ${category === "개인" ? "active" : ""}`}
-                onClick={() => setCategory("개인")}
+                onClick={() => { setCategory("개인"); setColor("gray"); }}
               >개인</button>
               <button 
                 className={`cal-category-tab ${category === "공지" ? "active" : ""}`}
-                onClick={() => setCategory("공지")}
+                onClick={() => { setCategory("공지"); setColor("green"); }}
               >공지</button>
             </div>
           </div>
@@ -234,17 +320,9 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <div className="cal-form-group" style={{ marginTop: 16 }}>
-            <label className="cal-form-label">색상</label>
-            <div className="cal-color-picker">
-              {['yellow', 'blue', 'pink', 'green', 'purple', 'lightblue', 'orange'].map(c => (
-                <div 
-                  key={c}
-                  className={`cal-color-circle bg-${c} ${color === c ? 'active' : ''}`}
-                  onClick={() => setColor(c)}
-                ></div>
-              ))}
-            </div>
+          <div className="cal-form-group" style={{ marginBottom: 0 }}>
+            <label className="cal-form-label">메모</label>
+            <textarea className="cal-form-textarea" placeholder="추가 메모를 입력하세요" value={memo} onChange={(e) => setMemo(e.target.value)}></textarea>
           </div>
 
           <div className="cal-form-section-title" style={{ marginTop: 24 }}>고객 정보</div>
@@ -255,11 +333,6 @@ export default function ScheduleRegistrationModal({ isOpen, onClose }) {
               <input type="text" className="cal-form-input" placeholder="고객명 또는 연락처 검색" value={customer} onChange={(e) => setCustomer(e.target.value)} />
               <Search size={16} className="cal-input-icon search" />
             </div>
-          </div>
-
-          <div className="cal-form-group" style={{ marginBottom: 0 }}>
-            <label className="cal-form-label">메모</label>
-            <textarea className="cal-form-textarea" placeholder="추가 메모를 입력하세요" value={memo} onChange={(e) => setMemo(e.target.value)}></textarea>
           </div>
         </div>
 

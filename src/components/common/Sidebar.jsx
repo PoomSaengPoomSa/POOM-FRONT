@@ -138,11 +138,10 @@ export default function Sidebar({ type = "cal" }) {
     path.includes('/monthly-calendar');
 
   const isCustomerActive =
-    path.includes('/customer-management') &&
-    !path.includes('/customer-management-memo-assistant');
+    path.includes('/customer-management');
 
   const isAssistantActive =
-    path.includes('/customer-management-memo-assistant');
+    path.includes('/counseling-assistant');
 
   const queryParams = new URLSearchParams(location.search);
   const tabParam = queryParams.get("tab");
@@ -156,8 +155,7 @@ export default function Sidebar({ type = "cal" }) {
     path.includes('/news-archive');
 
   const isNotificationActive =
-    path.includes('/notifications') ||
-    path.includes('/notification-message-draft');
+    path.includes('/notifications');
 
   return (
     <div
@@ -391,7 +389,7 @@ export default function Sidebar({ type = "cal" }) {
           {!isCollapsed && <span className="menu-text">홈</span>}
           {isCollapsed && <span className="sidebar-tooltip">홈</span>}
         </Link>
-        <Link to="/customer-management-registration-1" className={`${prefix}-menu-item sidebar-menu-item ${isCustomerActive ? 'active' : ''}`}>
+        <Link to="/customer-info" className={`${prefix}-menu-item sidebar-menu-item ${isCustomerActive ? 'active' : ''}`}>
           <Contact size={20} />
           {!isCollapsed && <span className="menu-text">고객정보</span>}
           {isCollapsed && <span className="sidebar-tooltip">고객정보</span>}
@@ -402,7 +400,7 @@ export default function Sidebar({ type = "cal" }) {
           onMouseLeave={() => setIsAssistantHovered(false)}
           style={{ display: 'flex', flexDirection: 'column' }}
         >
-          <Link to="/customer-management-memo-assistant?tab=simulator" className={`${prefix}-menu-item sidebar-menu-item ${isAssistantActive ? 'active' : ''}`}>
+          <Link to="/counseling-assistant?tab=simulator" className={`${prefix}-menu-item sidebar-menu-item ${isAssistantActive ? 'active' : ''}`}>
             <Bot size={20} />
             {!isCollapsed && <span className="menu-text">AI 상담보조</span>}
             {isCollapsed && <span className="sidebar-tooltip">AI 상담보조</span>}
@@ -423,7 +421,7 @@ export default function Sidebar({ type = "cal" }) {
               }}
             >
               <Link
-                to="/customer-management-memo-assistant?tab=simulator"
+                to="/counseling-assistant?tab=simulator"
                 style={{
                   textDecoration: 'none',
                   color: isSimulatorActive ? '#0284c7' : '#64748b',
@@ -436,7 +434,7 @@ export default function Sidebar({ type = "cal" }) {
                 AI 시뮬레이터
               </Link>
               <Link
-                to="/customer-management-memo-assistant?tab=memo"
+                to="/counseling-assistant?tab=memo"
                 style={{
                   textDecoration: 'none',
                   color: isMemoActive ? '#0284c7' : '#64748b',
