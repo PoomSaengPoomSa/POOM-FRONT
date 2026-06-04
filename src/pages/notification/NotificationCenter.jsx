@@ -197,6 +197,21 @@ export default function NotificationCenter() {
     };
   }, [activeTab]);
 
+  // URL 쿼리 파라미터(briefing_id)를 통한 특정 브리핑 자동 모달 팝업 오픈 처리
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const briefingId = queryParams.get("briefing_id");
+    if (briefingId && notificationsList.length > 0) {
+      const found = notificationsList.find(n => n.id === parseInt(briefingId, 10));
+      if (found && found.isBriefing) {
+        setSelectedBriefing(found);
+        setIsBriefingOpen(true);
+        // URL에서 파라미터를 정리하여 뒤로가기나 리프레시 시 재오픈 방지
+        navigate(location.pathname, { replace: true });
+      }
+    }
+  }, [location.search, notificationsList, navigate, location.pathname]);
+
 
 
   const handleResizeStart = (e) => {
