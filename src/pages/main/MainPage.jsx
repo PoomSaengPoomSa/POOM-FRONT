@@ -1059,8 +1059,8 @@ export default function MainPage() {
 
             <div className={`bottom-sub-split ${expandedCustomerId ? "collapsed" : ""}`}>
               <div className="bottom-card sub-split-card visit-briefing-card" onClick={expandedCustomerId ? () => { setExpandedCustomerId(null); setExpandedCustomerDetails(null); } : undefined} style={expandedCustomerId ? { cursor: "pointer" } : undefined}>
-                <div className="bottom-card-header" style={splitHeaderStyle(!expandedCustomerId)}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="bottom-card-header" style={{...splitHeaderStyle(!expandedCustomerId), marginBottom: '10px'}}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px'}}>
                     <h2 className="bottom-card-title">AI 방문 브리핑</h2>
                     <span className="header-count-indicator" style={expandedCustomerId ? { fontSize: '9px', padding: '1px 6px' } : {}}>오늘 {todayVisitors.length}건</span>
                   </div>
@@ -1101,7 +1101,7 @@ export default function MainPage() {
                 {!expandedCustomerId && (
                   <div className="notifications-simple-list">
                     {loadingNotifications ? <div className="notif-loading">알림 피드를 불러오는 중입니다...</div> : notifications.length === 0 ? <div className="notif-empty">수신된 알림이 없습니다.</div> : (
-                      notifications.map((notif) => {
+                      notifications.filter((notif) => notif.type !== "방문 예정 브리핑").map((notif) => {
                         const isExpanded = activeNotifId === notif.id;
                         return (
                           <div key={notif.id} className={`simple-notif-item ${isExpanded ? "expanded" : ""}`} onClick={(e) => { e.stopPropagation(); setActiveNotifId(prev => prev === notif.id ? null : notif.id); }} style={{ cursor: "pointer" }}>
