@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CustomerRegistrationModal from "./CustomerRegistrationModal";
-import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, UserCircle, Settings, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, TrendingUp, Users, Bell, Plus, Search, LogOut, UserCircle, Settings, Trash2, ChevronLeft, ChevronRight, Lightbulb } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import Sidebar from "../../components/common/Sidebar";
 import { api } from "../../api";
@@ -89,9 +89,9 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
     assetTotal: fullDetail?.total_assets !== undefined ? `${(fullDetail.total_assets / 100000000).toFixed(1)}억` : "32억",
     netWorthTotal: fullDetail?.net_worth !== undefined ? `${(fullDetail.net_worth / 100000000).toFixed(1)}억` : "32억",
     assetList: [
-      { name: '예적금', value: fullDetail ? Math.round((fullDetail.deposit / (fullDetail.net_worth || 1)) * 100) : 45, color: '#2dd4bf' },
-      { name: '투자상품', value: fullDetail ? Math.round((fullDetail.investment / (fullDetail.net_worth || 1)) * 100) : 35, color: '#a855f7' },
-      { name: '연금보험', value: fullDetail ? Math.round((fullDetail.pension / (fullDetail.net_worth || 1)) * 100) : 20, color: '#cbd5e1' },
+      { name: '예적금', value: fullDetail ? Math.round((fullDetail.deposit / (fullDetail.net_worth || 1)) * 100) : 45, color: '#2563eb' },
+      { name: '투자상품', value: fullDetail ? Math.round((fullDetail.investment / (fullDetail.net_worth || 1)) * 100) : 35, color: '#8b5cf6' },
+      { name: '연금보험', value: fullDetail ? Math.round((fullDetail.pension / (fullDetail.net_worth || 1)) * 100) : 20, color: '#2dd4bf' },
     ],
     assetLLMInsight: fullDetail?.llm_insight || "순자산 중 예적금 및 투자상품 비율이 적절한 균형을 유지하고 있습니다.",
     riskLevel: riskLevel,
@@ -112,7 +112,7 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
         productName: item.product_name,
         productDesc: item.product_explanation,
         status: (item.is_owned || Number(item.is_suitable) === 2) ? "보유 중" : (Number(item.is_suitable) === 1 ? "적합" : "부적합"),
-        statusColor: (item.is_owned || Number(item.is_suitable) === 2) ? "#3b82f6" : (Number(item.is_suitable) === 1 ? "#10b981" : "#ef4444"),
+        statusColor: (item.is_owned || Number(item.is_suitable) === 2) ? "#0284c7" : (Number(item.is_suitable) === 1 ? "#2dd4bf" : "#fb5f5f"),
         matchingDesc: item.reason
       }))
       : []
@@ -120,9 +120,9 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
 
   if (fullDetail && fullDetail.net_worth === 0) {
     defaults.assetList = [
-      { name: '예적금', value: 0, color: '#2dd4bf' },
-      { name: '투자상품', value: 0, color: '#a855f7' },
-      { name: '연금보험', value: 0, color: '#cbd5e1' },
+      { name: '예적금', value: 0, color: '#2563eb' },
+      { name: '투자상품', value: 0, color: '#8b5cf6' },
+      { name: '연금보험', value: 0, color: '#2dd4bf' },
     ];
   }
 
@@ -628,21 +628,32 @@ export default function CustomerInfo() {
                       boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
                     }}
                   >
-                    <Trash2 size={13} color="#ef4444" />
+                    <Trash2 size={12} color="#ef4444" />
                     삭제하기
                   </button>
                 </div>
               </div>
 
-              <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {/* 이탈 위험 수준 (최상단 가로 Full-Width) */}
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-                    <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>이탈 위험 수준</h3>
+              <div style={{display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {/* 이탈 위험 수준 */}
+                <div style={{
+                      background: '#fafafa',
+                      border: '1px solid #d2d7dc',
+                      borderRadius: 16,
+                      padding: '24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 5,
+                      height: 200,
+                      boxSizing: 'border-box',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
+                    }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0 }}>이탈 위험 수준 분석</h3>
                     <span style={{
                       background: `${details.riskColor}15`,
                       color: details.riskColor,
-                      fontSize: 10,
+                      fontSize: 14,
                       fontWeight: 700,
                       padding: '2px 6px',
                       borderRadius: 6,
@@ -650,33 +661,30 @@ export default function CustomerInfo() {
                       alignItems: 'center',
                       gap: 4
                     }}>
-                      <span>{details.riskEmoji}</span>
-                      <span>위험도 {details.riskLevel} ({details.riskLabel})</span>
+                      <span>위험도 {details.riskLevel}</span> {/*{details.riskLabel}*/}
                     </span>
                   </div>
 
                   <div style={{
                     padding: '10px 12px',
-                    background: 'linear-gradient(135deg, rgba(248, 250, 252, 0.4) 0%, rgba(241, 245, 249, 0.5) 100%)',
-                    border: '1px dashed ' + (details.riskColor || '#cbd5e1'),
+                    // background: 'linear-gradient(135deg, rgba(245, 243, 255, 0.4) 0%, rgba(238, 242, 255, 0.5) 100%)',
+                    /*border: '1px dashed rgba(138, 92, 246, 0.81)',*/
                     borderRadius: 8,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.01)',
+                    boxShadow: '0 2px 8px rgba(139, 92, 246, 0.02)',
                     marginTop: 4
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
                       <span style={{
-                        background: 'linear-gradient(135deg, ' + (details.riskColor || '#cbd5e1') + ' 0%, #64748b 100%)',
+                        background: 'linear-gradient(135deg, #8b5cf6 0%, #2e24ea 100%)',
                         color: 'white',
-                        fontSize: 9,
+                        fontSize: 12,
                         fontWeight: 800,
-                        padding: '1px 5px',
+                        padding: '1px 6px',
                         borderRadius: 8,
                         letterSpacing: '0.3px',
-                        textShadow: '0 1px 1px rgba(0,0,0,0.1)'
-                      }}>AI 이탈 방지 인사이트</span>
-                      <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500 }}>{details.riskDesc}</span>
+                      }}><span className="ai-news-briefing-badge-icon">🤖</span> AI 인사이트</span>
                     </div>
-                    <p style={{ fontSize: 11, color: '#4b5563', lineHeight: 1.4, margin: 0, fontWeight: 500 }}>
+                    <p style={{ fontSize: 14, color: '#1a1c20', lineHeight: 1.4, margin: 0, fontWeight: 500 }}>
                       {details.riskLLMInsight}
                     </p>
                   </div>
@@ -686,35 +694,45 @@ export default function CustomerInfo() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                   {/* Left Column: 자산 보유 현황 + 주력 상품 매칭 현황 */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {/* 자산 보유 현황 (높이 240px 맞춤 & 가로 병렬화) */}
-                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6, height: 240, boxSizing: 'border-box' }}>
+                    <div style={{
+                      background: '#fafafa',
+                      border: '1px solid #d2d7dc',
+                      borderRadius: 16,
+                      padding: '24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 16,
+                      minHeight: 240,
+                      boxSizing: 'border-box',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
+                    }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>자산 보유 현황</h3>
-                        <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>포트폴리오 비중</span>
+                        <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0 }}>자산 보유 현황</h3>
+                        <span style={{ fontSize: 11, color: '#0284c7', fontWeight: 700, cursor: 'default' }}>포트폴리오 비중</span>
                       </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'row', gap: 12, flex: 1, alignItems: 'center', minHeight: 0 }}>
+                      <div style={{ display: 'flex', flexDirection: 'row', gap: 24, flex: 1, alignItems: 'center', minHeight: 0 }}>
                         {/* Left: 차트 & 범례 */}
-                        <div style={{ flex: '1 1 50%', display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
-                          <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 20, justifyContent: 'center', flexShrink: 0 }}>
+                          <div style={{ position: 'relative', width: 110, height: 110, flexShrink: 0 }}>
                             <ResponsiveContainer width="100%" height="100%">
                               <PieChart>
-                                <Pie data={details.assetList} innerRadius={20} outerRadius={32} paddingAngle={2} dataKey="value" stroke="none">
+                                <Pie data={details.assetList} innerRadius={35} outerRadius={50} paddingAngle={0} dataKey="value" stroke="none">
                                   {details.assetList.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                                 </Pie>
                               </PieChart>
                             </ResponsiveContainer>
-                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                              <span style={{ fontSize: 8, color: '#64748b', fontWeight: 600 }}>순자산</span>
-                              <span style={{ fontSize: 10, fontWeight: 700, color: '#d97706' }}>{details.netWorthTotal}</span>
+                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                              <span style={{ fontSize: 10, color: '#64748b', fontWeight: 600 }}>순자산</span>
+                              <span style={{ fontSize: 13, fontWeight: 800, color: '#002334', marginTop: 2 }}>{details.netWorthTotal}</span>
                             </div>
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flexShrink: 0 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0 }}>
                             {details.assetList.map((item, idx) => (
-                              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                <div style={{ width: 4, height: 4, borderRadius: '50%', background: item.color }}></div>
-                                <span style={{ fontSize: 9, color: '#475569', fontWeight: 600 }}>{item.name}</span>
-                                <span style={{ fontSize: 9, fontWeight: 700, color: '#0f172a' }}>{item.value}%</span>
+                              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.color }}></div>
+                                <span style={{ fontSize: 13, color: '#1e293b', fontWeight: 600 }}>{item.name}</span>
+                                <span style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginLeft: 4 }}>{item.value}%</span>
                               </div>
                             ))}
                           </div>
@@ -722,31 +740,30 @@ export default function CustomerInfo() {
 
                         {/* Right: AI 포트폴리오 제언 */}
                         <div style={{
-                          flex: '1 1 50%',
-                          padding: '8px 10px',
-                          background: 'linear-gradient(135deg, rgba(245, 243, 255, 0.4) 0%, rgba(238, 242, 255, 0.5) 100%)',
-                          border: '1px dashed rgba(139, 92, 246, 0.25)',
-                          borderRadius: 8,
-                          boxShadow: '0 2px 8px rgba(139, 92, 246, 0.02)',
-                          height: '100%',
+                          flex: 1,
+                          padding: '10px 15px',
+                          background: '#f6f6ff',
+                          border: '1px solid #e0e4ff',
+                          borderRadius: 16,
+                          minHeight: 100,
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: 4,
+                          gap: 8,
                           justifyContent: 'center',
-                          overflowY: 'auto'
+                          boxSizing: 'border-box',
                         }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center'}}>
                             <span style={{
-                              background: 'linear-gradient(135deg, #a855f7 0%, #6366f1 100%)',
+                              background: 'linear-gradient(135deg, #8b5cf6 0%, #2e24ea 100%)',
                               color: 'white',
-                              fontSize: 8,
+                              fontSize: 12,
                               fontWeight: 800,
-                              padding: '1px 4px',
-                              borderRadius: 6,
-                              letterSpacing: '0.2px'
-                            }}>AI 제언</span>
+                              padding: '1px 6px',
+                              borderRadius: 8,
+                              letterSpacing: '0.3px',
+                            }}><span className="ai-news-briefing-badge-icon">🤖</span> AI 인사이트</span>
                           </div>
-                          <p style={{ fontSize: 10, color: '#4b5563', lineHeight: 1.35, margin: 0, fontWeight: 500 }}>
+                          <p style={{ fontSize: 13, color: '#1a1c20', lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
                             {details.assetLLMInsight}
                           </p>
                         </div>
@@ -754,10 +771,21 @@ export default function CustomerInfo() {
                     </div>
 
                     {/* 주력 상품 매칭 현황 (높이 220px 고정 및 콤팩트 리스트 모달 연계) */}
-                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, height: 220, boxSizing: 'border-box' }}>
+                    <div style={{
+                      background: '#fafafa',
+                      border: '1px solid #d2d7dc',
+                      borderRadius: 16,
+                      padding: '24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 16,
+                      height: 220,
+                      boxSizing: 'border-box',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
+                    }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>주력 상품 매칭 현황</h3>
-                        <span style={{ fontSize: 9, color: '#94a3b8', fontWeight: 600 }}>클릭 시 AI 제언 상세 팝업</span>
+                        <h3 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', margin: 0 }}>주력 상품 매칭 현황</h3>
+                        <span style={{ fontSize: 11, color: '#0284c7', fontWeight: 600 }}>클릭 시 AI 제언 상세 팝업</span>
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto', paddingRight: 4, flex: 1 }}>
@@ -779,7 +807,7 @@ export default function CustomerInfo() {
                               transition: 'all 0.2s'
                             }}
                             onMouseOver={(e) => {
-                              e.currentTarget.style.borderColor = '#8b5cf6';
+                              e.currentTarget.style.borderColor = '#0284c7';
                               e.currentTarget.style.boxShadow = '0 2px 4px rgba(139, 92, 246, 0.08)';
                             }}
                             onMouseOut={(e) => {
@@ -787,7 +815,7 @@ export default function CustomerInfo() {
                               e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.02)';
                             }}
                           >
-                            <h4 style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <h4 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {product.productName}
                             </h4>
                             <div
@@ -801,7 +829,7 @@ export default function CustomerInfo() {
                                 color: 'white',
                                 borderRadius: 4,
                                 fontWeight: 700,
-                                fontSize: 9,
+                                fontSize: 10,
                                 flexShrink: 0
                               }}
                             >
@@ -821,15 +849,26 @@ export default function CustomerInfo() {
                   {/* Right Column: 메모 기반 고객 특징 + 방문 주기 그래프 */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {/* 메모 기반 고객 특징 (높이 240px 맞춤) */}
-                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, height: 240, boxSizing: 'border-box' }}>
+                    <div style={{
+                      background: '#fafafa',
+                      border: '1px solid #d2d7dc',
+                      borderRadius: 16,
+                      padding: '24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 16,
+                      minHeight: 240,
+                      boxSizing: 'border-box',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
+                    }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>메모 기반 고객 특징</h3>
+                        <h3 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', margin: 0 }}>메모 기반 고객 특징</h3>
                         <button
                           onClick={() => setIsFeatureModalOpen(true)}
                           style={{
                             padding: '4px 8px',
                             borderRadius: 6,
-                            fontSize: 10,
+                            fontSize: 11,
                             fontWeight: 700,
                             cursor: 'pointer',
                             background: 'white',
@@ -848,7 +887,7 @@ export default function CustomerInfo() {
 
                       {wordCloudData.length > 0 ? (
                         /* 워드 클라우드 뷰 */
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 8px', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '4px 2px', overflowY: 'auto' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 5px', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '2px 1px', overflowY: 'auto' }}>
                           {wordCloudData.map((tag, idx) => (
                             <span
                               key={idx}
@@ -856,7 +895,7 @@ export default function CustomerInfo() {
                                 fontSize: tag.size,
                                 color: tag.color,
                                 background: tag.bg,
-                                padding: '6px 12px',
+                                padding: '5px 10px',
                                 borderRadius: 16,
                                 fontWeight: 700,
                                 boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
@@ -910,28 +949,39 @@ export default function CustomerInfo() {
                     </div>
 
                     {/* 방문 주기 그래프 (높이 220px 맞춤 및 차트 축소) */}
-                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, height: 220, boxSizing: 'border-box' }}>
-                      <h3 style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>방문 주기 그래프</h3>
+                    <div style={{
+                      background: '#fafafa',
+                      border: '1px solid #d2d7dc',
+                      borderRadius: 16,
+                      padding: '24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 16,
+                      height: 220,
+                      boxSizing: 'border-box',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
+                    }}>
+                      <h3 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', margin: 0 }}>방문 주기 그래프</h3>
 
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))', gap: 8 }}>
-                        <div style={{ background: '#e0e7ff', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
-                          <span style={{ fontSize: 10, color: '#475569', fontWeight: 600 }}>총 방문</span>
+                        <div style={{ background: '#0285c72e', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
+                          <span style={{ fontSize: 11, color: '#2f3846', fontWeight: 600 }}>총 방문</span>
                           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
-                            <span style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>{details.visitData.totalVisits}</span>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: '#0284c7', lineHeight: 1 }}>{details.visitData.totalVisits}</span>
                             <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>회</span>
                           </div>
                         </div>
-                        <div style={{ background: '#e0e7ff', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
-                          <span style={{ fontSize: 10, color: '#475569', fontWeight: 600 }}>평균 주기</span>
+                        <div style={{ background: '#0285c72e', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
+                          <span style={{ fontSize: 11, color: '#2f3846', fontWeight: 600 }}>평균 주기</span>
                           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
-                            <span style={{ fontSize: 18, fontWeight: 700, color: '#5c5ced', lineHeight: 1 }}>{details.visitData.averageInterval}</span>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: '#0284c7', lineHeight: 1 }}>{details.visitData.averageInterval}</span>
                             <span style={{ fontSize: 9, color: '#64748b', fontWeight: 600, marginLeft: 2 }}>일</span>
                           </div>
                         </div>
-                        <div style={{ background: '#e0e7ff', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
-                          <span style={{ fontSize: 10, color: '#475569', fontWeight: 600 }}>마지막 방문</span>
+                        <div style={{ background: '#0285c72e', borderRadius: 12, padding: '6px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 48 }}>
+                          <span style={{ fontSize: 11, color: '#2f3846', fontWeight: 600 }}>마지막 방문</span>
                           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
-                            <span style={{ fontSize: 18, fontWeight: 700, color: '#14b8a6', lineHeight: 1 }}>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: '#0284c7', lineHeight: 1 }}>
                               {details.visitData.lastVisitDiff === "-" || details.visitData.lastVisitDiff === "오늘" ? "" : "+"}
                               {details.visitData.lastVisitDiff}
                             </span>
@@ -953,7 +1003,7 @@ export default function CustomerInfo() {
                                   style={{
                                     width: 12,
                                     height: (item.height ? item.height * 0.4 : 40),
-                                    backgroundColor: '#5c5ced',
+                                    backgroundColor: '#0284c7',
                                     borderRadius: 4,
                                     marginBottom: -1,
                                     zIndex: 2,
@@ -1077,14 +1127,14 @@ export default function CustomerInfo() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: 12, marginBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{
-                    background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
-                    color: 'white',
-                    fontSize: 9,
-                    fontWeight: 800,
-                    padding: '2px 6px',
-                    borderRadius: 6,
-                    letterSpacing: '0.5px'
-                  }}>AI 제언 상세</span>
+                        background: 'linear-gradient(135deg, #8b5cf6 0%, #2e24ea 100%)',
+                        color: 'white',
+                        fontSize: 12,
+                        fontWeight: 800,
+                        padding: '1px 6px',
+                        borderRadius: 8,
+                        letterSpacing: '0.3px',
+                      }}><span className="ai-news-briefing-badge-icon">🤖</span> AI 인사이트</span>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: 0 }}>
                     {selectedProductModal.productName}
                   </h3>
@@ -1096,7 +1146,7 @@ export default function CustomerInfo() {
                     color: 'white',
                     borderRadius: 4,
                     fontWeight: 700,
-                    fontSize: 10
+                    fontSize: 12
                   }}
                 >
                   {selectedProductModal.status}
@@ -1105,8 +1155,8 @@ export default function CustomerInfo() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>상품 설명</span>
-                  <p style={{ fontSize: 12, color: '#475569', lineHeight: 1.5, margin: 0 }}>
+                  <span style={{ fontSize: 12, color: '#0284c7', fontWeight: 600 }}>상품 설명</span>
+                  <p style={{ fontSize: 13, color: '#3b4450', lineHeight: 1.5, margin: 0 }}>
                     {selectedProductModal.productDesc}
                   </p>
                 </div>
@@ -1119,9 +1169,9 @@ export default function CustomerInfo() {
                   marginTop: 8
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                    <span style={{ fontSize: 9, color: '#8b5cf6', fontWeight: 800, letterSpacing: '0.5px' }}>AI RECOMMENDATION REASON</span>
+                    <span style={{ fontSize: 12, color: '#8b5cf6', fontWeight: 800, letterSpacing: '0.5px' }}>AI RECOMMENDATION REASON</span>
                   </div>
-                  <p style={{ fontSize: 12, color: '#1e1b4b', lineHeight: 1.6, margin: 0, fontWeight: 600 }}>
+                  <p style={{ fontSize: 13, color: '#1e1b4b', lineHeight: 1.6, margin: 0, fontWeight: 600 }}>
                     {selectedProductModal.matchingDesc}
                   </p>
                 </div>
@@ -1134,16 +1184,16 @@ export default function CustomerInfo() {
                   padding: '10px',
                   borderRadius: 8,
                   border: 'none',
-                  background: '#0f172a',
+                  background: '#8b5cf6',
                   color: 'white',
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: 600,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                   boxShadow: '0 4px 6px -1px rgba(15, 23, 42, 0.1)'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.background = '#1e293b'}
-                onMouseOut={(e) => e.currentTarget.style.background = '#0f172a'}
+                onMouseOver={(e) => e.currentTarget.style.background = '#5e25e3'}
+                onMouseOut={(e) => e.currentTarget.style.background = '#8b5cf6'}
               >
                 닫기
               </button>
@@ -1195,14 +1245,14 @@ export default function CustomerInfo() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: 12, marginBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{
-                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-                    color: 'white',
-                    fontSize: 9,
-                    fontWeight: 800,
-                    padding: '2px 6px',
-                    borderRadius: 6,
-                    letterSpacing: '0.5px'
-                  }}>AI 분석</span>
+                        background: 'linear-gradient(135deg, #8b5cf6 0%, #2e24ea 100%)',
+                        color: 'white',
+                        fontSize: 12,
+                        fontWeight: 800,
+                        padding: '1px 6px',
+                        borderRadius: 8,
+                        letterSpacing: '0.3px',
+                      }}><span className="ai-news-briefing-badge-icon">🤖</span> AI 분석</span>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: 0 }}>
                     {selectedCustomer.name} 고객 특징 상세 목록
                   </h3>
@@ -1264,7 +1314,7 @@ export default function CustomerInfo() {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        background: '#f8fafc',
+                        background: '#fafafa',
                         border: '1px solid #e2e8f0',
                         borderRadius: 10,
                         padding: '10px 14px',
@@ -1274,15 +1324,14 @@ export default function CustomerInfo() {
                     >
                       <div
                         style={{
-                          width: 48,
+                          width: 25,
                           height: 22,
                           borderRadius: 4,
-                          background: item.color || '#64748b',
-                          color: 'white',
+                          color: '#713beec9',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: 10,
+                          fontSize: 12,
                           fontWeight: 700
                         }}
                       >

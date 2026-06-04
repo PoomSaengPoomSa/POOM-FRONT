@@ -550,7 +550,7 @@ export default function CounselingAssistant() {
                       width: '160px',
                       justifyContent: 'center',
                       padding: '8px 16px',
-                      fontSize: '12px',
+                      fontSize: '14px',
                       fontWeight: 700,
                       color: activeTab === 'simulator' ? '#8b5cf6' : '#64748b',
                       border: 'none',
@@ -573,12 +573,12 @@ export default function CounselingAssistant() {
                       width: '160px',
                       justifyContent: 'center',
                       padding: '8px 16px',
-                      fontSize: '12px',
+                      fontSize: '14px',
                       fontWeight: 700,
-                      color: activeTab === 'memo' ? '#0284c7' : '#64748b',
+                      color: activeTab === 'memo' ? '#8b5cf6' : '#64748b',
                       border: 'none',
-                      background: activeTab === 'memo' ? '#e0f2fe' : 'transparent',
-                      borderBottom: activeTab === 'memo' ? '2px solid #0284c7' : '2px solid transparent',
+                      background: activeTab === 'memo' ? '#f5f3ff' : 'transparent',
+                      borderBottom: activeTab === 'memo' ? '2px solid #8b5cf6' : '2px solid transparent',
                       borderRadius: '0 6px 0 0',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease-in-out',
@@ -599,8 +599,8 @@ export default function CounselingAssistant() {
                 {/* Section 1: Memo Assistant (Top Workspace) */}
                 {activeTab === "memo" && (
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '4px', height: '14px', background: '#0284c7', borderRadius: '2px', display: 'inline-block' }}></span>
+                  <div style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ width: '4px', height: '17px', background: '#8b5cf6', borderRadius: '2px', display: 'inline-block' }}></span>
                     상담 메모 및 보고서 어시스턴트
                   </div>
                   
@@ -774,17 +774,17 @@ export default function CounselingAssistant() {
                       </div>
                     ) : (
                       /* Memo Input */
-                      <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                        <div className="memo-box-title" style={{ fontSize: '12px', fontWeight: 700 }}>AI 기반 상담 메모 구조화</div>
+                      <div className="memo-box" style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                        <div className="memo-box-title" style={{ fontSize: '15px', fontWeight: 700 }}>AI 기반 상담 메모 구조화</div>
                         <textarea 
                           className="memo-textarea" 
                           placeholder="상담 내용을 이곳에 메모하세요."
                           value={memoText}
                           onChange={(e) => setMemoText(e.target.value)}
-                          style={{ minHeight: '200px', flex: 1, marginBottom: '16px', resize: 'none', fontSize: '12px' }}
+                          style={{ minHeight: '200px', flex: 1, marginBottom: '16px', resize: 'none', fontSize: '13px' }}
                         />
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
-                          <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '11px' }}>
+                          <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '12px' }}>
                             💡 자유롭게 메모하세요. AI가 구조화된 상담 보고서로 변환합니다.
                           </div>
                           <button 
@@ -809,98 +809,93 @@ export default function CounselingAssistant() {
 
                     {/* Right Container (Always Timeline): Timeline History */}
                     <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: '420px' }}>
-                      <div className="memo-box-title" style={{ marginBottom: '20px', fontSize: '13px', fontWeight: 700 }}>이전 상담 타임라인</div>
+                      <div className="memo-box-title" style={{ marginBottom: '20px', fontSize: '15px', fontWeight: 700 }}>이전 상담 타임라인</div>
                       
                       <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
                         {timelineList.length === 0 ? (
-                          <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8', fontSize: '11px', fontWeight: '500' }}>
+                          <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>
                             이전 상담 타임라인 이력이 없습니다.
                           </div>
                         ) : (
                           timelineList.map((item, index) => {
-                            const isExpanded = expandedTimelineId === item.timelineId;
-                            const isLast = index === timelineList.length - 1;
-                            return (
-                              <div 
-                                key={item.timelineId} 
-                                className="timeline-item"
-                                onClick={() => handleTimelineClick(item.timelineId)}
-                                style={{ 
-                                  cursor: 'pointer', 
-                                  background: isExpanded ? '#f0f4f8' : 'transparent',
-                                  padding: isExpanded ? '16px' : '0',
-                                  borderRadius: isExpanded ? '12px' : '0',
-                                  margin: isExpanded ? '0 -16px 20px -16px' : '0 0 20px 0',
-                                  transition: 'all 0.2s ease-in-out'
-                                }}
-                              >
-                                <div className="timeline-dot" style={{ 
-                                  borderColor: isExpanded ? '#f97316 #3b82f6 #3b82f6 #f97316' : '#0284c7',
-                                  borderWidth: '2px',
-                                  color: isExpanded ? '#0f172a' : '#0284c7'
+                          const isExpanded = expandedTimelineId === item.timelineId;
+                          const isLast = index === timelineList.length - 1;
+                          return (
+                            <div key={item.timelineId} style={{ display: 'flex', gap: '16px', marginBottom: '8px' }}>
+                              {/* 왼쪽 dot + line */}
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, width: '32px' }}>
+                                <div style={{
+                                  width: '32px', height: '32px', borderRadius: '50%',
+                                  background: isExpanded ? '#EEEDFE' : 'var(--cust-bg, #f8fafc)',
+                                  border: isExpanded ? '2px solid #7F77DD' : '1.5px solid #e2e8f0',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  flexShrink: 0, zIndex: 1, transition: 'all 0.2s'
                                 }}>
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isExpanded ? '#534AB7' : '#94a3b8'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/>
+                                  </svg>
                                 </div>
                                 {!isLast && (
-                                  <div className="timeline-line" style={{
-                                    left: isExpanded ? '32px' : '16px',
-                                    top: isExpanded ? '48px' : '32px',
-                                    borderLeft: '1px dotted #94a3b8',
-                                    background: 'none',
-                                    width: '0',
-                                    bottom: '-20px'
-                                  }}></div>
+                                  <div style={{ width: '1px', flex: 1, background: '#e2e8f0', margin: '4px 0', minHeight: '16px' }} />
                                 )}
-                                <div className="timeline-content" style={{ paddingLeft: isExpanded ? '8px' : '0' }}>
-                                  <span className="timeline-date">{item.date}</span>
-                                  <span className="timeline-text" style={{ color: isExpanded ? '#0f172a' : '#475569', fontWeight: isExpanded ? '600' : 'normal', fontSize: isExpanded ? '12px' : '11px' }}>
+                              </div>
+
+                              {/* 오른쪽 카드 */}
+                              <div style={{ flex: 1, marginBottom: '8px' }}>
+                                <div
+                                  onClick={() => handleTimelineClick(item.timelineId)}
+                                  style={{
+                                    background: isExpanded ? '#f8f8fc' : 'white',
+                                    border: isExpanded ? '1px solid #a581fb' : '1px solid #e2e8f0',
+                                    borderRadius: '12px',
+                                    padding: '12px 14px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                  }}
+                                >
+                                  {/* 날짜 */}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                                    </svg>
+                                    {item.date}
+                                  </div>
+
+                                  {/* 요약 텍스트 */}
+                                  <div style={{ fontSize: '13px', color: '#080f1a', lineHeight: 1.5, fontWeight: 500 }}>
                                     {item.content?.summary || item.memo}
-                                  </span>
-                                  
+                                  </div>
+
+                                  {/* 펼쳐진 상세 */}
                                   {isExpanded && (
-                                    <div style={{ marginTop: '12px' }}>
-                                      <div style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8b5cf6', fontSize: '11px', fontWeight: '700', marginBottom: '12px' }}>
-                                          AI 요약
-                                        </div>
-                                        {timelineDetails[item.timelineId] ? (
-                                          <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
-                                            <tbody>
-                                              <tr>
-                                                <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>주요 내용</td>
-                                                <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600', whiteSpace: 'pre-wrap' }}>
-                                                  {timelineDetails[item.timelineId].content.main_content || "-"}
-                                                </td>
-                                              </tr>
-                                              <tr>
-                                                <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>특이사항</td>
-                                                <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600', whiteSpace: 'pre-wrap' }}>
-                                                  {timelineDetails[item.timelineId].content.special_remarks || "-"}
-                                                </td>
-                                              </tr>
-                                              <tr>
-                                                <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>후속 조치</td>
-                                                <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600', whiteSpace: 'pre-wrap' }}>
-                                                  {timelineDetails[item.timelineId].content.follow_up || "-"}
-                                                </td>
-                                              </tr>
-                                              <tr>
-                                                <td style={{ color: '#64748b', fontWeight: '600', paddingBottom: '8px', width: '80px', verticalAlign: 'top' }}>요약</td>
-                                                <td style={{ color: '#334155', paddingBottom: '8px', verticalAlign: 'top', fontWeight: '600', whiteSpace: 'pre-wrap' }}>
-                                                  {timelineDetails[item.timelineId].content.summary || "-"}
-                                                </td>
-                                              </tr>
-                                            </tbody>
-                                          </table>
-                                        ) : (
-                                          <div style={{ fontSize: '13px', color: '#94a3b8' }}>로딩중...</div>
-                                        )}
-                                      </div>
+                                    <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #AFA9EC', display: 'flex', flexDirection: 'column', gap: '8px', background: 'white', borderRadius: '8px', padding: '12px 14px', margin: '12px -2px -2px -2px' }}>
+
+                                      {timelineDetails[item.timelineId] ? (
+                                        [
+                                          { label: '주요 내용', key: 'main_content' },
+                                          { label: '특이사항', key: 'special_remarks' },
+                                          { label: '후속 조치', key: 'follow_up' },
+                                          { label: '요약', key: 'summary' },
+                                        ].map(({ label, key }) => (
+                                          timelineDetails[item.timelineId].content[key] ? (
+                                            <div key={key} style={{ display: 'flex', gap: '12px'}}>
+                                              <span style={{ fontSize: '12px', color: '#534AB7', fontWeight: 600, minWidth: '56px', paddingTop: '1px' }}>{label}</span>
+                                              <span style={{ fontSize: '13px', color: '#2b1f45', lineHeight: 1.5, flex: 1, whiteSpace: 'pre-wrap' }}>
+                                                {timelineDetails[item.timelineId].content[key]}
+                                              </span>
+                                            </div>
+                                          ) : null
+                                        ))
+                                      ) : (
+                                        <div style={{ fontSize: '13px', color: '#94a3b8' }}>로딩중...</div>
+                                      )}
                                     </div>
                                   )}
                                 </div>
                               </div>
-                            );
-                          })
+                            </div>
+                          );
+                        })
                         )}
                       </div>
                     </div>
@@ -911,8 +906,8 @@ export default function CounselingAssistant() {
                 {/* Section 2: Simulator (Bottom Workspace) */}
                 {activeTab === "simulator" && (
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '4px', height: '14px', background: '#8b5cf6', borderRadius: '2px', display: 'inline-block' }}></span>
+                    <div style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ width: '4px', height: '17px', background: '#8b5cf6', borderRadius: '2px', display: 'inline-block' }}></span>
                     자산 시뮬레이터 및 AI 질의응답
                   </div>
                   
@@ -921,8 +916,8 @@ export default function CounselingAssistant() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minHeight: 0 }}>
                       
                       {/* Single Integrated Container */}
-                      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto' }}>
-                        <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '12px', marginTop: 0 }}>고객 정보 & AI 인사이트</h3>
+                      <div style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                        <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', marginBottom: '12px', marginTop: 0 }}>고객 정보 & AI 인사이트</h3>
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
@@ -955,24 +950,32 @@ export default function CounselingAssistant() {
                           {/* Premium AI Insight Glow Card */}
                           <div className="ai-insight-glow-card" style={{ marginTop: '16px' }}>
                             <div className="ai-insight-header">
-                              <span className="ai-badge-gradient" style={{ fontSize: '9px' }}>AI INSIGHT</span>
-                              <span style={{ fontSize: '10px', color: '#8b5cf6', fontWeight: 800 }}>금융 라이프스타일 분석</span>
+                              <span className="ai-badge-gradient" style={{
+                              background: 'linear-gradient(135deg, #8b5cf6 0%, #2e24ea 100%)',
+                              color: 'white',
+                              fontSize: 12,
+                              fontWeight: 800,
+                              padding: '1px 6px',
+                              borderRadius: 8,
+                              letterSpacing: '0.3px',
+                            }}>AI INSIGHT</span>
+                              <span style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: 800 }}>금융 라이프스타일 분석</span>
                             </div>
-                            <div className="ai-insight-body" style={{ fontSize: '11px' }}>
+                            <div className="ai-insight-body" style={{ fontSize: '12px' }}>
                               {selectedSimDetails.insight}
                             </div>
                           </div>
 
                         {/* Additional Notes Integrated at the bottom */}
                         <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px', gap: '8px' }}>
-                          <span style={{ color: '#475569', fontSize: '12px', fontWeight: 700 }}>추가 입력 사항</span>
+                          <span style={{ color: '#475569', fontSize: '15px', fontWeight: 700 }}>추가 입력 사항</span>
                           <textarea
                             style={{ 
                               width: '100%', 
                               border: '1px solid #cbd5e1', 
                               borderRadius: '8px', 
                               padding: '10px 12px', 
-                              fontSize: '11px', 
+                              fontSize: '13px', 
                               color: '#334155', 
                               resize: 'none',
                               outline: 'none',
@@ -1062,7 +1065,7 @@ export default function CounselingAssistant() {
                             padding: '24px',
                             boxSizing: 'border-box'
                           }}>
-                            <p style={{ fontSize: '13px', fontWeight: 600, color: '#475569', lineHeight: '1.6', marginBottom: '12px' }}>
+                            <p style={{ fontSize: '14px', fontWeight: 600, color: '#475569', lineHeight: '1.6', marginBottom: '12px' }}>
                               PB님, 위쪽에서 추가 입력 사항을 저장한 후,<br />
                               상담 지원용 시뮬레이션 질문을 입력해보세요.
                             </p>
@@ -1104,7 +1107,7 @@ export default function CounselingAssistant() {
                               color: '#64748b',
                               padding: '10px 14px', 
                               borderRadius: '12px 12px 12px 2px',
-                              fontSize: '11px',
+                              fontSize: '13px',
                               fontWeight: 500,
                               display: 'flex',
                               alignItems: 'center',
@@ -1157,7 +1160,7 @@ export default function CounselingAssistant() {
                           <button 
                             onClick={() => handleSendQuestion()}
                             style={{ 
-                              background: '#0f172a', 
+                              background: '#0284c7', 
                               color: 'white', 
                               width: '32px', 
                               height: '32px', 

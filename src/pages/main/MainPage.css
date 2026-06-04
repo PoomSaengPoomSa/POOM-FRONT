@@ -2471,7 +2471,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   padding-right: 2px;
   scrollbar-width: thin;
 }
