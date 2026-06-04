@@ -321,9 +321,9 @@ export default function EconomicIndicatorArchive() {
                 <div style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.6, padding: '10px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
                   {isLoading ? (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
-                  ) : reportData?.content ? (
+                  ) : reportData?.summary ? (
                     <div style={{ margin: 0 }}>
-                      {renderPreviewMarkdown(reportData.content)}
+                      {renderMarkdown(reportData.summary)}
                     </div>
                   ) : (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>분석 보고서가 존재하지 않습니다.</div>
@@ -480,9 +480,9 @@ export default function EconomicIndicatorArchive() {
                 <div style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.6, padding: '10px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
                   {isLoading ? (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
-                  ) : reportData?.content ? (
+                  ) : reportData?.summary ? (
                     <div style={{ margin: 0 }}>
-                      {renderPreviewMarkdown(reportData.content)}
+                      {renderMarkdown(reportData.summary)}
                     </div>
                   ) : (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>분석 보고서가 존재하지 않습니다.</div>
@@ -647,9 +647,9 @@ export default function EconomicIndicatorArchive() {
                 <div style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.6, padding: '10px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
                   {isLoading ? (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
-                  ) : reportData?.content ? (
+                  ) : reportData?.summary ? (
                     <div style={{ margin: 0 }}>
-                      {renderPreviewMarkdown(reportData.content)}
+                      {renderMarkdown(reportData.summary)}
                     </div>
                   ) : (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>분석 보고서가 존재하지 않습니다.</div>
