@@ -749,7 +749,7 @@ export default function MainPage() {
       if (c.avatarType === "risk" && c.grade === "주의") continue;
       if (!seen.has(c.id)) { seen.add(c.id); result.push(c); }
     }
-    return result;
+    return result.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
   }, [todayVisitors, churnRiskCustomers]);
 
   const renderDailyTimeline = () => (
@@ -943,7 +943,7 @@ export default function MainPage() {
             <div className={`bottom-card key-customers-card-new ${expandedCustomerId ? "has-expanded" : ""}`}>
               <div className="bottom-card-header">
                 <h2 className="bottom-card-title">AI 주요 고객 관리</h2>
-                <Link to="/customer-management-registration-1" className="btn-all-customers">전체 보기</Link>
+                <Link to="/customer-info" className="btn-all-customers">전체 보기</Link>
               </div>
               <div className="customers-pill-list-wrap">
                 {loadingCustomers ? <div className="customers-loading">고객 분석을 로드하는 중입니다...</div> : (
@@ -984,7 +984,7 @@ export default function MainPage() {
                       </div>
                     </div>
                     <div className="header-right">
-                      <button className="btn-go-profile" onClick={() => navigate(`/customer-management-registration-1?c_id=${expandedCustomerId}`)}>
+                      <button className="btn-go-profile" onClick={() => navigate(`/customer-info?c_id=${expandedCustomerId}`)}>
                         상세 프로필 <ChevronRight size={14} style={{ marginLeft: "2px" }} />
                       </button>
                       <button className="btn-close-panel" onClick={() => { setExpandedCustomerId(null); setExpandedCustomerDetails(null); }}>
@@ -1273,7 +1273,7 @@ export default function MainPage() {
                       <h4 className="section-title">추천 적합 고객</h4>
                       <div className="suitable-customers-list">
                         {selectedProductDetail.suitable_customers.map((cust) => (
-                          <div key={cust.c_id} className="suitable-customer-pill" onClick={() => { setIsProductModalOpen(false); navigate(`/customer-management-registration-1?c_id=${cust.c_id}`); }}>
+                          <div key={cust.c_id} className="suitable-customer-pill" onClick={() => { setIsProductModalOpen(false); navigate(`/customer-info?c_id=${cust.c_id}`); }}>
                             <span className="cust-name">{cust.name}</span><span className="cust-grade">{cust.grade}</span>
                           </div>
                         ))}
@@ -1296,7 +1296,7 @@ export default function MainPage() {
                 <h2 className="briefing-modal-title" style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', margin: '0' }}>{selectedBriefing ? selectedBriefing.content : "방문 예정 브리핑"}</h2>
                 {selectedBriefing?.c_id && (
                   <button 
-                    onClick={() => { setIsBriefingOpen(false); setSelectedBriefing(null); navigate(`/customer-management-registration-1?c_id=${selectedBriefing.c_id}`); }}
+                    onClick={() => { setIsBriefingOpen(false); setSelectedBriefing(null); navigate(`/customer-info?c_id=${selectedBriefing.c_id}`); }}
                     style={{ marginLeft: '12px', padding: '4px 10px', fontSize: '11px', fontWeight: '600', color: 'white', backgroundColor: '#0284c7', border: 'none', borderRadius: '4px', cursor: 'pointer', transition: 'background-color 0.2s' }}
                     onMouseOver={(e) => e.target.style.backgroundColor = '#0369a1'} onMouseOut={(e) => e.target.style.backgroundColor = '#0284c7'}
                   >

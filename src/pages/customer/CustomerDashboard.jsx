@@ -52,6 +52,7 @@ export default function CustomerDashboard() {
           time: c.c_id % 2 === 0 ? "10:00 AM" : "14:30 PM",
         };
       });
+      mapped.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
       setCustomersList(mapped);
       if (mapped.length > 0) {
         setSelectedCustomerId(mapped[0].id);
@@ -244,7 +245,7 @@ export default function CustomerDashboard() {
           </div>
 
           <div className="cust-list-tabs">
-            <Link to="/customer-management-registration-1" style={{ textDecoration: "none", color: "inherit", flex: 1 }}><div className="cust-list-tab">전체 고객</div></Link>
+            <Link to="/customer-info" style={{ textDecoration: "none", color: "inherit", flex: 1 }}><div className="cust-list-tab">전체 고객</div></Link>
             <div className="cust-list-tab active">오늘 방문</div>
           </div>
 

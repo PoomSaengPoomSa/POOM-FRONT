@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, Calendar as CalendarIcon, Search } from "lucide-react";
-import "./CalendarNew.css";
+import "./Calendar.css";
 import MiniCalendarPicker from "./MiniCalendarPicker";
 import { useCalendar } from "./CalendarContext";
 

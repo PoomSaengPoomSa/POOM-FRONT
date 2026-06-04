@@ -2,35 +2,25 @@ import { Navigate, Route, Routes, Outlet } from "react-router-dom";
 
 import AppLayout from "../layouts/AppLayout.jsx";
 
-import AuthPage from "../pages/auth/AuthPage.jsx";
-import SignUpPage from "../pages/auth/SignUpPage.jsx";
 
-
-import ProfilePage from "../pages/profile/ProfilePage.jsx";
-import EconomyPage from "../pages/economy/EconomyPage.jsx";
-import MemoPage from "../pages/memo/MemoPage.jsx";
 
 // New Admin Dashboards
 import AdminSystemDashboard from "../pages/admin/AdminSystemDashboard.jsx";
 import AdminEmployeeDashboard from "../pages/admin/AdminEmployeeDashboard.jsx";
 import AdminPermissionSettings from "../pages/admin/AdminPermissionSettings.jsx";
 
-// New News Bucket Page
-import NotificationMessageDraft from "../pages/news/NotificationMessageDraft.jsx";
+
 
 // Phase 2: Auth and Calendar New Pages
-import SignUpNew from "../pages/auth/SignUpNew.jsx";
-import LoginNew from "../pages/auth/LoginNew.jsx";
+import SignUpPage from "../pages/auth/SignUpPage.jsx";
+import LoginPage from "../pages/auth/LoginPage.jsx";
 
 import MainPage from "../pages/main/MainPage.jsx";
 
 // Phase 3: Customer Management and News Bucket Pages
-import CustomerNotifications from "../pages/news/CustomerNotifications.jsx";
-import CustomerRegistration1 from "../pages/customer/CustomerRegistration1.jsx";
-import CustomerRegistration2 from "../pages/customer/CustomerRegistration2.jsx";
-import CustomerMemoAssistant from "../pages/customer/CustomerMemoAssistant.jsx";
-import CustomerVisitBriefing from "../pages/customer/CustomerVisitBriefing.jsx";
-import CustomerProfile from "../pages/customer/CustomerProfile.jsx";
+import NotificationCenter from "../pages/notification/NotificationCenter.jsx";
+import CustomerInfo from "../pages/customer/CustomerInfo.jsx";
+import CounselingAssistant from "../pages/assistant/CounselingAssistant.jsx";
 import CustomerDashboard from "../pages/customer/CustomerDashboard.jsx";
 
 // Phase 4: Calendar (Day) and Trend Archives
@@ -39,38 +29,27 @@ import TrendArchive from "../pages/trend/TrendArchive.jsx";
 import EconomicIndicatorArchive from "../pages/trend/EconomicIndicatorArchive.jsx";
 import EconomicIndicatorLlmReport from "../pages/trend/EconomicIndicatorLlmReport.jsx";
 import NewsArchive from "../pages/trend/NewsArchive.jsx";
-import NewsArchiveDetails from "../pages/trend/NewsArchiveDetails.jsx";
-
-// Phase 6: Settings
-import SettingsPage from "../pages/settings/SettingsPage.jsx";
 
 export default function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
 
-      <Route path="/auth" element={<AuthPage />} />
-      <Route path="/auth/signup" element={<SignUpPage />} />
-
       {/* Phase 2 Auth Routes */}
-      <Route path="/sign-up" element={<SignUpNew />} />
-      <Route path="/login" element={<LoginNew />} />
+      <Route path="/sign-up" element={<SignUpPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/login-pb" element={<Navigate to="/login" replace />} />
       <Route path="/login-developer" element={<Navigate to="/login" replace />} />
 
       <Route element={<AppLayout />}>
 
-        <Route path="/calendar" element={<Navigate to="/monthly-calendar" replace />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/economy" element={<EconomyPage />} />
-        <Route path="/memo" element={<MemoPage />} />
+        <Route path="/calendar" element={<Navigate to="/main" replace />} />
         <Route path="/admin" element={<AdminPermissionSettings />} />
         
         {/* New Routes */}
         <Route path="/admin-system-dashboard" element={<AdminSystemDashboard />} />
         <Route path="/admin-employee-dashboard" element={<AdminEmployeeDashboard />} />
         <Route path="/admin-permission-settings" element={<AdminPermissionSettings />} />
-        <Route path="/notification-message-draft" element={<NotificationMessageDraft />} />
         
         {/* Phase 2 Calendar Routes */}
         <Route element={<CalendarProvider><Outlet /></CalendarProvider>}>
@@ -78,12 +57,9 @@ export default function AppRouter() {
         </Route>
 
         {/* Phase 3 & 5 Customer Management Routes */}
-        <Route path="/notifications" element={<CustomerNotifications />} />
-        <Route path="/customer-management-registration-1" element={<CustomerRegistration1 />} />
-        <Route path="/customer-management-registration-2" element={<CustomerRegistration2 />} />
-        <Route path="/customer-management-memo-assistant" element={<CustomerMemoAssistant />} />
-        <Route path="/customer-management-visit-briefing" element={<CustomerVisitBriefing />} />
-        <Route path="/customer-management-profile" element={<CustomerProfile />} />
+        <Route path="/notifications" element={<NotificationCenter />} />
+        <Route path="/customer-info" element={<CustomerInfo />} />
+        <Route path="/counseling-assistant" element={<CounselingAssistant />} />
         <Route path="/customer-management-dashboard" element={<CustomerDashboard />} />
 
         {/* Phase 4 & 5 Trend Routes */}
@@ -91,10 +67,6 @@ export default function AppRouter() {
         <Route path="/economic-indicator-archive" element={<EconomicIndicatorArchive />} />
         <Route path="/economic-indicator-archive-llm-report" element={<EconomicIndicatorLlmReport />} />
         <Route path="/news-archive" element={<NewsArchive />} />
-        <Route path="/news-archive-details" element={<NewsArchiveDetails />} />
-
-        {/* Phase 6 Settings */}
-        <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
       <Route
