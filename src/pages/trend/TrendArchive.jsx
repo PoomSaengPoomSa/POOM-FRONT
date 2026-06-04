@@ -50,8 +50,8 @@ export default function TrendArchive() {
 
     api.trend.getNewsDetail(item.id)
       .then(detail => {
-        const categoryMap = { "경제": "경제", "정치": "정치", "사회": "사회", economy: "경제", politics: "정치", it: "사회", itScience: "사회", "IT/과학": "사회" };
-        const colorMap = { "경제": "green", "정치": "pink", "사회": "blue", economy: "green", politics: "pink", it: "blue", itScience: "blue", "IT/과학": "blue" };
+        const categoryMap = { "경제": "경제", "정치": "정치", "국제": "국제", "사회": "국제", economy: "경제", politics: "정치", international: "국제", it: "국제", itScience: "국제", "IT/과학": "국제" };
+        const colorMap = { "경제": "green", "정치": "pink", "국제": "blue", "사회": "blue", economy: "green", politics: "pink", international: "blue", it: "blue", itScience: "blue", "IT/과학": "blue" };
 
         setSelectedNewsItem({
           title: detail.title,
@@ -68,7 +68,7 @@ export default function TrendArchive() {
       });
   };
 
-  const newsItems = dashboardData?.news || { economy: [], politics: [], itScience: [], it: [] };
+  const newsItems = dashboardData?.news || { economy: [], politics: [], international: [], itScience: [], it: [] };
   const indicators = dashboardData?.indicators || null;
 
   const goldProbRise = indicators?.gold?.probRise ?? null;
@@ -343,21 +343,21 @@ export default function TrendArchive() {
                     정치
                   </button>
                   <button 
-                    onClick={() => setActiveBriefingTab("itScience")}
+                    onClick={() => setActiveBriefingTab("international")}
                     style={{ 
                       border: 'none', 
-                      background: activeBriefingTab === 'itScience' ? '#ffffff' : 'transparent',
-                      color: activeBriefingTab === 'itScience' ? '#0284c7' : '#64748b',
+                      background: activeBriefingTab === 'international' ? '#ffffff' : 'transparent',
+                      color: activeBriefingTab === 'international' ? '#0284c7' : '#64748b',
                       fontSize: 12, 
-                      fontWeight: activeBriefingTab === 'itScience' ? 700 : 600,
+                      fontWeight: activeBriefingTab === 'international' ? 700 : 600,
                       padding: '5px 12px',
                       borderRadius: 8,
                       cursor: 'pointer',
-                      boxShadow: activeBriefingTab === 'itScience' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+                      boxShadow: activeBriefingTab === 'international' ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
                       transition: 'all 0.2s ease'
                     }}
                   >
-                    사회
+                    국제
                   </button>
                 </div>
               </div>
@@ -396,11 +396,11 @@ export default function TrendArchive() {
                   )}
                 </div>
                 <div className="trend-news-col">
-                  <div className="trend-news-col-title">사회 <ChevronDown size={16} color="#cbd5e1" /></div>
-                  {(newsItems.itScience || newsItems.it).length === 0 ? (
+                  <div className="trend-news-col-title">국제 <ChevronDown size={16} color="#cbd5e1" /></div>
+                  {(newsItems.international || newsItems.itScience || newsItems.it).length === 0 ? (
                     <div style={{ fontSize: 12, color: '#94a3b8', padding: '8px 0' }}>최신 뉴스가 없습니다.</div>
                   ) : (
-                    (newsItems.itScience || newsItems.it).slice(0, 3).map((item, i) => (
+                    (newsItems.international || newsItems.itScience || newsItems.it).slice(0, 3).map((item, i) => (
                       <div key={i} className="trend-news-item" onClick={() => handleNewsClick(item)} style={{ cursor: 'pointer' }}>{item.title}</div>
                     ))
                   )}
