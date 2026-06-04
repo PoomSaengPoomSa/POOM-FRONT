@@ -53,7 +53,7 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
 
   if (churnRisk && churnRisk.grade) {
     riskLabel = churnRisk.grade;
-    riskLLMInsight = churnRisk.reason || "이탈 위험 수준에 대한 분석이 완료되었습니다. 제공된 사유를 참고해 주세요.";
+    riskLLMInsight = churnRisk.explain_reason || churnRisk.reason || "이탈 위험 수준에 대한 분석이 완료되었습니다. 제공된 사유를 참고해 주세요.";
     if (churnRisk.grade === "주의") {
       riskLevel = "보통";
       riskDesc = "이탈 위험이 보통입니다";
