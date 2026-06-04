@@ -119,6 +119,21 @@ export default function CounselingAssistant() {
             ...prev,
             [selectedCustomerId]: res.additional_notes || ""
           }));
+          if (res.history && res.history.length > 0) {
+            const mappedHistory = res.history.map(item => ({
+              sender: item.role === 'user' ? 'user' : 'ai',
+              text: item.content
+            }));
+            setChatMessages(prev => ({
+              ...prev,
+              [selectedCustomerId]: mappedHistory
+            }));
+          } else {
+            setChatMessages(prev => ({
+              ...prev,
+              [selectedCustomerId]: []
+            }));
+          }
         }
       } catch (error) {
         console.error("시뮬레이터 정보 조회 실패:", error);
@@ -349,6 +364,10 @@ export default function CounselingAssistant() {
         additional_notes: notes
       });
       setSimulatorSaved(true);
+      setChatMessages(prev => ({
+        ...prev,
+        [selectedCustomerId]: []
+      }));
       setShowNotesSaveToast(true);
       setTimeout(() => setShowNotesSaveToast(false), 2000);
     } catch (error) {
