@@ -15,6 +15,7 @@
 
 .trend-container {
   display: flex;
+  width: 100%;
   height: 100vh;
   overflow: hidden;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
@@ -73,6 +74,7 @@
 /* Main Content Area */
 .trend-main {
   flex: 1;
+  min-width: 0;
   padding: 12px 24px;
   position: relative;
   display: flex;
@@ -99,6 +101,7 @@
   box-shadow: var(--trend-panel-shadow);
   border: 1px solid var(--trend-glass-border);
   margin-bottom: 20px;
+  width: 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
