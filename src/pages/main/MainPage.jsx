@@ -363,6 +363,7 @@ export default function MainPage() {
     events, selectedDate, setSelectedDate, allAiTodos, toast, showToast,
     personalKpi, branchKpi, seasonalProducts, deleteEvent, updateEvent,
     fetchKpiData, fetchCalendarData, ignoredAiTodoIds, handleIgnoreAiTodo,
+    revertAiTodo,
   } = useCalendar();
 
   const [activeKpiTab, setActiveKpiTab] = useState("personal");
@@ -767,12 +768,24 @@ export default function MainPage() {
               key={item.id}
               item={item}
               isCompleted={isCompleted}
-              onToggle={(id) => setCompletedMyTodos(prev => {
-                const next = new Set(prev);
-                if (next.has(id)) next.delete(id);
-                else next.add(id);
-                return next;
-              })}
+              onToggle={(id) => {
+                const targetEvent = events.find(e => e.id === id);
+                const isConvertedAi = targetEvent && targetEvent.at_id && targetEvent.at_id !== "None" && targetEvent.at_id !== "null" && targetEvent.at_id !== 0;
+                if (isConvertedAi) {
+                  showConfirm(
+                    "일정 승인 취소",
+                    `'${targetEvent.title}' 일정을 취소하고 AI To Do 목록으로 복원하시겠습니까?`,
+                    () => revertAiTodo(id)
+                  );
+                } else {
+                  setCompletedMyTodos(prev => {
+                    const next = new Set(prev);
+                    if (next.has(id)) next.delete(id);
+                    else next.add(id);
+                    return next;
+                  });
+                }
+              }}
               onDelete={(data) => showConfirm("일정 삭제", `'${data.title}' 일정을 정말로 삭제하시겠습니까?`, () => deleteEvent(data.id))}
               onShowDetail={handleShowScheduleDetail}
               onIgnoreAi={(data) => showConfirm("추천 일정 숨기기", `'${data.content}' 추천 일정을 숨기시겠습니까?`, () => handleIgnoreAiTodo(data.id))}
