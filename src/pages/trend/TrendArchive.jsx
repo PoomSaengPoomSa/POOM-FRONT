@@ -51,7 +51,7 @@ export default function TrendArchive() {
     api.trend.getNewsDetail(item.id)
       .then(detail => {
         const categoryMap = { "경제": "경제", "정치": "정치", "국제": "국제", "사회": "국제", economy: "경제", politics: "정치", international: "국제", it: "국제", itScience: "국제", "IT/과학": "국제" };
-        const colorMap = { "경제": "green", "정치": "pink", "국제": "blue", "사회": "blue", economy: "green", politics: "pink", international: "blue", it: "blue", itScience: "blue", "IT/과학": "blue" };
+        const colorMap = { "경제": "green", "정치": "purple", "국제": "blue", "사회": "blue", economy: "green", politics: "purple", international: "blue", it: "blue", itScience: "blue", "IT/과학": "blue" };
 
         setSelectedNewsItem({
           title: detail.title,
@@ -92,7 +92,7 @@ export default function TrendArchive() {
           <Link to="/economic-indicator-archive" style={{ textDecoration: 'none' }}>
             <h2 className="trend-section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>경제지표 아카이브</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#0ea5e9', fontWeight: 600, background: '#f0f9ff', padding: '6px 12px', borderRadius: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#0284c7', fontWeight: 600, background: '#f0f9ff', padding: '6px 12px', borderRadius: 20 }}>
                 자세히 보기 <ChevronRight size={16} />
               </div>
             </h2>
@@ -136,7 +136,7 @@ export default function TrendArchive() {
                     <span className="indicator-name-sub">Gold Price</span>
                   </div>
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: goldProbRise > goldProbFall ? '#ef4444' : '#3b82f6', marginTop: 'auto', marginBottom: 2 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: goldProbRise > goldProbFall ? '#ef4444' : '#0284c7', marginTop: 'auto', marginBottom: 2 }}>
                   예측: {goldPredText}
                 </div>
               </div>
@@ -196,14 +196,14 @@ export default function TrendArchive() {
               <div className="indicator-card-right" style={{ justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 1 }}>
                 <span className="indicator-predict-label">다음달 예측</span>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: 'auto', marginBottom: 2 }}>
-                  <span style={{ fontSize: 24, fontWeight: 800, color: '#2563eb', fontFamily: "'Inter', sans-serif", lineHeight: 1.1 }}>
+                  <span style={{ fontSize: 24, fontWeight: 800, color: '#0284c7', fontFamily: "'Inter', sans-serif", lineHeight: 1.1 }}>
                     {isLoading ? "..." : (indicators?.realEstate?.tomorrow ?? "-")}
                   </span>
                   {!isLoading && indicators?.realEstate && indicators.realEstate.changeRate !== undefined && (
                     <span style={{ 
                       fontSize: 11, 
                       fontWeight: 700, 
-                      color: indicators.realEstate.changeDirection === 'up' ? '#ef4444' : '#3b82f6',
+                      color: indicators.realEstate.changeDirection === 'up' ? '#ef4444' : '#0284c7',
                       marginTop: 2 
                     }}>
                       {indicators.realEstate.changeDirection === 'up' ? '▲ +' : '▼ -'}
@@ -223,9 +223,9 @@ export default function TrendArchive() {
                 opacity: 0.35, 
                 pointerEvents: 'none' 
               }}>
-                <svg viewBox="0 0 100 35" style={{ width: '100%', height: '100%', fill: 'none', stroke: '#3b82f6', strokeWidth: 2 }}>
+                <svg viewBox="0 0 100 35" style={{ width: '100%', height: '100%', fill: 'none', stroke: '#0284c7', strokeWidth: 2 }}>
                   <path d="M 0 25 Q 20 28 40 20 T 70 24 T 100 15" />
-                  <circle cx="100" cy="15" r="3" fill="#3b82f6" />
+                  <circle cx="100" cy="15" r="3" fill="#0284c7" />
                 </svg>
               </div>
             </div>
@@ -251,9 +251,9 @@ export default function TrendArchive() {
                 <div style={{ display: 'flex', alignItems: 'center', fontSize: 11, width: '100%' }}>
                   <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 28 }}>인하</span>
                   <div style={{ flex: 1, height: 6, background: '#f1f5f9', borderRadius: 3, margin: '0 8px', overflow: 'hidden' }}>
-                    <div style={{ width: `${brProbCut ?? 0}%`, height: '100%', background: '#3b82f6', borderRadius: 3 }}></div>
+                    <div style={{ width: `${brProbCut ?? 0}%`, height: '100%', background: '#0284c7', borderRadius: 3 }}></div>
                   </div>
-                  <span style={{ fontWeight: 700, color: '#3b82f6', width: 28, textAlign: 'right' }}>
+                  <span style={{ fontWeight: 700, color: '#0284c7', width: 28, textAlign: 'right' }}>
                     {brProbCut !== null && brProbCut !== undefined ? `${brProbCut}%` : "-"}
                   </span>
                 </div>
@@ -287,7 +287,7 @@ export default function TrendArchive() {
           <Link to="/news-archive" style={{ textDecoration: 'none' }}>
             <h2 className="trend-section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>뉴스 아카이브</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#0ea5e9', fontWeight: 600, background: '#f0f9ff', padding: '6px 12px', borderRadius: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#0284c7', fontWeight: 600, background: '#f0f9ff', padding: '6px 12px', borderRadius: 20 }}>
                 자세히 보기 <ChevronRight size={16} />
               </div>
             </h2>

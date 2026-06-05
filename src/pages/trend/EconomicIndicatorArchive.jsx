@@ -376,7 +376,7 @@ export default function EconomicIndicatorArchive() {
                       <button 
                         onClick={() => setIsModalOpen(true)}
                         style={{
-                          background: '#0ea5e9',
+                          background: '#0284c7',
                           color: 'white',
                           border: 'none',
                           fontSize: '11px',
@@ -395,7 +395,7 @@ export default function EconomicIndicatorArchive() {
                           e.currentTarget.style.transform = 'translateY(-0.5px)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = '#0ea5e9';
+                          e.currentTarget.style.background = '#0284c7';
                           e.currentTarget.style.transform = 'translateY(0)';
                         }}
                       >
