@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { X, Calendar as CalendarIcon, Search } from "lucide-react";
 import "./Calendar.css";
 import MiniCalendarPicker from "./MiniCalendarPicker";
 import { useCalendar } from "./CalendarContext";
+import { api } from "../../api";
 
 export default function ScheduleRegistrationModal({ isOpen, onClose, editEvent }) {
   const { addEvent, events, updateEvent } = useCalendar();
@@ -19,9 +20,22 @@ export default function ScheduleRegistrationModal({ isOpen, onClose, editEvent }
   const [errors, setErrors] = useState({ title: false, startDate: false, startTime: false, endDate: false, endTime: false });
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+  const [allCustomers, setAllCustomers] = useState([]);
+  const [hoveredCustomerId, setHoveredCustomerId] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
+      // PB가 담당하는 고객 목록 로드 (api.customer.getList("all")은 u_id가 관리하는 c_id만 필터링하여 반환함)
+      const fetchCustomers = async () => {
+        try {
+          const list = await api.customer.getList("all");
+          setAllCustomers(list || []);
+        } catch (e) {
+          console.error("고객 목록 조회 실패:", e);
+        }
+      };
+      fetchCustomers();
+
       if (editEvent) {
         setTitle(editEvent.title || "");
         setCategory(editEvent.category || "상담");
@@ -101,6 +115,18 @@ export default function ScheduleRegistrationModal({ isOpen, onClose, editEvent }
       }
     }
   }, [isOpen, editEvent]);
+
+  // 검색 창 입력에 따른 필터링된 고객 목록 계산
+  const filteredCustomers = useMemo(() => {
+    if (!customer.trim()) return [];
+    const term = customer.toLowerCase();
+    return allCustomers.filter(c => 
+      c.name !== customer && (
+        c.name.toLowerCase().includes(term) || 
+        c.phone.replace(/-/g, '').includes(term.replace(/-/g, ''))
+      )
+    );
+  }, [customer, allCustomers]);
 
   const handleDateSelect = (date, setter, isEnd = false) => {
     const yyyy = date.getFullYear();
@@ -252,6 +278,7 @@ export default function ScheduleRegistrationModal({ isOpen, onClose, editEvent }
                 <CalendarIcon size={16} className="cal-input-icon" style={{ cursor: 'pointer' }} onClick={() => setShowStartPicker(!showStartPicker)} />
                 {showStartPicker && (
                   <MiniCalendarPicker 
+                    defaultDate={startDate}
                     onSelect={(d) => { handleDateSelect(d, setStartDate, false); setShowStartPicker(false); if (errors.startDate) setErrors({ ...errors, startDate: false }); }} 
                     onClose={() => setShowStartPicker(false)} 
                   />
@@ -276,6 +303,7 @@ export default function ScheduleRegistrationModal({ isOpen, onClose, editEvent }
                 {showEndPicker && (
                   <MiniCalendarPicker 
                     alignRight={true}
+                    defaultDate={endDate}
                     onSelect={(d) => { handleDateSelect(d, setEndDate, true); setShowEndPicker(false); if (errors.endDate) setErrors({ ...errors, endDate: false }); }} 
                     onClose={() => setShowEndPicker(false)} 
                   />
@@ -327,12 +355,51 @@ export default function ScheduleRegistrationModal({ isOpen, onClose, editEvent }
 
           <div className="cal-form-section-title" style={{ marginTop: 24 }}>고객 정보</div>
 
-          <div className="cal-form-group">
+          <div className="cal-form-group" style={{ position: 'relative' }}>
             <label className="cal-form-label">고객 선택</label>
-            <div className="cal-input-icon-wrap">
+            <div className="cal-input-icon-wrap" style={{ position: 'relative' }}>
               <input type="text" className="cal-form-input" placeholder="고객명 또는 연락처 검색" value={customer} onChange={(e) => setCustomer(e.target.value)} />
               <Search size={16} className="cal-input-icon search" />
             </div>
+            {filteredCustomers.length > 0 && (
+              <div className="cal-customer-dropdown" style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                zIndex: 10,
+                background: 'white',
+                border: '1px solid #cbd5e1',
+                borderRadius: '6px',
+                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                maxHeight: '150px',
+                overflowY: 'auto',
+                marginTop: '4px'
+              }}>
+                {filteredCustomers.map(c => (
+                  <div 
+                    key={c.c_id}
+                    onClick={() => {
+                      setCustomer(c.name);
+                    }}
+                    onMouseEnter={() => setHoveredCustomerId(c.c_id)}
+                    onMouseLeave={() => setHoveredCustomerId(null)}
+                    style={{
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #f1f5f9',
+                      fontSize: '13px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      backgroundColor: hoveredCustomerId === c.c_id ? '#f1f5f9' : 'white'
+                    }}
+                  >
+                    <span style={{ fontWeight: '600', color: '#1e293b' }}>{c.name}</span>
+                    <span style={{ color: '#64748b', fontSize: '11px' }}>{c.phone}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

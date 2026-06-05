@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { generateMiniCalendar, formatMonthYear } from './calendarUtils';
 
-export default function MiniCalendarPicker({ onSelect, onClose, alignRight = false }) {
+export default function MiniCalendarPicker({ onSelect, onClose, alignRight = false, defaultDate }) {
+  const today = defaultDate ? new Date(defaultDate.replace(/\//g, '-')) : new Date();
+  const validToday = isNaN(today.getTime()) ? new Date() : today;
+
   const [currentMonth, setCurrentMonth] = useState({ 
-    year: 2026, 
-    month: 4 // Default to May 2026 for demo consistency
+    year: validToday.getFullYear(), 
+    month: validToday.getMonth() 
   });
 
   const handlePrev = (e) => {
@@ -30,7 +33,7 @@ export default function MiniCalendarPicker({ onSelect, onClose, alignRight = fal
     });
   };
 
-  const days = generateMiniCalendar(currentMonth.year, currentMonth.month, new Date(2026, 4, 9), 'day');
+  const days = generateMiniCalendar(currentMonth.year, currentMonth.month, validToday, 'day');
 
   return (
     <>

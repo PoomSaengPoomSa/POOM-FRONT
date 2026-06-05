@@ -275,6 +275,16 @@ export function CalendarProvider({ children }) {
       const u_id = currentUser ? currentUser.id : null;
       if (!u_id) return;
 
+      // updatedEvent.customer 로부터 customer_id 매핑 처리
+      let customerId = null;
+      if (updatedEvent.customer) {
+        const customersList = await api.customer.getList("all");
+        const matched = customersList.find(c => c.name === updatedEvent.customer);
+        if (matched) {
+          customerId = matched.c_id;
+        }
+      }
+
       const startLocal = updatedEvent.startTime.replace(/\//g, '-').replace(' ', 'T');
       const endLocal = updatedEvent.endTime.replace(/\//g, '-').replace(' ', 'T');
 
@@ -284,6 +294,7 @@ export function CalendarProvider({ children }) {
         start_datetime: startLocal,
         end_datetime: endLocal,
         color: updatedEvent.color,
+        customer_id: customerId,
         memo: updatedEvent.memo
       });
 
@@ -301,7 +312,7 @@ export function CalendarProvider({ children }) {
     try {
       const targetEvent = events.find(e => e.id === id);
       if (targetEvent && targetEvent.at_id) {
-        handleIgnoreAiTodo(targetEvent.at_id);
+        await handleIgnoreAiTodo(targetEvent.at_id);
       }
       await api.schedule.delete(id);
       await fetchCalendarData();
