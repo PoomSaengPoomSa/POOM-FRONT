@@ -338,8 +338,8 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  background: transparent;
-  color: var(--trend-text-muted);
+  background: #0284c7;
+  color: white;
   border: none;
   border-radius: 8px;
   transition: all 0.2s ease;
@@ -350,9 +350,9 @@
 }
 
 .trend-tab.active {
-  background: var(--trend-primary);
+  background: #0284c7;
   color: white;
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 2px 8px rgba(50, 119, 204, 0.3);
 }
 
 .eco-grid {
@@ -421,9 +421,9 @@
   text-align: center;
 }
 
-.news-arch-badge.green { background: #22c55e; }
-.news-arch-badge.pink { background: #f472b6; }
-.news-arch-badge.blue { background: #38bdf8; }
+.news-arch-badge.blue { background-color: #e0f2fe; color: #0284c7; }
+.news-arch-badge.purple { background-color: #e0e7ff; color: #4f46e5; }
+.news-arch-badge.green { background-color: #e2fbf0; color: #10b981; }
 
 .news-arch-title {
   flex: 1;
@@ -441,7 +441,7 @@
 }
 
 .news-arch-star {
-  color: #fbbf24;
+  color: #fb8f24;
 }
 
 .news-arch-search {
@@ -569,7 +569,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #2563eb;
+  background-color: #0284c7;
 }
 
 .realtime-trend-title-text {
@@ -650,12 +650,12 @@
 
 /* AI News Briefing Box */
 .ai-news-briefing-box {
-  background: linear-gradient(135deg, rgba(240, 249, 255, 0.6) 0%, rgba(255, 255, 255, 0.7) 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #f5f3ff 100%);
   border-radius: 16px;
-  border: 1px dashed #bae6fd;
+  border: 1px dashed #8b5cf6;
   padding: 16px 20px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.03);
+  box-shadow: 0 12px 30px -10px rgba(139, 92, 246, 0.15);
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -668,7 +668,7 @@
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #0284c7, #38bdf8);
+  background: linear-gradient(to bottom, #8b5cf6, #a78bfa);
 }
 
 .ai-news-briefing-header {
@@ -688,14 +688,14 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: #e0f2fe;
-  color: #0369a1;
+  background: linear-gradient(135deg, #8b5cf6 0%, #2e24ea 100%);
+  color: #ffffff;
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: -0.2px;
-  box-shadow: 0 2px 5px rgba(14, 165, 233, 0.05);
+  box-shadow: 0 2px 5px rgba(139, 92, 246, 0.05);
 }
 
 .ai-news-briefing-badge-icon {
@@ -758,23 +758,23 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #0284c7;
-  box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+  background-color: #8b5cf6;
+  box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
   animation: pulse-spark-effect 1.8s infinite;
 }
 
 @keyframes pulse-spark-effect {
-  0% {
+  0% {          
     transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7);
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
   }
   70% {
     transform: scale(1);
-    box-shadow: 0 0 0 6px rgba(14, 165, 233, 0);
+    box-shadow: 0 0 0 6px rgba(139, 92, 246, 0);
   }
   100% {
     transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
   }
 }
 

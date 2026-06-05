@@ -566,7 +566,7 @@ export default function CounselingAssistant() {
                   <button
                     onClick={() => handleTabChange("simulator")}
                     style={{
-                      width: '160px',
+                      width: '180px',
                       justifyContent: 'center',
                       padding: '8px 16px',
                       fontSize: '14px',
@@ -589,7 +589,7 @@ export default function CounselingAssistant() {
                   <button
                     onClick={() => handleTabChange("memo")}
                     style={{
-                      width: '160px',
+                      width: '180px',
                       justifyContent: 'center',
                       padding: '8px 16px',
                       fontSize: '14px',

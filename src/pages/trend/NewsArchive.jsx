@@ -94,7 +94,7 @@ export default function NewsArchive() {
 
     api.trend.getNewsDetail(item.id)
       .then(detail => {
-        const colorMap = { "경제": "green", "정치": "pink", "국제": "blue", "사회": "blue", economy: "green", politics: "pink", international: "blue", it: "blue", "IT/과학": "blue" };
+        const colorMap = { "경제": "green", "정치": "purple", "국제": "blue", "사회": "blue", economy: "green", politics: "purple", international: "blue", it: "blue", "IT/과학": "blue" };
         setSelectedNewsItem({
           title: detail.title,
           type: item.category || "경제",
@@ -118,7 +118,7 @@ export default function NewsArchive() {
       {/* Main Content */}
       <div className="trend-main">
         <div className="trend-section-box" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#0f172a', marginBottom: 20, marginTop: 0 }}>뉴스 아카이브</h1>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 20, marginTop: 0 }}>뉴스 아카이브</h1>
           
           {/* AI 실시간 뉴스 브리핑 박스 */}
           {dashboardData?.aiSummaries && (
@@ -237,10 +237,10 @@ export default function NewsArchive() {
               newsItems.map(item => (
                 <div key={item.id} onClick={() => handleNewsClick(item)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
                   <div className="news-arch-item">
-                    <span className={`news-arch-badge ${item.category === "경제" ? "green" : item.category === "정치" ? "pink" : "blue"}`}>{item.category}</span>
+                    <span className={`news-arch-badge ${item.category === "경제" ? "green" : item.category === "정치" ? "purple" : "blue"}`}>{item.category}</span>
                     <span className="news-arch-title">{item.title}</span>
                     <div className="news-arch-meta">
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CalendarIcon size={14} color="#38bdf8" /> {item.publishedAt}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CalendarIcon size={14} color="#0284c7" /> {item.publishedAt}</span>
                     </div>
                   </div>
                 </div>
