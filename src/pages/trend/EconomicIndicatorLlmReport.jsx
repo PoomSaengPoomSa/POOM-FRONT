@@ -126,20 +126,29 @@ export default function EconomicIndicatorLlmReport() {
     return `${prefix}${Math.abs(val)}${suffix}`;
   };
 
-  // ✅ 수정된 renderMarkdown: # (h1) 처리 추가
+  // ✅ 수정된 renderMarkdown: # (h1) 및 가독성 패치 적용
   const renderMarkdown = (text) => {
     if (!text) return null;
-    return text.split("\n").map((line, index) => {
+    
+    // LaTeX 수식 기호 정제 ($R^2$ ➔ R² 등)
+    let cleanedText = text
+      .replace(/\$R\^2\$/g, "R²")
+      .replace(/\$R\^2\$/g, "R²")
+      .replace(/\$R\^2\$/g, "R²")
+      .replace(/\$R2\$/g, "R²");
+
+    return cleanedText.split(/\r?\n/).map((line, index) => {
       // # h1 처리 (## 보다 먼저 체크해야 함)
       if (line.startsWith("# ") && !line.startsWith("##")) {
         return (
           <h2 key={index} style={{
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: 800,
             color: '#0f172a',
-            margin: '28px 0 14px 0',
+            margin: '32px 0 16px 0',
             borderBottom: '2px solid #3b82f6',
-            paddingBottom: '10px'
+            paddingBottom: '10px',
+            lineHeight: 1.4
           }}>
             {line.replace(/^#\s*/, "").trim()}
           </h2>
@@ -147,70 +156,97 @@ export default function EconomicIndicatorLlmReport() {
       }
       if (line.startsWith("###")) {
         return (
-          <h3 key={index} style={{
-            fontSize: 18,
+          <h4 key={index} style={{
+            fontSize: 15,
             fontWeight: 700,
-            color: '#0f172a',
-            margin: '24px 0 12px 0',
+            color: '#1e293b',
+            margin: '20px 0 10px 0',
             borderBottom: '1px solid #e2e8f0',
-            paddingBottom: '8px'
+            paddingBottom: '6px',
+            lineHeight: 1.4
           }}>
             {line.replace(/^###\s*/, "").trim()}
-          </h3>
+          </h4>
         );
       }
       if (line.startsWith("##")) {
         return (
-          <h4 key={index} style={{
-            fontSize: 16,
+          <h3 key={index} style={{
+            fontSize: 18,
             fontWeight: 700,
-            color: '#1e293b',
-            margin: '20px 0 10px 0'
+            color: '#0f172a',
+            margin: '26px 0 12px 0',
+            lineHeight: 1.4
           }}>
             {line.replace(/^##\s*/, "").trim()}
-          </h4>
+          </h3>
         );
       }
-      if (line.startsWith("**") && line.endsWith("**")) {
+      const trimmedLine = line.trim();
+      if (trimmedLine.startsWith("**") && trimmedLine.endsWith("**")) {
         return (
-          <p key={index} style={{ fontWeight: 700, color: '#0f172a', margin: '14px 0 6px 0' }}>
-            {line.replace(/\*\*/g, "")}
+          <p key={index} style={{ 
+            fontSize: '14px', 
+            fontWeight: 800, 
+            color: '#0f172a', 
+            margin: '12px 0 6px 0'
+          }}>
+            <span style={{
+              background: 'linear-gradient(to top, rgba(254, 240, 138, 0.45) 50%, transparent 50%)',
+              padding: '0 4px',
+              borderRadius: '2px'
+            }}>
+              {trimmedLine.replace(/\*\*/g, "")}
+            </span>
           </p>
         );
       }
       if (line.startsWith("- ") || line.startsWith("* ")) {
+        const content = line.substring(2);
+        let parts = content.split("**");
         return (
           <li key={index} style={{
             fontSize: 14,
             color: '#334155',
             lineHeight: 1.8,
-            marginLeft: '20px',
-            marginBottom: '6px'
+            marginLeft: '24px',
+            marginBottom: '8px',
+            listStyleType: 'disc'
           }}>
-            {line.substring(2)}
+            {parts.map((part, i) => i % 2 === 1 ? (
+              <strong key={i} style={{ 
+                fontWeight: 800, 
+                background: 'linear-gradient(to top, rgba(254, 240, 138, 0.5) 40%, transparent 40%)',
+                padding: '0 2px', 
+                color: '#0f172a' 
+              }}>{part}</strong>
+            ) : part)}
           </li>
         );
       }
       if (line.trim() === "") {
-        return <div key={index} style={{ height: 8 }} />;
+        return <div key={index} style={{ height: 10 }} />;
       }
 
       // Check inline bold e.g. **bold**
       let parts = line.split("**");
       if (parts.length > 1) {
         return (
-          <p key={index} style={{ fontSize: 14, color: '#334155', lineHeight: 1.8, margin: '6px 0' }}>
-            {parts.map((part, i) =>
-              i % 2 === 1
-                ? <strong key={i} style={{ color: '#0f172a', fontWeight: 700 }}>{part}</strong>
-                : part
-            )}
+          <p key={index} style={{ fontSize: 14, color: '#334155', lineHeight: 1.8, margin: '10px 0' }}>
+            {parts.map((part, i) => i % 2 === 1 ? (
+              <strong key={i} style={{ 
+                fontWeight: 800, 
+                background: 'linear-gradient(to top, rgba(254, 240, 138, 0.5) 40%, transparent 40%)',
+                padding: '0 2px', 
+                color: '#0f172a' 
+              }}>{part}</strong>
+            ) : part)}
           </p>
         );
       }
 
       return (
-        <p key={index} style={{ fontSize: 14, color: '#334155', lineHeight: 1.8, margin: '6px 0' }}>
+        <p key={index} style={{ fontSize: 14, color: '#334155', lineHeight: 1.8, margin: '10px 0' }}>
           {line}
         </p>
       );

@@ -138,25 +138,53 @@ export default function EconomicIndicatorArchive() {
   // Simple and premium Markdown parser/renderer in React
   const renderMarkdown = (text) => {
     if (!text) return null;
-    return text.split("\n").map((line, index) => {
+    
+    // LaTeX 수식 기호 정제 ($R^2$ ➔ R², $R^2$ ➔ R² 등)
+    let cleanedText = text
+      .replace(/\$R\^2\$/g, "R²")
+      .replace(/\$R\^2\$/g, "R²")
+      .replace(/\$R\^2\$/g, "R²")
+      .replace(/\$R2\$/g, "R²");
+
+    return cleanedText.split(/\r?\n/).map((line, index) => {
+      // H1 (# ) 처리
+      if (line.startsWith("# ") && !line.startsWith("##")) {
+        return (
+          <h2 key={index} style={{
+            fontSize: 22,
+            fontWeight: 800,
+            color: '#0f172a',
+            margin: '32px 0 16px 0',
+            borderBottom: '2px solid #3b82f6',
+            paddingBottom: '10px',
+            lineHeight: 1.4
+          }}>
+            {line.replace(/^#\s*/, "").trim()}
+          </h2>
+        );
+      }
       if (line.startsWith("###")) {
-        return <h3 key={index} style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '20px 0 10px 0', borderBottom: '1px solid #e2e8f0', paddingBottom: '6px' }}>{line.replace("###", "").trim()}</h3>;
+        return <h4 key={index} style={{ fontSize: 15, fontWeight: 700, color: '#1e293b', margin: '20px 0 10px 0', borderBottom: '1px solid #e2e8f0', paddingBottom: '6px', lineHeight: 1.4 }}>{line.replace("###", "").trim()}</h4>;
       }
       if (line.startsWith("##")) {
-        return <h4 key={index} style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', margin: '16px 0 8px 0' }}>{line.replace("##", "").trim()}</h4>;
+        return <h3 key={index} style={{ fontSize: 18, fontWeight: 700, color: '#0f172a', margin: '26px 0 12px 0', lineHeight: 1.4 }}>{line.replace("##", "").trim()}</h3>;
       }
-      if (line.startsWith("**") && line.endsWith("**")) {
+      const trimmedLine = line.trim();
+      if (trimmedLine.startsWith("**") && trimmedLine.endsWith("**")) {
         return (
           <p key={index} style={{ 
-            fontSize: '12.5px', 
+            fontSize: '14px', 
             fontWeight: 800, 
             color: '#0f172a', 
-            margin: '8px 0 4px 0',
-            background: 'linear-gradient(to top, rgba(253, 224, 71, 0.45) 45%, transparent 45%)',
-            display: 'inline-block',
-            padding: '0 2px'
+            margin: '12px 0 6px 0'
           }}>
-            {line.replace(/\*\*/g, "")}
+            <span style={{
+              background: 'linear-gradient(to top, rgba(254, 240, 138, 0.45) 50%, transparent 50%)',
+              padding: '0 4px',
+              borderRadius: '2px'
+            }}>
+              {trimmedLine.replace(/\*\*/g, "")}
+            </span>
           </p>
         );
       }
@@ -164,11 +192,18 @@ export default function EconomicIndicatorArchive() {
         const content = line.substring(2);
         let parts = content.split("**");
         return (
-          <li key={index} style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.6, marginLeft: '16px', marginBottom: '4px' }}>
+          <li key={index} style={{ 
+            fontSize: '14px', 
+            color: '#334155', 
+            lineHeight: 1.8, 
+            marginLeft: '24px', 
+            marginBottom: '8px',
+            listStyleType: 'disc'
+          }}>
             {parts.map((part, i) => i % 2 === 1 ? (
               <strong key={i} style={{ 
                 fontWeight: 800, 
-                background: 'linear-gradient(to top, rgba(253, 224, 71, 0.45) 45%, transparent 45%)',
+                background: 'linear-gradient(to top, rgba(254, 240, 138, 0.5) 40%, transparent 40%)',
                 padding: '0 2px', 
                 color: '#0f172a' 
               }}>{part}</strong>
@@ -177,18 +212,18 @@ export default function EconomicIndicatorArchive() {
         );
       }
       if (line.trim() === "") {
-        return <div key={index} style={{ height: 6 }} />;
+        return <div key={index} style={{ height: 10 }} />;
       }
 
       // Check inline bold e.g. **bold**
       let parts = line.split("**");
       if (parts.length > 1) {
         return (
-          <p key={index} style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.6, margin: '4px 0' }}>
+          <p key={index} style={{ fontSize: '14px', color: '#334155', lineHeight: 1.8, margin: '10px 0' }}>
             {parts.map((part, i) => i % 2 === 1 ? (
               <strong key={i} style={{ 
                 fontWeight: 800, 
-                background: 'linear-gradient(to top, rgba(253, 224, 71, 0.45) 45%, transparent 45%)',
+                background: 'linear-gradient(to top, rgba(254, 240, 138, 0.5) 40%, transparent 40%)',
                 padding: '0 2px', 
                 color: '#0f172a' 
               }}>{part}</strong>
@@ -197,7 +232,7 @@ export default function EconomicIndicatorArchive() {
         );
       }
 
-      return <p key={index} style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.6, margin: '4px 0' }}>{line}</p>;
+      return <p key={index} style={{ fontSize: '14px', color: '#334155', lineHeight: 1.8, margin: '10px 0' }}>{line}</p>;
     });
   };
 
@@ -246,6 +281,59 @@ export default function EconomicIndicatorArchive() {
     return renderMarkdown(previewLines.join("\n"));
   };
 
+  const highlightSummary = (text) => {
+    if (!text) return null;
+    
+    // 1. 혹시 과거 데이터나 제목 클러터가 섞여 있다면 2차 정제
+    let cleanText = text
+      .replace(/대한민국 부동산 가격지수 예측 모델 분석 보고서/g, "")
+      .replace(/1\.\s+머신러닝 회귀 모델 예측 성능 평가/g, "")
+      .replace(/금값 예측 모델 SHAP 분석 보고서/g, "")
+      .replace(/1\.\s+글로벌 핵심 피처 요약 및 편향성 진단/g, "")
+      .replace(/\[부동산 가격지수 분석 리포트\]/g, "")
+      .replace(/###/g, "")
+      .trim();
+
+    // 2. 하이라이트 키워드 패턴들
+    const keywords = [
+      "성능 개선", "예측 성능", "설명력", 
+      "RMSE", "R²", "MAE", "MSE",
+      "상승", "하락", "기여", "기여도", "유동성",
+      "앙상블 모델", "회귀 모델", "최우선 전략",
+      "WTI 유가", "연방기금금리", "소비자물가지수",
+      "KOSPI200", "매수우위지수", "M2 통화량", "통화량"
+    ];
+
+    // 정규식으로 키워드, 소수점 숫자(부호포함), 백분율 등을 매치하여 스플릿
+    const pattern = new RegExp(`(${keywords.join("|")}|\\-\\d+\\.\\d+%?|\\d+\\.\\d+%?|\\d+%|\\d+\\.\\d+)`, "g");
+    const parts = cleanText.split(pattern);
+
+    return (
+      <p style={{ margin: 0, lineHeight: 1.8, fontSize: '13.5px', color: '#334155' }}>
+        {parts.map((part, i) => {
+          const isKeyword = keywords.includes(part);
+          const isNumeric = /^-?\d+(\.\d+)?%?$/.test(part);
+          
+          if (isKeyword || isNumeric) {
+            return (
+              <span key={i} style={{ 
+                fontWeight: 700, 
+                color: '#0f172a',
+                background: 'rgba(254, 240, 138, 0.65)',
+                padding: '1px 3px', 
+                borderRadius: '3px',
+                margin: '0 1px'
+              }}>
+                {part}
+              </span>
+            );
+          }
+          return part;
+        })}
+      </p>
+    );
+  };
+
   return (
     <div className="trend-container">
       {/* Sidebar */}
@@ -283,7 +371,6 @@ export default function EconomicIndicatorArchive() {
                     <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--trend-text-main)' }}>AI 심층 분석 보고서 (LLM)</span>
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--trend-text-muted)', display: 'flex', gap: 12, alignItems: 'center' }}>
-                    {reportData?.modelName && <span style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: 4, fontWeight: 600 }}>{reportData.modelName}</span>}
                     {reportData?.generatedAt && <span>분석 완료: {new Date(reportData.generatedAt).toLocaleString('ko-KR')}</span>}
                     {reportData?.content && (
                       <button 
@@ -318,21 +405,17 @@ export default function EconomicIndicatorArchive() {
                   </div>
                 </div>
                 
-                <div style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.6, padding: '10px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                <div style={{ fontSize: '13.5px', color: '#334155', lineHeight: 1.8, padding: '16px 20px', background: '#f8fafc', borderRadius: 12, border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8, minHeight: '120px', justifyContent: 'center' }}>
                   {isLoading ? (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
-                  ) : reportData?.content ? (
-                    <div style={{ margin: 0 }}>
-                      {renderPreviewMarkdown(reportData.content)}
-                    </div>
+                  ) : reportData?.summary ? (
+                    renderMarkdown(reportData.summary)
                   ) : (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>분석 보고서가 존재하지 않습니다.</div>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: 10, color: 'var(--trend-text-muted)' }}>
-                  {reportData?.dataSources ? `출처: ${reportData.dataSources.join(", ")}` : ""}
-                </div>
+
               </div>
 
               {/* 하단 2열 배치 (컴팩트 예측 + SHAP 기여도) */}
@@ -442,7 +525,6 @@ export default function EconomicIndicatorArchive() {
                     <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--trend-text-main)' }}>AI 심층 분석 보고서 (LLM)</span>
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--trend-text-muted)', display: 'flex', gap: 12, alignItems: 'center' }}>
-                    {reportData?.modelName && <span style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: 4, fontWeight: 600 }}>{reportData.modelName}</span>}
                     {reportData?.generatedAt && <span>분석 완료: {new Date(reportData.generatedAt).toLocaleString('ko-KR')}</span>}
                     {reportData?.content && (
                       <button 
@@ -477,21 +559,17 @@ export default function EconomicIndicatorArchive() {
                   </div>
                 </div>
                 
-                <div style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.6, padding: '10px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                <div style={{ fontSize: '13.5px', color: '#334155', lineHeight: 1.8, padding: '16px 20px', background: '#f8fafc', borderRadius: 12, border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8, minHeight: '120px', justifyContent: 'center' }}>
                   {isLoading ? (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
-                  ) : reportData?.content ? (
-                    <div style={{ margin: 0 }}>
-                      {renderPreviewMarkdown(reportData.content)}
-                    </div>
+                  ) : reportData?.summary ? (
+                    renderMarkdown(reportData.summary)
                   ) : (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>분석 보고서가 존재하지 않습니다.</div>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: 10, color: 'var(--trend-text-muted)' }}>
-                  {reportData?.dataSources ? `출처: ${reportData.dataSources.join(", ")}` : ""}
-                </div>
+
               </div>
 
               {/* 하단 2열 배치 (컴팩트 예측 + SHAP 기여도) */}
@@ -609,7 +687,6 @@ export default function EconomicIndicatorArchive() {
                     <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--trend-text-main)' }}>AI 심층 분석 보고서 (LLM)</span>
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--trend-text-muted)', display: 'flex', gap: 12, alignItems: 'center' }}>
-                    {reportData?.modelName && <span style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: 4, fontWeight: 600 }}>{reportData.modelName}</span>}
                     {reportData?.generatedAt && <span>분석 완료: {new Date(reportData.generatedAt).toLocaleString('ko-KR')}</span>}
                     {reportData?.content && (
                       <button 
@@ -644,21 +721,17 @@ export default function EconomicIndicatorArchive() {
                   </div>
                 </div>
                 
-                <div style={{ fontSize: '12.5px', color: '#334155', lineHeight: 1.6, padding: '10px 16px', background: '#f8fafc', borderRadius: 12, border: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                <div style={{ fontSize: '13.5px', color: '#334155', lineHeight: 1.8, padding: '16px 20px', background: '#f8fafc', borderRadius: 12, border: '1px solid #f1f5f9', marginBottom: 8, minHeight: '120px', display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'center' }}>
                   {isLoading ? (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
-                  ) : reportData?.content ? (
-                    <div style={{ margin: 0 }}>
-                      {renderPreviewMarkdown(reportData.content)}
-                    </div>
+                  ) : reportData?.summary ? (
+                    renderMarkdown(reportData.summary)
                   ) : (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>분석 보고서가 존재하지 않습니다.</div>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: 10, color: 'var(--trend-text-muted)' }}>
-                  {reportData?.dataSources ? `출처: ${reportData.dataSources.join(", ")}` : ""}
-                </div>
+
               </div>
 
               {/* 하단 3열 배치 (차트 + 컴팩트 수치 지표 + 도넛 차트 기여도) */}
@@ -869,7 +942,7 @@ export default function EconomicIndicatorArchive() {
                     {selectedTab} AI 심층 분석 보고서
                   </h2>
                   <p style={{ fontSize: 11, color: '#64748b', margin: '2px 0 0 0' }}>
-                    {reportData?.modelName} · 분석 기준일 {reportData?.generatedAt ? new Date(reportData.generatedAt).toLocaleString('ko-KR') : ''}
+                    분석 기준일 {reportData?.generatedAt ? new Date(reportData.generatedAt).toLocaleString('ko-KR') : ''}
                   </p>
                 </div>
               </div>
@@ -931,7 +1004,6 @@ export default function EconomicIndicatorArchive() {
               background: 'white',
             }}>
               <span style={{ fontSize: 11, color: '#94a3b8' }}>
-                {reportData?.dataSources ? `출처: ${reportData.dataSources.join(", ")}` : ""}
               </span>
               <button
                 onClick={() => setIsModalOpen(false)}
