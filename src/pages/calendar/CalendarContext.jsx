@@ -19,12 +19,20 @@ export function CalendarProvider({ children }) {
   // AI 추천 일정 로컬 삭제/숨김 목록 상태
   const [ignoredAiTodoIds, setIgnoredAiTodoIds] = useState(new Set());
 
-  const handleIgnoreAiTodo = (id) => {
-    setIgnoredAiTodoIds((prev) => {
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
+  const handleIgnoreAiTodo = async (id) => {
+    try {
+      await api.aiTodo.delete(id);
+      setIgnoredAiTodoIds((prev) => {
+        const next = new Set(prev);
+        next.add(id);
+        return next;
+      });
+      await fetchCalendarData();
+      showToast("추천 일정을 숨겼습니다.");
+    } catch (error) {
+      console.error("AI To Do 삭제 실패:", error);
+      showToast("추천 일정 숨기기에 실패했습니다.");
+    }
   };
   
   // KPI 및 주력 상품 상태 추가
