@@ -409,7 +409,9 @@ export default function EconomicIndicatorArchive() {
                   {isLoading ? (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
                   ) : reportData?.summary ? (
-                    renderMarkdown(reportData.summary)
+                    <div style={{ margin: 0 }}>
+                      {renderMarkdown(reportData.summary)}
+                    </div>
                   ) : (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>분석 보고서가 존재하지 않습니다.</div>
                   )}
@@ -563,7 +565,9 @@ export default function EconomicIndicatorArchive() {
                   {isLoading ? (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
                   ) : reportData?.summary ? (
-                    renderMarkdown(reportData.summary)
+                    <div style={{ margin: 0 }}>
+                      {renderMarkdown(reportData.summary)}
+                    </div>
                   ) : (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>분석 보고서가 존재하지 않습니다.</div>
                   )}
@@ -725,7 +729,9 @@ export default function EconomicIndicatorArchive() {
                   {isLoading ? (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>보고서 데이터를 분석하는 중...</div>
                   ) : reportData?.summary ? (
-                    renderMarkdown(reportData.summary)
+                    <div style={{ margin: 0 }}>
+                      {renderMarkdown(reportData.summary)}
+                    </div>
                   ) : (
                     <div style={{ padding: '10px 0', textAlign: 'center', color: '#64748b' }}>분석 보고서가 존재하지 않습니다.</div>
                   )}
