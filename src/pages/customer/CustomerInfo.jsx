@@ -73,27 +73,27 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
   }
 
   const defaults = {
-    job: fullDetail?.job || "중견기업 CEO",
-    vipStatus: fullDetail?.grade || "VIP",
-    typeStatus: fullDetail?.tendency || "위험중립형",
-    email: fullDetail?.email || customer?.email || "example@email.com",
-    address: fullDetail?.address || "서울시 강남구",
+    job: fullDetail?.job || "미등록",
+    vipStatus: fullDetail?.grade || "일반",
+    typeStatus: fullDetail?.tendency || "미등록",
+    email: fullDetail?.email || customer?.email || "미등록",
+    address: fullDetail?.address || "미등록",
     gridData: {
-      totalAsset: fullDetail?.total_assets !== undefined ? `${(fullDetail.total_assets / 100000000).toFixed(1)}억` : "16억",
-      age: fullDetail?.birthday ? `만 ${new Date().getFullYear() - new Date(fullDetail.birthday).getFullYear()}세` : "만 54세",
-      birthdayStr: fullDetail?.birthday ? fullDetail.birthday.replace(/-/g, ".") : "1972.08.14",
-      startDate: fullDetail?.start_date ? fullDetail.start_date.replace(/-/g, ".") : "2018.03.05",
-      lastConsult: "2026.01.11",
-      nextVisit: "2026.05.02",
+      totalAsset: fullDetail?.total_assets !== undefined ? `${(fullDetail.total_assets / 100000000).toFixed(1)}억` : "-",
+      age: fullDetail?.birthday ? `만 ${new Date().getFullYear() - new Date(fullDetail.birthday).getFullYear()}세` : "-",
+      birthdayStr: fullDetail?.birthday ? fullDetail.birthday.replace(/-/g, ".") : "-",
+      startDate: fullDetail?.start_date ? fullDetail.start_date.replace(/-/g, ".") : "-",
+      lastConsult: "-",
+      nextVisit: "-",
     },
-    assetTotal: fullDetail?.total_assets !== undefined ? `${(fullDetail.total_assets / 100000000).toFixed(1)}억` : "32억",
-    netWorthTotal: fullDetail?.net_worth !== undefined ? `${(fullDetail.net_worth / 100000000).toFixed(1)}억` : "32억",
+    assetTotal: fullDetail?.total_assets !== undefined ? `${(fullDetail.total_assets / 100000000).toFixed(1)}억` : "-",
+    netWorthTotal: fullDetail?.net_worth !== undefined ? `${(fullDetail.net_worth / 100000000).toFixed(1)}억` : "-",
     assetList: [
-      { name: '예적금', value: fullDetail ? Math.round((fullDetail.deposit / (fullDetail.net_worth || 1)) * 100) : 45, color: '#2563eb' },
-      { name: '투자상품', value: fullDetail ? Math.round((fullDetail.investment / (fullDetail.net_worth || 1)) * 100) : 35, color: '#8b5cf6' },
-      { name: '연금보험', value: fullDetail ? Math.round((fullDetail.pension / (fullDetail.net_worth || 1)) * 100) : 20, color: '#2dd4bf' },
+      { name: '예적금', value: fullDetail ? Math.round((fullDetail.deposit / (fullDetail.net_worth || 1)) * 100) : 0, color: '#2563eb' },
+      { name: '투자상품', value: fullDetail ? Math.round((fullDetail.investment / (fullDetail.net_worth || 1)) * 100) : 0, color: '#8b5cf6' },
+      { name: '연금보험', value: fullDetail ? Math.round((fullDetail.pension / (fullDetail.net_worth || 1)) * 100) : 0, color: '#2dd4bf' },
     ],
-    assetLLMInsight: fullDetail?.llm_insight || "순자산 중 예적금 및 투자상품 비율이 적절한 균형을 유지하고 있습니다.",
+    assetLLMInsight: fullDetail?.llm_insight || "AI의 분석이 진행되지 않았습니다.",
     riskLevel: riskLevel,
     riskLabel: riskLabel,
     riskDesc: riskDesc,
@@ -111,8 +111,8 @@ const getCustomerDetails = (customer, fullDetail, visitStats, churnRisk, custome
       ? productMatches.items.map(item => ({
         productName: item.product_name,
         productDesc: item.product_explanation,
-        status: (item.is_owned || Number(item.is_suitable) === 2) ? "보유 중" : (Number(item.is_suitable) === 1 ? "적합" : "부적합"),
-        statusColor: (item.is_owned || Number(item.is_suitable) === 2) ? "#0284c7" : (Number(item.is_suitable) === 1 ? "#2dd4bf" : "#fb5f5f"),
+        status: (item.is_owned || Number(item.is_suitable) === 2) ? "보유 중" : (Number(item.is_suitable) === 1 ? "적합" : (Number(item.is_suitable) === -1 ? "미분석" : "부적합")),
+        statusColor: (item.is_owned || Number(item.is_suitable) === 2) ? "#0284c7" : (Number(item.is_suitable) === 1 ? "#2dd4bf" : (Number(item.is_suitable) === -1 ? "#64748b" : "#fb5f5f")),
         matchingDesc: item.reason
       }))
       : []

@@ -410,5 +410,65 @@
   text-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
+/* Counseling Date Picker Style */
+.consult-date-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 4px 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.consult-date-container:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.05);
+}
+
+.consult-date-container:focus-within {
+  border-color: #8b5cf6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12), 0 4px 12px rgba(139, 92, 246, 0.05);
+  transform: translateY(-1px);
+}
+
+.consult-date-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #64748b;
+  user-select: none;
+  letter-spacing: -0.2px;
+}
+
+.consult-date-input {
+  border: none;
+  background: transparent;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* Custom Calendar Icon styling inside webkit browser datepicker */
+.consult-date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(48%) sepia(85%) saturate(1455%) hue-rotate(231deg) brightness(97%) contrast(98%);
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.consult-date-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
 
 

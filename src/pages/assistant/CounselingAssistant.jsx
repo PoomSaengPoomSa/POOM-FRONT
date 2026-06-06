@@ -27,6 +27,13 @@ export default function CounselingAssistant() {
   const [generatedReport, setGeneratedReport] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [memoText, setMemoText] = useState("");
+  const [consultDate, setConsultDate] = useState(() => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  });
 
   const formatAssets = (assetVal) => {
     if (assetVal === undefined || assetVal === null) return "32억 1,234만";
@@ -191,6 +198,11 @@ export default function CounselingAssistant() {
   useEffect(() => {
     setGeneratedReport(null);
     setMemoText("");
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    setConsultDate(`${yyyy}-${mm}-${dd}`);
   }, [selectedCustomerId]);
 
   const handleGenerateReport = async () => {
@@ -198,16 +210,15 @@ export default function CounselingAssistant() {
     
     setIsGenerating(true);
     try {
-      const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 19);
       const res = await api.customer.generateReport(selectedCustomerId, {
         memo: memoText,
-        consult_date: nowStr
+        consult_date: consultDate
       });
       
       if (res && res.data) {
         setGeneratedReport({
           ...res.data,
-          date: nowStr.split(' ')[0].replace(/-/g, '.')
+          date: consultDate.replace(/-/g, '.')
         });
       }
     } catch (error) {
@@ -242,6 +253,7 @@ export default function CounselingAssistant() {
       await api.customer.saveReport(selectedCustomerId, {
         cm_id: generatedReport?.cm_id || null,
         memo: memoText,
+        consult_date: consultDate,
         content: reportContent
       });
 
@@ -250,6 +262,11 @@ export default function CounselingAssistant() {
         setShowSaveToast(false);
         setGeneratedReport(null);
         setMemoText("");
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        setConsultDate(`${yyyy}-${mm}-${dd}`);
       }, 2000);
       
       await fetchTimeline(selectedCustomerId);
@@ -335,8 +352,8 @@ export default function CounselingAssistant() {
     assetsRaw: fullCustomerDetail?.total_assets !== undefined ? (fullCustomerDetail.total_assets / 100000000) : 0, // in 100M units
     needs: fullCustomerDetail?.llm_insight ? 
       (fullCustomerDetail.llm_insight.length > 30 ? fullCustomerDetail.llm_insight.slice(0, 30) + "..." : fullCustomerDetail.llm_insight) 
-      : "등록된 주요 니즈가 없습니다.",
-    insight: fullCustomerDetail?.llm_insight || "등록된 AI 인사이트가 없습니다.",
+      : "AI의 분석이 진행되지 않았습니다.",
+    insight: fullCustomerDetail?.llm_insight || "AI의 분석이 진행되지 않았습니다.",
     products: fullCustomerDetail ? [
       fullCustomerDetail.deposit > 0 ? "예적금" : null,
       fullCustomerDetail.investment > 0 ? "투자상품" : null,
@@ -794,7 +811,18 @@ export default function CounselingAssistant() {
                     ) : (
                       /* Memo Input */
                       <div className="memo-box" style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto' }}>
-                        <div className="memo-box-title" style={{ fontSize: '15px', fontWeight: 700 }}>AI 기반 상담 메모 구조화</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                          <div className="memo-box-title" style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>AI 기반 상담 메모 구조화</div>
+                          <div className="consult-date-container">
+                            <span className="consult-date-label">상담 일자</span>
+                            <input 
+                              type="date" 
+                              className="consult-date-input"
+                              value={consultDate} 
+                              onChange={(e) => setConsultDate(e.target.value)}
+                            />
+                          </div>
+                        </div>
                         <textarea 
                           className="memo-textarea" 
                           placeholder="상담 내용을 이곳에 메모하세요."
