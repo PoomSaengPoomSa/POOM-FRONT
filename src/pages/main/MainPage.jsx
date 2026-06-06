@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  ChevronLeft, ChevronRight, RotateCcw, Sparkles, X, Calendar, MoreHorizontal, ChevronDown
+  ChevronLeft, ChevronRight, RotateCcw, Plus, Sparkles, X, Calendar, MoreHorizontal, ChevronDown
 } from "lucide-react";
 import Sidebar from "../../components/common/Sidebar";
 import { api } from "../../api";
@@ -233,7 +233,7 @@ const parseBriefing = (expandedContent) => {
 
 // ─── 공통 컴포넌트 ──────────────────────────────
 
-function TimelineCard({ item, isCompleted, onToggle, onDelete, onShowDetail, onIgnoreAi, onSelectAi }) {
+function TimelineCard({ item, isCompleted, onToggle, onDelete, onShowDetail, onIgnoreAi, onSelectAi, onRevertAi }) {
   const isAi = item.type === "ai";
   const data = item.data;
   
@@ -258,13 +258,47 @@ function TimelineCard({ item, isCompleted, onToggle, onDelete, onShowDetail, onI
         onClick={() => onShowDetail(data, item.type)}
         style={{ cursor: "pointer" }}
       >
-        <div 
-          className={`round-checkbox ${isCompleted ? 'checked' : ''}`}
-          onClick={(ev) => handleAction(isAi ? onSelectAi : onToggle, isAi ? data : data.id, ev)}
-          title={isAi ? "일정 등록" : (isCompleted ? "완료 취소" : "할 일 완료")}
-        >
-          {isCompleted && <div className="check-mark" />}
-        </div>
+        {isAi ? (
+          <button 
+            className="btn-select-ai-todo-plus" 
+            onClick={(ev) => handleAction(onSelectAi, data, ev)}
+            title="일정 등록"
+            style={{
+              width: "20px",
+              height: "20px",
+              borderRadius: "50%",
+              border: "1px solid #8b5cf6",
+              background: "#f5f3ff",
+              color: "#7c3aed",
+              cursor: "pointer",
+              marginRight: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 0,
+              flexShrink: 0,
+              transition: "all 0.2s"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#eedffe";
+              e.currentTarget.style.borderColor = "#7c3aed";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#f5f3ff";
+              e.currentTarget.style.borderColor = "#8b5cf6";
+            }}
+          >
+            <Plus size={11} style={{ strokeWidth: 3 }} />
+          </button>
+        ) : (
+          <div 
+            className={`round-checkbox ${isCompleted ? 'checked' : ''}`}
+            onClick={(ev) => handleAction(onToggle, data.id, ev)}
+            title={isCompleted ? "완료 취소" : "할 일 완료"}
+          >
+            {isCompleted && <div className="check-mark" />}
+          </div>
+        )}
         
         <div className="schedule-info-group">
           <div className="schedule-title-wrap">
@@ -281,7 +315,29 @@ function TimelineCard({ item, isCompleted, onToggle, onDelete, onShowDetail, onI
           </span>
         </div>
         
-        <div className="todo-action-buttons">
+        <div className="todo-action-buttons" style={{ display: "flex", alignItems: "center" }}>
+          {isConvertedAi && !isCompleted && (
+            <button
+              className="todo-revert-btn"
+              onClick={(ev) => handleAction(onRevertAi, data.id, ev)}
+              title="일정 취소 및 AI 복원"
+              style={{
+                border: "none",
+                background: "transparent",
+                color: "#64748b",
+                cursor: "pointer",
+                marginRight: "6px",
+                display: "flex",
+                alignItems: "center",
+                padding: "4px",
+                borderRadius: "4px"
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+            >
+              <RotateCcw size={13} />
+            </button>
+          )}
           <button
             className="todo-delete-btn"
             onClick={(ev) => handleAction(isAi ? onIgnoreAi : onDelete, data, ev)}
@@ -414,21 +470,6 @@ export default function MainPage() {
   }, []);
 
   const currentUser = useMemo(() => getCurrentUserFromStorage(), []);
-  const [completedMyTodos, setCompletedMyTodos] = useState(new Set());
-
-  useEffect(() => {
-    if (events && events.length > 0) {
-      setCompletedMyTodos((prev) => {
-        const next = new Set(prev);
-        events.forEach((e) => {
-          if (e.at_id && e.at_id !== "None" && e.at_id !== "null" && e.at_id !== 0) {
-            next.add(e.id);
-          }
-        });
-        return next;
-      });
-    }
-  }, [events]);
 
   const [activeNotifId, setActiveNotifId] = useState(null);
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
@@ -639,18 +680,7 @@ export default function MainPage() {
 
       await api.aiTodo.confirm(u_id, [todo.id], targetDateStr);
       await fetchKpiData?.();
-      const latestEvents = await fetchCalendarData?.();
-
-      if (latestEvents && Array.isArray(latestEvents)) {
-        const newlyCreated = latestEvents.find((e) => e.at_id === todo.id);
-        if (newlyCreated) {
-          setCompletedMyTodos((prev) => {
-            const next = new Set(prev);
-            next.add(newlyCreated.id);
-            return next;
-          });
-        }
-      }
+      await fetchCalendarData?.();
     } catch (error) {
       console.error("AI 추천 일정 등록 중 오류 발생:", error);
       if (showToast) showToast("일정 등록 중 오류가 발생했습니다.");
@@ -759,37 +789,35 @@ export default function MainPage() {
         <div className="todo-empty-state">진행 예정인 일정이 비어 있습니다.</div>
       ) : (
         mergedTimeline.map((item) => {
-          let isCompleted = false;
-          if (item.type === "my") {
-            isCompleted = completedMyTodos.has(item.data.id);
-          }
+          const isCompleted = item.type === "my" ? (item.data.is_completed || false) : false;
           return (
             <TimelineCard
               key={item.id}
               item={item}
               isCompleted={isCompleted}
-              onToggle={(id) => {
-                const targetEvent = events.find(e => e.id === id);
-                const isConvertedAi = targetEvent && targetEvent.at_id && targetEvent.at_id !== "None" && targetEvent.at_id !== "null" && targetEvent.at_id !== 0;
-                if (isConvertedAi) {
-                  showConfirm(
-                    "일정 승인 취소",
-                    `'${targetEvent.title}' 일정을 취소하고 AI To Do 목록으로 복원하시겠습니까?`,
-                    () => revertAiTodo(id)
-                  );
-                } else {
-                  setCompletedMyTodos(prev => {
-                    const next = new Set(prev);
-                    if (next.has(id)) next.delete(id);
-                    else next.add(id);
-                    return next;
-                  });
+              onToggle={async (id) => {
+                try {
+                  await api.schedule.complete(id);
+                  await fetchCalendarData();
+                } catch (error) {
+                  console.error("일정 완료 상태 변경 실패:", error);
+                  showToast("일정 완료 상태 변경에 실패했습니다.");
                 }
               }}
               onDelete={(data) => showConfirm("일정 삭제", `'${data.title}' 일정을 정말로 삭제하시겠습니까?`, () => deleteEvent(data.id))}
               onShowDetail={handleShowScheduleDetail}
               onIgnoreAi={(data) => showConfirm("추천 일정 숨기기", `'${data.content}' 추천 일정을 숨기시겠습니까?`, () => handleIgnoreAiTodo(data.id))}
               onSelectAi={handleSelectAiTodo}
+              onRevertAi={(id) => {
+                const targetEvent = events.find(e => e.id === id);
+                if (targetEvent) {
+                  showConfirm(
+                    "일정 승인 취소",
+                    `'${targetEvent.title}' 일정을 취소하고 AI To Do 목록으로 복원하시겠습니까?`,
+                    () => revertAiTodo(id)
+                  );
+                }
+              }}
             />
           );
         })
@@ -1481,7 +1509,16 @@ function MonthlyCalendar({ selectedDate, setSelectedDate, currentMonth, events, 
       ) : (
         <div className="monthly-schedule-list">
           {combined.map((item) => (
-            <div key={item.id} className="monthly-schedule-item" onClick={() => onShowDetail?.(item, "combined")} style={{ cursor: "pointer" }}>
+            <div 
+              key={item.id} 
+              className="monthly-schedule-item" 
+              onClick={() => onShowDetail?.(item, "combined")} 
+              style={{ 
+                cursor: "pointer",
+                textDecoration: item.raw.is_completed ? "line-through" : "none",
+                opacity: item.raw.is_completed ? 0.6 : 1
+              }}
+            >
               <span className={`schedule-indicator-bar ${getIndicatorClass(item.color)}`} />
               <span className="schedule-item-time">{item.time}</span>
               <span className="schedule-item-title">{item.title}</span>

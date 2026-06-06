@@ -160,6 +160,7 @@ export const api = {
     create: (data) => api.post("/schedules", data),
     update: (u_id, schedule_id, data) => api.patch(`/users/${u_id}/schedules/${schedule_id}`, data),
     delete: (schedule_id) => api.delete(`/schedules/${schedule_id}`),
+    complete: (schedule_id) => api.patch(`/schedules/${schedule_id}/complete`),
   },
 
   // 4. AI 투두 (AI To-Do) API
