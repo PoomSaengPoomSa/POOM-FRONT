@@ -3441,6 +3441,11 @@
   color: #9f1239;
 }
 
+.product-status-badge.unanalyzed {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
 .product-reason-text {
   font-size: 11px;
   line-height: 1.4;

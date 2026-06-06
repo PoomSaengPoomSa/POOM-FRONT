@@ -359,7 +359,7 @@ export default function CustomerDashboard() {
                         <span style={{ fontSize: 12, color: '#7c3aed', fontWeight: 800 }}>AI 포트폴리오 자산 진단</span>
                       </div>
                       <p style={{ fontSize: 12, color: '#475569', lineHeight: 1.6, fontWeight: 500, margin: 0 }}>
-                        {fullCustomerDetail?.llm_insight || "고객님의 현재 포트폴리오는 현금 및 예적금 비율이 높은 편이며, 글로벌 변동성에 대비한 리츠 및 대체자산 비중을 확대하는 방안을 고려해볼 수 있습니다."}
+                        {fullCustomerDetail?.llm_insight || "AI의 분석이 진행되지 않았습니다."}
                       </p>
                     </div>
 

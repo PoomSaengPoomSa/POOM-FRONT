@@ -809,7 +809,7 @@ export default function MainPage() {
                 <span className="top-kpi-pb-name">{personalKpi?.name ?? currentUser?.name} PB</span>
               </div>
               <div className="top-kpi-metrics">
-                <KpiMetric label="고객수" value={personalKpi?.customer_count} unit="명" goal={personalKpi?.customer_goal ?? 20} />
+                <KpiMetric label="신규 고객 수" value={personalKpi?.customer_count} unit="명" goal={personalKpi?.customer_goal ?? 20} />
                 <KpiMetric label="AUM" value={personalKpi?.aum} unit="억" goal={personalKpi?.aum_goal ?? 50} />
                 <KpiMetric label="비이자이익" value={personalKpi?.non_interest} unit="만" goal={personalKpi?.non_interest_goal ?? 6000} format="number" />
               </div>
@@ -821,7 +821,7 @@ export default function MainPage() {
                 <span className="top-kpi-branch-name">{branchKpi?.branch_name}</span>
               </div>
               <div className="top-kpi-metrics">
-                <KpiMetric label="고객수" value={branchKpi?.customer_count} unit="명" goal={branchKpi?.customer_goal ?? 150} format="number" />
+                <KpiMetric label="신규 고객 수" value={branchKpi?.customer_count} unit="명" goal={branchKpi?.customer_goal ?? 150} format="number" />
                 <KpiMetric label="AUM" value={branchKpi?.aum} unit="억" goal={branchKpi?.aum_goal ?? 550} format="number" />
                 <KpiMetric label="비이자이익" value={branchKpi?.non_interest} unit="만" goal={branchKpi?.non_interest_goal ?? 90000} format="number" />
               </div>
@@ -1024,7 +1024,8 @@ export default function MainPage() {
                           expandedCustomerDetails.productMatch.slice(0, 3).map((prod, idx) => {
                             let statusText = "적합", statusClass = "recommend";
                             if (prod.is_owned) { statusText = "보유중"; statusClass = "owned"; }
-                            else if (prod.is_suitable === false) { statusText = "부적합"; statusClass = "unsuitable"; }
+                            else if (Number(prod.is_suitable) === -1) { statusText = "미분석"; statusClass = "unanalyzed"; }
+                            else if (Number(prod.is_suitable) === 0) { statusText = "부적합"; statusClass = "unsuitable"; }
                             return (
                               <div className="product-match-item" key={idx}>
                                 <div className="product-item-header">
@@ -1035,10 +1036,9 @@ export default function MainPage() {
                             );
                           })
                         ) : (
-                          <>
-                            <div className="product-match-item"><div className="product-item-header"><span className="product-name">WON플러스예금</span><span className="product-status-badge owned">보유중</span></div></div>
-                            <div className="product-match-item"><div className="product-item-header"><span className="product-name">우리WON통장</span><span className="product-status-badge recommend">적합</span></div></div>
-                          </>
+                          <div style={{ padding: '12.5px 0', textAlign: 'center', color: '#94a3b8', fontSize: '12.5px', fontWeight: '500' }}>
+                            추천된 상품 매칭 분석 결과가 없습니다.
+                          </div>
                         )}
                       </div>
                     </div>
@@ -1049,7 +1049,9 @@ export default function MainPage() {
                         {expandedCustomerDetails.displayHashtags && expandedCustomerDetails.displayHashtags.length > 0 ? (
                           expandedCustomerDetails.displayHashtags.slice(0, 4).map((tag, idx) => <span className="feature-tag-pill" key={idx}># {tag}</span>)
                         ) : (
-                          ["일반", "안정추구형", "초등교사"].map((text, idx) => <span className="feature-tag-pill" key={idx}># {text}</span>)
+                          <div style={{ color: '#94a3b8', fontSize: '12.5px', fontWeight: '500' }}>
+                            분석된 특징 태그가 없습니다.
+                          </div>
                         )}
                       </div>
                     </div>
@@ -1058,10 +1060,10 @@ export default function MainPage() {
                       <div className="card-header"><div className="card-title-group"><span className="card-title">자산 포트폴리오 AI 진단</span></div></div>
                       <div className="portfolio-body">
                         <div className="asset-total-label">
-                          총 순자산: <span className="asset-total-value">{expandedCustomerDetails.detail?.total_assets ? (typeof expandedCustomerDetails.detail.total_assets === "number" ? `${(expandedCustomerDetails.detail.total_assets / 100000000).toFixed(1)}억원` : expandedCustomerDetails.detail.total_assets) : "8.0억원"}</span>
+                          총 순자산: <span className="asset-total-value">{expandedCustomerDetails.detail?.total_assets ? (typeof expandedCustomerDetails.detail.total_assets === "number" ? `${(expandedCustomerDetails.detail.total_assets / 100000000).toFixed(1)}억원` : expandedCustomerDetails.detail.total_assets) : "-"}</span>
                         </div>
                         <p className="card-body-text" style={{ whiteSpace: "pre-wrap", lineHeight: "1.6" }}>
-                          {formatLlmInsight(expandedCustomerDetails.detail?.llm_insight ?? "자산 분석 결과 예금 비중이 62.5%로 다소 높은 편입니다. 안정성을 고려하더라도 일부 자산을 채권형 상품이나 배당주로 전환하여 투자 성향에 맞춘 리밸런싱을 권장합니다.")}
+                          {formatLlmInsight(expandedCustomerDetails.detail?.llm_insight ?? "AI의 분석이 진행되지 않았습니다.")}
                         </p>
                       </div>
                     </div>
