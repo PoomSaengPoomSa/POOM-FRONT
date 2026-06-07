@@ -199,7 +199,8 @@ export function CalendarProvider({ children }) {
           c_id: sch.c_id,
           color: eventColor,
           memo: sch.memo || '',
-          at_id: sch.at_id
+          at_id: sch.at_id,
+          is_completed: sch.is_completed || false
         };
       });
 
