@@ -11,7 +11,7 @@ const AdminTabs = ({ user }) => {
 
   if (!user) return null;
 
-  const hasAccess = user.position === "지점장" || user.role === "Super Admin";
+  const hasAccess = user.role === "superadmin";
   if (!hasAccess) return null;
 
   return (
@@ -80,7 +80,7 @@ const getAvatarStyleByBranch = (branchName) => {
 };
 
 const AdminHeader = ({ title }) => {
-  const [user, setUser] = useState({ name: "관리자", role: "Super Admin", branch: "", position: "" });
+  const [user, setUser] = useState({ name: "관리자", role: "admin", branch: "", position: "" });
 
   useEffect(() => {
     async function fetchMe() {
@@ -89,7 +89,7 @@ const AdminHeader = ({ title }) => {
         if (me) {
           setUser({
             name: me.name,
-            role: me.role === 'admin' ? 'Super Admin' : 'PB User',
+            role: me.role,
             branch: me.branch || '',
             position: me.position || ''
           });
@@ -100,7 +100,7 @@ const AdminHeader = ({ title }) => {
         if (localUser) {
           setUser({
             name: localUser.name || localUser.id,
-            role: localUser.role === 'admin' ? 'Super Admin' : 'PB User',
+            role: localUser.role,
             branch: "",
             position: ""
           });
@@ -118,7 +118,7 @@ const AdminHeader = ({ title }) => {
         <div className="admin-profile">
           <div className="admin-profile-info">
             <span className="admin-name">{user.name}</span>
-            <span className="admin-role">{user.role}</span>
+            <span className="admin-role">{user.role === 'superadmin' ? 'Super Admin' : 'Admin'}</span>
           </div>
           <LogOut onClick={() => { api.auth.logout(); window.location.href = '/login'; }} size={20} className="admin-logout" />
         </div>
@@ -151,15 +151,15 @@ export default function AdminEmployeeDashboard() {
           return;
         }
 
-        // PB 일반 계정은 아예 어드민 영역 접근 불가 (캘린더로 튕김)
-        if (me.role !== "admin" && me.position !== "지점장") {
+        // 일반 계정은 아예 어드민 영역 접근 불가 (캘린더로 튕김)
+        if (me.role !== "admin" && me.role !== "superadmin") {
           alert("권한이 없습니다.");
           window.location.href = "/daily-calendar";
           return;
         }
 
-        // 지점장은 인수인계만 가능하고 대시보드는 접근 제한 (화면 표시)
-        if (me.role !== "admin") {
+        // 지점장(admin)은 인수인계만 가능하고 대시보드는 접근 제한 (화면 표시)
+        if (me.role !== "superadmin") {
           setIsAuthorized(false);
           setCheckingAuth(false);
           return;

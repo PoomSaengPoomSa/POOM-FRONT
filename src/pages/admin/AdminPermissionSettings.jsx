@@ -10,7 +10,7 @@ const AdminTabs = ({ user }) => {
 
   if (!user) return null;
 
-  const hasAccess = user.position === "지점장" || user.role === "Super Admin";
+  const hasAccess = user.role === "superadmin";
   if (!hasAccess) return null;
 
   return (
@@ -79,7 +79,7 @@ const getAvatarStyleByBranch = (branchName) => {
 };
 
 const AdminHeader = ({ title }) => {
-  const [user, setUser] = useState({ name: "관리자", role: "Super Admin", branch: "", position: "" });
+  const [user, setUser] = useState({ name: "관리자", role: "admin", branch: "", position: "" });
 
   useEffect(() => {
     async function fetchMe() {
@@ -88,7 +88,7 @@ const AdminHeader = ({ title }) => {
         if (me) {
           setUser({
             name: me.name,
-            role: me.role === 'admin' ? 'Super Admin' : 'PB User',
+            role: me.role,
             branch: me.branch || '',
             position: me.position || ''
           });
@@ -99,7 +99,7 @@ const AdminHeader = ({ title }) => {
         if (localUser) {
           setUser({
             name: localUser.name || localUser.id,
-            role: localUser.role === 'admin' ? 'Super Admin' : 'PB User',
+            role: localUser.role,
             branch: "",
             position: ""
           });
@@ -117,7 +117,7 @@ const AdminHeader = ({ title }) => {
         <div className="admin-profile">
           <div className="admin-profile-info">
             <span className="admin-name">{user.name}</span>
-            <span className="admin-role">{user.role}</span>
+            <span className="admin-role">{user.role === 'superadmin' ? 'Super Admin' : 'Admin'}</span>
           </div>
           <LogOut onClick={() => { api.auth.logout(); window.location.href = '/login'; }} size={20} className="admin-logout" />
         </div>
@@ -148,7 +148,7 @@ export default function AdminPermissionSettings() {
     async function verifyAuth() {
       try {
         const me = await api.auth.getMe();
-        if (!me || (me.role !== "admin" && me.position !== "지점장")) {
+        if (!me || (me.role !== "admin" && me.role !== "superadmin")) {
           alert("권한이 없습니다.");
           window.location.href = "/daily-calendar";
           return;
