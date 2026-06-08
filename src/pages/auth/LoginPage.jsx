@@ -38,9 +38,7 @@ export default function LoginPage() {
       const user = await api.auth.login(id.trim(), password);
       setIsSubmitting(false);
 
-      if (user.role === "admin") {
-        navigate("/admin-system-dashboard");
-      } else if (user.position === "지점장") {
+      if (user.role === "admin" || user.role === "superadmin") {
         navigate("/admin-permission-settings");
       } else {
         navigate("/main");
