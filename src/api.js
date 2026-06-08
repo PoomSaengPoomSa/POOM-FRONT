@@ -253,6 +253,7 @@ export const api = {
       return api.get(`/admin/handovers${query}`);
     },
     getEmployeeCustomers: (u_id) => api.get(`/admin/employees/${u_id}/customers`),
-    transferCustomers: (u_id, body) => api.post(`/admin/employees/${u_id}/transfer`, body)
+    transferCustomers: (u_id, body) => api.post(`/admin/employees/${u_id}/transfer`, body),
+    getBranches: () => api.get("/admin/branches")
   }
 };

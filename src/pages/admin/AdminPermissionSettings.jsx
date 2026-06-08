@@ -140,7 +140,8 @@ export default function AdminPermissionSettings() {
   const [currentCustomerList, setCurrentCustomerList] = useState([]);
   const [selectedCustomers, setSelectedCustomers] = useState(new Set());
   const [transferEmp, setTransferEmp] = useState(null);
-  const [targetBranch, setTargetBranch] = useState("압구정 지점");
+  const [branches, setBranches] = useState([]);
+  const [targetBranch, setTargetBranch] = useState("");
   const [loading, setLoading] = useState(true);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
@@ -161,6 +162,24 @@ export default function AdminPermissionSettings() {
     }
     verifyAuth();
   }, []);
+
+  useEffect(() => {
+    async function fetchBranches() {
+      try {
+        const res = await api.admin.getBranches();
+        if (res && res.branches) {
+          setBranches(res.branches);
+          if (res.branches.length > 0) {
+            setTargetBranch(res.branches[0].name);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch branches:", err);
+      }
+    }
+    fetchBranches();
+  }, []);
+
 
   // Load employees and handover logs from database
   const loadData = async () => {
@@ -207,12 +226,16 @@ export default function AdminPermissionSettings() {
     setTransferEmp(emp);
 
     // Set target branch if pending
-    let initialTarget = "강남 지점";
+    let initialTarget = branches[0]?.name || "";
     if (emp.branchNote && emp.branchNote.includes("→")) {
       const parts = emp.branchNote.split("→");
-      initialTarget = parts[1].trim() + " 지점";
+      const destNamePart = parts[1].trim();
+      const foundBranch = branches.find(b => b.name.includes(destNamePart) || destNamePart.includes(b.name));
+      if (foundBranch) {
+        initialTarget = foundBranch.name;
+      }
     } else {
-      initialTarget = "압구정 지점"; // 기본값
+      initialTarget = branches[0]?.name || "";
     }
     setTargetBranch(initialTarget);
 
@@ -281,19 +304,9 @@ export default function AdminPermissionSettings() {
   const handleComplete = async () => {
     if (!transferEmp) return;
 
-    // 지점 명칭 -> DB b_id 매핑
-    const branchMapping = {
-      "강남 지점": 1,
-      "강남지점": 1,
-      "여의도 지점": 2,
-      "여의도지점": 2,
-      "압구정 지점": 3,
-      "압구정지점": 3,
-      "서초 지점": 4,
-      "서초지점": 4
-    };
-
-    const targetBranchId = branchMapping[targetBranch] || 3;
+    // Find target branch ID dynamically from the DB branches list
+    const foundBranch = branches.find(b => b.name === targetBranch);
+    const targetBranchId = foundBranch ? foundBranch.b_id : 1;
 
     const payload = {
       receiver_u_id: selectedReplacement,
@@ -389,9 +402,9 @@ export default function AdminPermissionSettings() {
               onChange={(e) => setBranchFilter(e.target.value)}
             >
               <option>전체지점</option>
-              <option>강남지점</option>
-              <option>여의도지점</option>
-              <option>압구정지점</option>
+              {branches.map(b => (
+                <option key={b.b_id} value={b.name}>{b.name}</option>
+              ))}
             </select>
           </div>
 
@@ -604,10 +617,9 @@ export default function AdminPermissionSettings() {
                   </div>
                   <div className="branch-new">
                     <select value={targetBranch} onChange={(e) => setTargetBranch(e.target.value)}>
-                      <option>압구정 지점</option>
-                      <option>여의도 지점</option>
-                      <option>서초 지점</option>
-                      <option>강남 지점</option>
+                      {branches.map(b => (
+                        <option key={b.b_id} value={b.name}>{b.name}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
