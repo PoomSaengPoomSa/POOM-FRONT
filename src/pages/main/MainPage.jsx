@@ -609,18 +609,11 @@ export default function MainPage() {
         })));
 
         const allResponse = await api.customer.getList("all");
-        const risksResults = await Promise.all(
-          allResponse.map(async (c) => {
-            try { return { customer: c, risk: await api.customer.getChurnRisk(c.c_id) }; } 
-            catch { return { customer: c, risk: null }; }
-          })
-        );
-
-        setChurnRiskCustomers(risksResults
-          .filter((item) => item.risk && CHURN_RISK_GRADES.includes(item.risk.grade))
-          .map((item) => ({
-            id: item.customer.c_id, name: item.customer.name, grade: item.risk.grade,
-            reason: item.risk.reason, initial: item.customer.name?.[0] ?? "고", avatarType: "risk",
+        setChurnRiskCustomers(allResponse
+          .filter((c) => c.churn_grade && CHURN_RISK_GRADES.includes(c.churn_grade))
+          .map((c) => ({
+            id: c.c_id, name: c.name, grade: c.churn_grade,
+            reason: c.churn_reason, initial: c.name?.[0] ?? "고", avatarType: "risk",
           }))
         );
       } catch (e) { console.error("Failed to load customer list or risks:", e); } 
