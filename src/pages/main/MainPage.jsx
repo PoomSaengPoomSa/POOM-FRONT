@@ -776,6 +776,17 @@ export default function MainPage() {
     return result.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
   }, [todayVisitors, churnRiskCustomers]);
 
+  const sortedTodayVisitors = useMemo(() => {
+    const todayStr = toDateStr(new Date());
+    return [...todayVisitors].sort((a, b) => {
+      const aSched = events.find(e => e.c_id === a.id && e.category === '상담' && e.startTime.startsWith(todayStr));
+      const bSched = events.find(e => e.c_id === b.id && e.category === '상담' && e.startTime.startsWith(todayStr));
+      const aTime = aSched ? aSched.startTime.split(" ")[1] : "99:99";
+      const bTime = bSched ? bSched.startTime.split(" ")[1] : "99:99";
+      return aTime.localeCompare(bTime);
+    });
+  }, [todayVisitors, events]);
+
   const renderDailyTimeline = () => (
     <div className="daily-timeline-list">
       {mergedTimeline.length === 0 ? (
@@ -1104,9 +1115,12 @@ export default function MainPage() {
                 </div>
                 {!expandedCustomerId && (
                   <div className="briefing-list-container">
-                    {loadingCustomers ? <div className="briefing-loading">브리핑 데이터를 분석 중입니다...</div> : todayVisitors.length === 0 ? <div className="briefing-empty">오늘 예정된 방문 브리핑이 없습니다.</div> : (
-                      todayVisitors.map((v) => {
+                    {loadingCustomers ? <div className="briefing-loading">브리핑 데이터를 분석 중입니다...</div> : sortedTodayVisitors.length === 0 ? <div className="briefing-empty">오늘 예정된 방문 브리핑이 없습니다.</div> : (
+                      sortedTodayVisitors.map((v) => {
                         const churnItem = churnRiskCustomers.find((cr) => cr.id === v.id);
+                        const todayStr = toDateStr(new Date());
+                        const apptEvent = events.find(e => e.c_id === v.id && e.category === '상담' && e.startTime.startsWith(todayStr));
+                        const apptTime = apptEvent ? apptEvent.startTime.split(" ")[1] : "";
                         return (
                           <div key={v.id} className="briefing-card" onClick={(e) => { e.stopPropagation(); handleVisitorClick(v.id); }} style={{ cursor: "pointer" }}>
                             <div className="briefing-card-top">
@@ -1114,6 +1128,7 @@ export default function MainPage() {
                                 {v.name} <span className="vip-tag">{v.grade}</span>
                                 {churnItem && <span className={`risk-tag-new ${churnItem.grade === "주의" ? "warning" : "danger"}`}>{churnItem.grade}</span>}
                               </span>
+                              {apptTime && <span className="briefing-time">{apptTime}</span>}
                             </div>
                             <div className="briefing-card-body">
                               {churnItem && <div className="briefing-risk-wrap"><span className="risk-text">{formatBriefingText(churnItem.reason)}</span></div>}

@@ -431,11 +431,21 @@ export default function NotificationCenter() {
                     onClick={() => handleCardClick(notif)}
                   >
                     {/* Left Side: Badge & Content */}
-                    <div className="notif-alert-left">
-                      <span className={`notif-alert-badge badge-${notif.category}`}>
-                        {notif.type}
-                      </span>
-                      <span className="notif-alert-content">
+                    <div className="notif-alert-left" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                      {notif.tags && notif.tags.length > 0 ? (
+                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                          {notif.tags.map((tag, tIdx) => (
+                            <span key={tIdx} className={`notif-alert-badge badge-${tag.category}`}>
+                              {tag.type}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className={`notif-alert-badge badge-${notif.category}`}>
+                          {notif.type}
+                        </span>
+                      )}
+                      <span className="notif-alert-content" style={{ marginLeft: '8px' }}>
                         {notif.content}
                       </span>
                     </div>
