@@ -14,7 +14,7 @@ import "./MainPage.css";
 const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 const DEFAULT_LEFT_WIDTH = 50;
 const MAX_NEWS_COUNT = 2;
-const MAX_NOTIFICATIONS = 5;
+const MAX_NOTIFICATIONS = 10;
 const CHURN_RISK_GRADES = ["위험", "주의"];
 
 const SCHEDULE_COLOR_MAP = {
@@ -627,7 +627,9 @@ export default function MainPage() {
       try {
         setLoadingNotifications(true);
         const data = await api.notification.getList("today");
-        setNotifications(data.slice(0, MAX_NOTIFICATIONS));
+        // 방문 예정 브리핑은 좌측의 'AI 방문 브리핑' 카드에서 처리하므로 일반 알림 목록에서 필터링 후 노출합니다.
+        const generalNotifications = data.filter((notif) => notif.type !== "방문 예정 브리핑");
+        setNotifications(generalNotifications.slice(0, MAX_NOTIFICATIONS));
       } catch (err) { console.error("Failed to fetch notifications:", err); } 
       finally { setLoadingNotifications(false); }
     };
