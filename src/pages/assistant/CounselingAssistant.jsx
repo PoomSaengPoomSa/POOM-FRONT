@@ -1005,7 +1005,7 @@ export default function CounselingAssistant() {
                               padding: '1px 6px',
                               borderRadius: 8,
                               letterSpacing: '0.3px',
-                            }}>AI INSIGHT</span>
+                            }}>AI 인사이트</span>
                               <span style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: 800 }}>금융 라이프스타일 분석</span>
                             </div>
                             <div className="ai-insight-body" style={{ fontSize: '12px' }}>
