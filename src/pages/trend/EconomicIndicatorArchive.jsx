@@ -31,6 +31,10 @@ export default function EconomicIndicatorArchive() {
   useEffect(() => {
     const type = tabToType[selectedTab];
     setIsLoading(true);
+    setLatestData(null);
+    setHistoryData(null);
+    setContributionData(null);
+    setReportData(null);
 
     const today = new Date();
     const to = today.toISOString().split('T')[0];
@@ -68,6 +72,15 @@ export default function EconomicIndicatorArchive() {
         setIsLoading(false);
       });
   }, [selectedTab]);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const parts = dateStr.split("-");
+    if (parts.length >= 2) {
+      return `${parts[0].slice(2)}.${parts[1]}`;
+    }
+    return dateStr;
+  };
 
   // Dynamic conic gradient string builder for SHAP contributions
   const getConicGradient = (contribs) => {
@@ -424,7 +437,7 @@ export default function EconomicIndicatorArchive() {
               <div style={{ display: 'flex', gap: 16 }}>
                 {/* 내일 예측 컴팩트 카드 */}
                 <div className="eco-box" style={{ padding: '14px 18px', flex: 1, background: 'rgba(255, 255, 255, 0.85)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--trend-text-main)', marginBottom: 8 }}>인공지능 내일 예측</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--trend-text-main)', marginBottom: 8 }}>AI 다음주 예측</div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 8 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -580,7 +593,7 @@ export default function EconomicIndicatorArchive() {
               <div style={{ display: 'flex', gap: 16 }}>
                 {/* 다음달 예측 컴팩트 카드 */}
                 <div className="eco-box" style={{ padding: '14px 18px', flex: 1, background: 'rgba(255, 255, 255, 0.85)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--trend-text-main)', marginBottom: 8 }}>인공지능 다음달 예측</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--trend-text-main)', marginBottom: 8 }}>AI 다음달 예측</div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 8 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -746,19 +759,57 @@ export default function EconomicIndicatorArchive() {
                 <div className="eco-box" style={{ padding: '12px 16px', flex: 0.9, display: 'flex', flexDirection: 'column' }}>
                   <div className="eco-box-title" style={{ fontSize: 13, marginBottom: 8 }}>부동산 추이·예측</div>
                   <div style={{ height: 110, position: 'relative', marginTop: 4 }}>
-                    <div style={{ position: 'absolute', top: -14, right: 0, fontSize: 8, color: '#94a3b8' }}>
-                      {historyData?.source || "ECOS - FRED"}
-                    </div>
                     {isLoading || !svgPaths ? (
                       <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 11 }}>
                         차트 데이터를 불러오는 중...
                       </div>
                     ) : (
-                      <svg viewBox="0 25 400 145" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                      <svg viewBox="-35 20 435 155" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                         {/* Grid Lines */}
-                        <line x1="0" y1="40" x2="400" y2="40" stroke="#f8fafc" strokeWidth="1" />
-                        <line x1="0" y1="95" x2="400" y2="95" stroke="#f8fafc" strokeWidth="1" />
-                        <line x1="0" y1="150" x2="400" y2="150" stroke="#f1f5f9" strokeWidth="1.5" />
+                        <line x1="0" y1="40" x2="380" y2="40" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
+                        <line x1="0" y1="95" x2="380" y2="95" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" />
+                        <line x1="0" y1="150" x2="380" y2="150" stroke="#cbd5e1" strokeWidth="1.5" />
+
+                        {/* Y-axis elements */}
+                        <line x1="0" y1="40" x2="0" y2="150" stroke="#cbd5e1" strokeWidth="1.5" />
+                        <line x1="-4" y1="40" x2="0" y2="40" stroke="#cbd5e1" strokeWidth="1.5" />
+                        <text x="-8" y="43" fontSize="9" fontWeight="500" fill="#64748b" textAnchor="end">
+                          {historyData?.stats?.max ? historyData.stats.max.toFixed(1) : ""}
+                        </text>
+                        <line x1="-4" y1="95" x2="0" y2="95" stroke="#cbd5e1" strokeWidth="1.5" />
+                        <text x="-8" y="98" fontSize="9" fontWeight="500" fill="#64748b" textAnchor="end">
+                          {historyData?.stats ? ((historyData.stats.min + historyData.stats.max) / 2).toFixed(1) : ""}
+                        </text>
+                        <line x1="-4" y1="150" x2="0" y2="150" stroke="#cbd5e1" strokeWidth="1.5" />
+                        <text x="-8" y="153" fontSize="9" fontWeight="500" fill="#64748b" textAnchor="end">
+                          {historyData?.stats?.min ? historyData.stats.min.toFixed(1) : ""}
+                        </text>
+
+                        {/* X-axis ticks & date labels */}
+                        {historyData?.series?.[0] && (
+                          <>
+                            <line x1="0" y1="150" x2="0" y2="154" stroke="#cbd5e1" strokeWidth="1.5" />
+                            <text x="0" y="167" fontSize="9" fontWeight="500" fill="#64748b" textAnchor="middle">
+                              {formatDate(historyData.series[0].date)}
+                            </text>
+                          </>
+                        )}
+                        {historyData?.series?.[Math.floor(historyData.series.length / 2)] && (
+                          <>
+                            <line x1="150" y1="150" x2="150" y2="154" stroke="#cbd5e1" strokeWidth="1.5" />
+                            <text x="150" y="167" fontSize="9" fontWeight="500" fill="#64748b" textAnchor="middle">
+                              {formatDate(historyData.series[Math.floor(historyData.series.length / 2)].date)}
+                            </text>
+                          </>
+                        )}
+                        {historyData?.series?.[historyData.series.length - 1] && (
+                          <>
+                            <line x1="300" y1="150" x2="300" y2="154" stroke="#cbd5e1" strokeWidth="1.5" />
+                            <text x="300" y="167" fontSize="9" fontWeight="500" fill="#64748b" textAnchor="middle">
+                              {formatDate(historyData.series[historyData.series.length - 1].date)}
+                            </text>
+                          </>
+                        )}
 
                         {/* History Curve */}
                         <path d={svgPaths.historyPath} fill="none" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -792,38 +843,37 @@ export default function EconomicIndicatorArchive() {
                 </div>
 
                 {/* 컴팩트 주요 수치 지표 */}
-                <div className="eco-box" style={{ padding: '12px 16px', flex: 1, background: 'rgba(255, 255, 255, 0.85)', display: 'flex', flexDirection: 'column' }}>
-                  <div className="eco-box-title" style={{ fontSize: 13, marginBottom: 8 }}>인공지능 다음달 예측</div>
-                  <div className="indicator-stats" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginTop: 'auto', marginBottom: 2 }}>
+                <div className="eco-box" style={{ padding: '14px 18px', flex: 1, background: 'rgba(255, 255, 255, 0.85)', display: 'flex', flexDirection: 'column' }}>
+                  <div className="eco-box-title" style={{ fontSize: 13, marginBottom: 4 }}>AI 다음달 예측</div>
+                  <div className="indicator-stats" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6, marginTop: 14, marginBottom: 8, flex: 1 }}>
                     {isLoading || !latestData ? (
                       <div style={{ padding: 10, textAlign: 'center', color: '#64748b', fontSize: 11, width: '100%' }}>로딩 중...</div>
                     ) : (
                       <>
-                        <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                          <span className="indicator-stat-label" style={{ fontSize: 10, color: 'var(--trend-text-muted)', fontWeight: 600 }}>지난달</span>
-                          <span className="indicator-stat-value" style={{ fontSize: 12, color: 'var(--trend-text-muted)', fontWeight: 500 }}>{latestData.yesterday.value}</span>
+                        <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, justifyContent: 'center', height: '100%' }}>
+                          <span className="indicator-stat-label" style={{ fontSize: 11, color: 'var(--trend-text-muted)', fontWeight: 600, marginBottom: 4 }}>지난달</span>
+                          <span className="indicator-stat-value" style={{ fontSize: 15, color: 'var(--trend-text-muted)', fontWeight: 600 }}>{latestData.yesterday.value}</span>
                         </div>
-                        <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                          <span className="indicator-stat-label" style={{ fontSize: 10, color: 'var(--trend-text-muted)', fontWeight: 600 }}>이번달</span>
-                          <span className="indicator-stat-value" style={{ fontSize: 12, color: 'var(--trend-text-muted)', fontWeight: 500 }}>{latestData.today.value}</span>
+                        <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, justifyContent: 'center', height: '100%' }}>
+                          <span className="indicator-stat-label" style={{ fontSize: 11, color: 'var(--trend-text-muted)', fontWeight: 600, marginBottom: 4 }}>이번달</span>
+                          <span className="indicator-stat-value" style={{ fontSize: 15, color: 'var(--trend-text-muted)', fontWeight: 600, marginBottom: 4 }}>{latestData.today.value}</span>
                           <span
                             className={`indicator-stat-change ${latestData.today.direction}`}
                             style={{
                               background: latestData.today.direction === 'up' ? '#dcfce7' : latestData.today.direction === 'down' ? '#fee2e2' : '#f1f5f9',
                               color: latestData.today.direction === 'up' ? '#16a34a' : latestData.today.direction === 'down' ? '#ef4444' : '#64748b',
-                              padding: '1px 3px',
+                              padding: '2px 4px',
                               borderRadius: 3,
-                              fontSize: 8,
-                              fontWeight: 700,
-                              marginTop: 1
+                              fontSize: 9,
+                              fontWeight: 700
                             }}
                           >
                             {formatChange(latestData.today.changeRate, latestData.today.direction, latestData.type)}
                           </span>
                         </div>
-                        <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1.1 }}>
-                          <span className="indicator-stat-label" style={{ fontSize: 10, color: '#3b82f6', fontWeight: 800 }}>다음달(예측)</span>
-                          <span className="indicator-stat-value large" style={{ fontSize: 20, fontWeight: 800, color: '#3b82f6', lineHeight: 1.1 }}>{latestData.tomorrow.value ?? "-"}</span>
+                        <div className="indicator-stat-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1.2, justifyContent: 'center', height: '100%' }}>
+                          <span className="indicator-stat-label" style={{ fontSize: 12, color: '#3b82f6', fontWeight: 800, marginBottom: 4 }}>다음달(예측)</span>
+                          <span className="indicator-stat-value large" style={{ fontSize: 32, fontWeight: 800, color: '#3b82f6', lineHeight: 1.1, marginBottom: 4 }}>{latestData.tomorrow.value ?? "-"}</span>
                           {latestData.tomorrow.value !== null && (
                             <span
                               className={`indicator-stat-change ${latestData.tomorrow.direction}`}
