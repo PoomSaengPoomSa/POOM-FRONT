@@ -403,7 +403,7 @@ export default function AdminEmployeeDashboard() {
             }}>
               {esStatus === "오류" ? "연결 끊김" : val(metrics?.active_employees, "명")}
             </div>
-            <div className="admin-stat-sub" style={{ marginTop: '8px', fontSize: '13px', color: esStatus === "오류" ? '#ef4444' : '#10b981', fontWeight: '600' }}>
+            <div className="admin-stat-sub" style={{ marginTop: '8px', fontSize: '13px', color: esStatus === "오류" ? '#ef4444' : '#6b7280' }}>
               {esStatus === "오류"
                 ? "실시간 집계 불가 (ES 확인)"
                 : (metrics?.active_employees_sub ?? <span style={{ color: '#9ca3af' }}>-</span>)
@@ -520,7 +520,7 @@ export default function AdminEmployeeDashboard() {
                   <LineChart data={trendData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
-                    <YAxis axisLine={false} tickLine={false} domain={[50, 90]} ticks={[50, 55, 60, 65, 70, 75, 80, 85, 90]} tickFormatter={(val) => `${val}%`} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                    <YAxis axisLine={false} tickLine={false} domain={[0, 100]} ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={(val) => `${val}%`} tick={{ fontSize: 12, fill: '#6b7280' }} />
                     <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: 12 }} />
                     <Line 
                       type="monotone" 
