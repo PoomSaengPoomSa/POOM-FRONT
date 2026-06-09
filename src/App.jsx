@@ -241,7 +241,7 @@ export default function App() {
               if (latestBriefing) {
                 setActiveAlert(latestBriefing);
                 
-                const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-84.wav");
+                const audio = new Audio("/ding.mp3");
                 audio.play().catch(e => console.log("실시간 알림 효과음 재생 실패:", e));
               }
             }
