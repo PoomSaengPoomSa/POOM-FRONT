@@ -142,7 +142,7 @@ export default function TrendArchive() {
               </div>
 
               <div className="indicator-card-right" style={{ justifyContent: 'flex-start', gap: 6 }}>
-                <span className="indicator-predict-label" style={{ marginBottom: 4 }}>내일 예측</span>
+                <span className="indicator-predict-label" style={{ marginBottom: 4 }}>다음주 예측</span>
                 {/* 상승 */}
                 <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, width: '100%' }}>
                   <span style={{ color: 'var(--trend-text-main)', fontWeight: 600, width: 28 }}>상승</span>
@@ -167,7 +167,7 @@ export default function TrendArchive() {
             </div>
 
             {/* Real Estate (부동산 가격지수) */}
-            <div className="indicator-card horizontal-card" style={{ position: 'relative' }}>
+            <div className="indicator-card horizontal-card">
               <div className="indicator-card-left" style={{ justifyContent: 'space-between', zIndex: 1 }}>
                 <div className="indicator-title-row">
                   <div className="indicator-icon"><Home size={20} color="#0f172a" /></div>
@@ -193,10 +193,10 @@ export default function TrendArchive() {
                 </div>
               </div>
 
-              <div className="indicator-card-right" style={{ justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 1 }}>
+              <div className="indicator-card-right" style={{ justifyContent: 'flex-start', alignItems: 'flex-end', zIndex: 1, gap: 4 }}>
                 <span className="indicator-predict-label">다음달 예측</span>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: 'auto', marginBottom: 2 }}>
-                  <span style={{ fontSize: 24, fontWeight: 800, color: '#0284c7', fontFamily: "'Inter', sans-serif", lineHeight: 1.1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginBottom: 2 }}>
+                  <span style={{ fontSize: 34, fontWeight: 800, color: '#0284c7', fontFamily: "'Inter', sans-serif", lineHeight: 1.1 }}>
                     {isLoading ? "..." : (indicators?.realEstate?.tomorrow ?? "-")}
                   </span>
                   {!isLoading && indicators?.realEstate && indicators.realEstate.changeRate !== undefined && (
@@ -211,22 +211,6 @@ export default function TrendArchive() {
                     </span>
                   )}
                 </div>
-              </div>
-              
-              {/* Background Micro Sparkline */}
-              <div style={{ 
-                position: 'absolute', 
-                left: 0, 
-                right: 0, 
-                bottom: 0, 
-                height: 32, 
-                opacity: 0.35, 
-                pointerEvents: 'none' 
-              }}>
-                <svg viewBox="0 0 100 35" style={{ width: '100%', height: '100%', fill: 'none', stroke: '#0284c7', strokeWidth: 2 }}>
-                  <path d="M 0 25 Q 20 28 40 20 T 70 24 T 100 15" />
-                  <circle cx="100" cy="15" r="3" fill="#0284c7" />
-                </svg>
               </div>
             </div>
 
