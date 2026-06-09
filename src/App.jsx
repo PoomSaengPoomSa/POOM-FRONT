@@ -239,10 +239,31 @@ export default function App() {
             if (list && list.length > 0) {
               const latestBriefing = list.find(n => n.isBriefing);
               if (latestBriefing) {
-                setActiveAlert(latestBriefing);
+                // 방문 시간 파싱 (예: "홍길동 고객 — 17:00 방문 예정")
+                const timeMatch = latestBriefing.content.match(/(\d{2}):(\d{2})/);
+                let shouldPopup = true;
                 
-                const audio = new Audio("/ding.mp3");
-                audio.play().catch(e => console.log("실시간 알림 효과음 재생 실패:", e));
+                if (timeMatch) {
+                  const visitHours = parseInt(timeMatch[1], 10);
+                  const visitMinutes = parseInt(timeMatch[2], 10);
+                  
+                  const now = new Date();
+                  const visitTime = new Date(now);
+                  visitTime.setHours(visitHours, visitMinutes, 0, 0);
+                  
+                  // 현재 시간이 방문 시간보다 10분 이상 지났다면 실시간 팝업을 띄우지 않습니다.
+                  const tenMinutes = 10 * 60 * 1000;
+                  if (now.getTime() - visitTime.getTime() > tenMinutes) {
+                    shouldPopup = false;
+                  }
+                }
+                
+                if (shouldPopup) {
+                  setActiveAlert(latestBriefing);
+                  
+                  const audio = new Audio("/ding.mp3");
+                  audio.play().catch(e => console.log("실시간 알림 효과음 재생 실패:", e));
+                }
               }
             }
           }
