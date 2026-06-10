@@ -37,6 +37,8 @@ jobs:
           proxy_host: ${{ secrets.BASTION_HOST }}
           proxy_username: ${{ secrets.SERVER_USER }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 60s
+          command_timeout: 10m
           envs: GHCR_TOKEN
           script: |
             echo "$GHCR_TOKEN" | docker login ghcr.io -u poomsaengpoomsa --password-stdin
