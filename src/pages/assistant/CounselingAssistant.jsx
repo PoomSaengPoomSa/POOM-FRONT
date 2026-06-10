@@ -53,7 +53,7 @@ export default function CounselingAssistant() {
     try {
       const tabParam = showTodayOnly ? 'today' : 'all';
       const response = await api.customer.getList(tabParam);
-      
+
       const mapped = response.map((c) => {
         const char = c.name ? c.name[0] : "고";
         const avatarColor = c.gender === "F" ? "pink" : "blue";
@@ -75,7 +75,7 @@ export default function CounselingAssistant() {
       } else {
         setAllCustomersList(mapped);
       }
-      
+
       if (pendingSelectedCustomerIdRef.current) {
         setSelectedCustomerId(pendingSelectedCustomerIdRef.current);
         pendingSelectedCustomerIdRef.current = null;
@@ -96,7 +96,7 @@ export default function CounselingAssistant() {
       setFullCustomerDetail(null);
       return;
     }
-    
+
     const fetchDetail = async () => {
       try {
         const detail = await api.customer.getDetail(selectedCustomerId);
@@ -105,7 +105,7 @@ export default function CounselingAssistant() {
         console.error("고객 상세 정보 조회 실패:", error);
       }
     };
-    
+
     fetchDetail();
   }, [selectedCustomerId]);
 
@@ -116,7 +116,7 @@ export default function CounselingAssistant() {
       setSimulatorSaved(true);
       return;
     }
-    
+
     const fetchSimInfo = async () => {
       try {
         const res = await api.customer.getSimulatorInfo(selectedCustomerId);
@@ -146,7 +146,7 @@ export default function CounselingAssistant() {
         console.error("시뮬레이터 정보 조회 실패:", error);
       }
     };
-    
+
     fetchSimInfo();
   }, [selectedCustomerId]);
 
@@ -171,7 +171,7 @@ export default function CounselingAssistant() {
       setExpandedTimelineId(null);
       return;
     }
-    
+
     fetchTimeline(selectedCustomerId);
   }, [selectedCustomerId]);
 
@@ -207,14 +207,14 @@ export default function CounselingAssistant() {
 
   const handleGenerateReport = async () => {
     if (!selectedCustomerId || !memoText.trim()) return;
-    
+
     setIsGenerating(true);
     try {
       const res = await api.customer.generateReport(selectedCustomerId, {
         memo: memoText,
         consult_date: consultDate
       });
-      
+
       if (res && res.data) {
         setGeneratedReport({
           ...res.data,
@@ -241,7 +241,7 @@ export default function CounselingAssistant() {
       alert("상담 메모를 입력해주세요.");
       return;
     }
-    
+
     const reportContent = {
       main_content: generatedReport?.main_content || "",
       special_remarks: generatedReport?.special_remarks || "",
@@ -268,14 +268,14 @@ export default function CounselingAssistant() {
         const dd = String(today.getDate()).padStart(2, '0');
         setConsultDate(`${yyyy}-${mm}-${dd}`);
       }, 2000);
-      
+
       await fetchTimeline(selectedCustomerId);
     } catch (error) {
       console.error("보고서 저장 실패:", error);
       alert("보고서 저장 중 오류가 발생했습니다: " + error.message);
     }
   };
-  
+
   const currentList = showTodayOnly ? todayCustomersList : allCustomersList;
   const selectedCustomer = (allCustomersList.concat(todayCustomersList).find(c => c.id === selectedCustomerId) || currentList[0]) || { name: "로딩중...", color: "gray", initial: "고" };
 
@@ -350,8 +350,8 @@ export default function CounselingAssistant() {
     risk: fullCustomerDetail?.tendency || "위험 중립형",
     assets: formatAssets(fullCustomerDetail?.total_assets),
     assetsRaw: fullCustomerDetail?.total_assets !== undefined ? (fullCustomerDetail.total_assets / 100000000) : 0, // in 100M units
-    needs: fullCustomerDetail?.llm_insight ? 
-      (fullCustomerDetail.llm_insight.length > 30 ? fullCustomerDetail.llm_insight.slice(0, 30) + "..." : fullCustomerDetail.llm_insight) 
+    needs: fullCustomerDetail?.llm_insight ?
+      (fullCustomerDetail.llm_insight.length > 30 ? fullCustomerDetail.llm_insight.slice(0, 30) + "..." : fullCustomerDetail.llm_insight)
       : "AI의 분석이 진행되지 않았습니다.",
     insight: fullCustomerDetail?.llm_insight || "AI의 분석이 진행되지 않았습니다.",
     products: fullCustomerDetail ? [
@@ -360,8 +360,8 @@ export default function CounselingAssistant() {
       fullCustomerDetail.pension > 0 ? "연금보험" : null,
     ].filter(Boolean).join(" + ") || "보유 상품 없음" : "보유 상품 없음",
     lastCounsel: timelineList.length > 0 ? timelineList[0].date : "상담 이력 없음",
-    nextCounsel: (timelineList.length > 0 && timelineDetails[timelineList[0].timelineId]?.content?.next_consult) 
-      ? timelineDetails[timelineList[0].timelineId].content.next_consult 
+    nextCounsel: (timelineList.length > 0 && timelineDetails[timelineList[0].timelineId]?.content?.next_consult)
+      ? timelineDetails[timelineList[0].timelineId].content.next_consult
       : "미정"
   };
 
@@ -395,25 +395,25 @@ export default function CounselingAssistant() {
 
   const handleSendQuestion = async () => {
     if (!selectedCustomerId || !currentQuestion.trim()) return;
-    
+
     const question = currentQuestion;
     const notes = additionalNotes[selectedCustomerId] || "";
-    
+
     const userMsg = { sender: 'user', text: question };
     setChatMessages(prev => ({
       ...prev,
       [selectedCustomerId]: [...(prev[selectedCustomerId] || []), userMsg]
     }));
-    
+
     setCurrentQuestion("");
     setIsTyping(true);
-    
+
     try {
       const res = await api.customer.simulatorChat(selectedCustomerId, {
         question: question,
         additional_notes: notes
       });
-      
+
       if (res && res.data && res.data.answer) {
         const aiMsg = { sender: 'ai', text: res.data.answer };
         setChatMessages(prev => ({
@@ -433,9 +433,9 @@ export default function CounselingAssistant() {
     }
   };
 
-  const filteredCustomers = currentList.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    c.email.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredCustomers = currentList.filter(c =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.phone.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -449,11 +449,11 @@ export default function CounselingAssistant() {
       <div className={`cust-main ${isDragging ? 'dragging' : ''}`}>
 
         {/* Left Panel */}
-        <div 
-          className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''} ${isNarrow ? 'narrow' : ''}`} 
-          style={{ 
-            width: isListCollapsed ? 0 : listWidth, 
-            flexShrink: 0, 
+        <div
+          className={`cust-list-panel ${isModalOpen ? 'cust-blurred-content' : ''} ${isNarrow ? 'narrow' : ''}`}
+          style={{
+            width: isListCollapsed ? 0 : listWidth,
+            flexShrink: 0,
             padding: isListCollapsed ? 0 : (isNarrow ? '20px 10px' : '24px'),
             overflow: 'hidden',
             border: isListCollapsed ? 'none' : '1px solid var(--cust-glass-border)',
@@ -464,13 +464,13 @@ export default function CounselingAssistant() {
             <h2 className="cust-list-title" style={{ fontSize: isNarrow ? '15px' : '18px' }}>나의 고객</h2>
             <button className="cust-add-btn" onClick={() => setIsModalOpen(true)}><Plus size={16} /></button>
           </div>
-          
+
           <div className="cust-search" style={{ marginBottom: isNarrow ? '16px' : '24px' }}>
             <Search size={16} className="cust-search-icon" style={{ left: isNarrow ? '10px' : '12px' }} />
-            <input 
-              type="text" 
-              className="cust-search-input" 
-              placeholder={isNarrow ? "" : "Search"} 
+            <input
+              type="text"
+              className="cust-search-input"
+              placeholder={isNarrow ? "" : "Search"}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ paddingLeft: isNarrow ? '32px' : '40px', paddingRight: isNarrow ? '8px' : '16px' }}
@@ -479,18 +479,18 @@ export default function CounselingAssistant() {
 
           <div className="cust-filter-area" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isNarrow ? '12px' : '16px' }}>
             <label className="cust-checkbox-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: isNarrow ? '11px' : '13px', fontWeight: 600, color: '#334155', userSelect: 'none' }}>
-              <input 
-                type="checkbox" 
-                className="cust-checkbox-input" 
+              <input
+                type="checkbox"
+                className="cust-checkbox-input"
                 checked={showTodayOnly}
                 onChange={(e) => setShowTodayOnly(e.target.checked)}
-                style={{ 
-                  width: '14px', 
-                  height: '14px', 
-                  accentColor: '#0284c7', 
+                style={{
+                  width: '14px',
+                  height: '14px',
+                  accentColor: '#0284c7',
                   cursor: 'pointer',
                   borderRadius: '4px'
-                }} 
+                }}
               />
               <span>{isNarrow ? '오늘 방문' : '오늘 방문 고객만 보기'}</span>
             </label>
@@ -498,11 +498,11 @@ export default function CounselingAssistant() {
 
           <div className="cust-list-items">
             {filteredCustomers.map(c => (
-              <div 
-                className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`} 
-                key={c.id} 
-                onClick={() => { setSelectedCustomerId(c.id); setIsListCollapsed(true); }} 
-                style={{ 
+              <div
+                className={`cust-list-item ${selectedCustomerId === c.id ? 'active' : ''}`}
+                key={c.id}
+                onClick={() => { setSelectedCustomerId(c.id); setIsListCollapsed(true); }}
+                style={{
                   cursor: 'pointer',
                   padding: isNarrow ? '10px 8px' : '12px 16px',
                   gap: isNarrow ? '10px' : '16px'
@@ -526,11 +526,11 @@ export default function CounselingAssistant() {
         </div>
 
         {/* Resizer Divider */}
-        <div 
-          className={`cust-resizer ${isDragging ? 'dragging' : ''}`} 
-          onMouseDown={isListCollapsed ? null : handleMouseDown} 
-          style={{ 
-            width: isListCollapsed ? '16px' : '24px', 
+        <div
+          className={`cust-resizer ${isDragging ? 'dragging' : ''}`}
+          onMouseDown={isListCollapsed ? null : handleMouseDown}
+          style={{
+            width: isListCollapsed ? '16px' : '24px',
             cursor: isListCollapsed ? 'default' : 'col-resize',
             position: 'relative'
           }}
@@ -631,604 +631,604 @@ export default function CounselingAssistant() {
 
               {/* Unified Single Scroll Layout */}
               <div style={{ display: 'flex', flexDirection: 'column', padding: '8px 24px 32px 24px', gap: '24px' }}>
-                
+
                 {/* Section 1: Memo Assistant (Top Workspace) */}
                 {activeTab === "memo" && (
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '4px', height: '17px', background: '#8b5cf6', borderRadius: '2px', display: 'inline-block' }}></span>
-                    상담 메모 및 보고서 어시스턴트
-                  </div>
-                  
-                  <div className="memo-layout-grid" style={{ marginBottom: 0 }}>
-                    {/* Left Container (Dynamic): Memo Input OR AI Report */}
-                    {generatedReport ? (
-                      /* AI Report (with editable textareas) */
-                      <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                          <div className="memo-box-title" style={{ margin: 0, fontSize: '13px', fontWeight: 700 }}>AI 상담 보고서</div>
-                          <button 
-                            onClick={() => setGeneratedReport(null)} 
-                            style={{
-                              fontSize: '11px',
-                              color: '#0284c7',
-                              background: '#e0f2fe',
-                              border: 'none',
-                              borderRadius: '12px',
-                              padding: '4px 10px',
-                              cursor: 'pointer',
-                              fontWeight: '600',
-                              transition: 'background 0.2s'
-                            }}
-                          >
-                            메모 다시 작성
-                          </button>
-                        </div>
-                        
-                        <table className="report-table">
-                          <tbody>
-                            <tr>
-                              <th>고객명</th>
-                              <td>
-                                <input 
-                                  type="text" 
-                                  value={generatedReport.customer_name || ""} 
-                                  onChange={(e) => handleReportFieldChange("customer_name", e.target.value)}
-                                  style={{ 
-                                    width: '100%', 
-                                    padding: '8px', 
-                                    border: '1px solid #cbd5e1', 
-                                    borderRadius: '6px', 
-                                    boxSizing: 'border-box',
-                                    fontSize: '13px',
-                                    outline: 'none',
-                                    color: '#334155'
-                                  }}
-                                />
-                              </td>
-                            </tr>
-                            <tr>
-                              <th>주요 내용</th>
-                              <td>
-                                <textarea 
-                                  value={generatedReport.main_content || ""} 
-                                  onChange={(e) => handleReportFieldChange("main_content", e.target.value)}
-                                  style={{ 
-                                    width: '100%', 
-                                    padding: '8px', 
-                                    border: '1px solid #cbd5e1', 
-                                    borderRadius: '6px', 
-                                    boxSizing: 'border-box', 
-                                    minHeight: '85px', 
-                                    fontFamily: 'inherit', 
-                                    resize: 'vertical',
-                                    fontSize: '13px',
-                                    outline: 'none',
-                                    color: '#334155'
-                                  }}
-                                />
-                              </td>
-                            </tr>
-                            <tr>
-                              <th>특이사항</th>
-                              <td>
-                                <textarea 
-                                  value={generatedReport.special_remarks || ""} 
-                                  onChange={(e) => handleReportFieldChange("special_remarks", e.target.value)}
-                                  style={{ 
-                                    width: '100%', 
-                                    padding: '8px', 
-                                    border: '1px solid #cbd5e1', 
-                                    borderRadius: '6px', 
-                                    boxSizing: 'border-box', 
-                                    minHeight: '65px', 
-                                    fontFamily: 'inherit', 
-                                    resize: 'vertical',
-                                    fontSize: '13px',
-                                    outline: 'none',
-                                    color: '#334155'
-                                  }}
-                                />
-                              </td>
-                            </tr>
-                            <tr>
-                              <th>후속 조치</th>
-                              <td>
-                                <textarea 
-                                  value={generatedReport.follow_up || ""} 
-                                  onChange={(e) => handleReportFieldChange("follow_up", e.target.value)}
-                                  style={{ 
-                                    width: '100%', 
-                                    padding: '8px', 
-                                    border: '1px solid #cbd5e1', 
-                                    borderRadius: '6px', 
-                                    boxSizing: 'border-box', 
-                                    minHeight: '65px', 
-                                    fontFamily: 'inherit', 
-                                    resize: 'vertical',
-                                    fontSize: '13px',
-                                    outline: 'none',
-                                    color: '#334155'
-                                  }}
-                                />
-                              </td>
-                            </tr>
-                            <tr>
-                              <th>요약</th>
-                              <td>
-                                <textarea 
-                                  value={generatedReport.summary || ""} 
-                                  onChange={(e) => handleReportFieldChange("summary", e.target.value)}
-                                  style={{ 
-                                    width: '100%', 
-                                    padding: '8px', 
-                                    border: '1px solid #cbd5e1', 
-                                    borderRadius: '6px', 
-                                    boxSizing: 'border-box', 
-                                    minHeight: '65px', 
-                                    fontFamily: 'inherit', 
-                                    resize: 'vertical',
-                                    fontSize: '13px',
-                                    outline: 'none',
-                                    color: '#334155'
-                                  }}
-                                />
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                    <div style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ width: '4px', height: '17px', background: '#8b5cf6', borderRadius: '2px', display: 'inline-block' }}></span>
+                      상담 메모 및 보고서 어시스턴트
+                    </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px', marginTop: '16px' }}>
-                          <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            ⚠️ AI를 통해 생성한 결과물에는 실수가 포함될 수 있습니다.
-                          </div>
-                          <div className="report-actions" style={{ justifyContent: 'flex-end', position: 'relative', width: '100%', margin: 0 }}>
-                            {showSaveToast && (
-                              <div style={{
-                                position: 'absolute', right: '80px', top: '50%', transform: 'translateY(-50%)',
-                                display: 'flex', alignItems: 'center', gap: 8,
-                                background: '#334155', color: 'white',
-                                padding: '6px 12px', borderRadius: 20,
-                                fontSize: 12, fontWeight: 500,
-                                whiteSpace: 'nowrap'
-                              }}>
-                                <div style={{ width: 16, height: 16, background: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <Check size={10} color="white" strokeWidth={3} />
-                                </div>
-                                저장완료
-                              </div>
-                            )}
-                            <button 
-                              className="report-btn report-btn-primary"
-                              onClick={handleSaveReport}
-                              style={{ fontSize: '12px' }}
+                    <div className="memo-layout-grid" style={{ marginBottom: 0 }}>
+                      {/* Left Container (Dynamic): Memo Input OR AI Report */}
+                      {generatedReport ? (
+                        /* AI Report (with editable textareas) */
+                        <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                            <div className="memo-box-title" style={{ margin: 0, fontSize: '13px', fontWeight: 700 }}>AI 상담 보고서</div>
+                            <button
+                              onClick={() => setGeneratedReport(null)}
+                              style={{
+                                fontSize: '11px',
+                                color: '#0284c7',
+                                background: '#e0f2fe',
+                                border: 'none',
+                                borderRadius: '12px',
+                                padding: '4px 10px',
+                                cursor: 'pointer',
+                                fontWeight: '600',
+                                transition: 'background 0.2s'
+                              }}
                             >
-                              저장
+                              메모 다시 작성
+                            </button>
+                          </div>
+
+                          <table className="report-table">
+                            <tbody>
+                              <tr>
+                                <th>고객명</th>
+                                <td>
+                                  <input
+                                    type="text"
+                                    value={generatedReport.customer_name || ""}
+                                    onChange={(e) => handleReportFieldChange("customer_name", e.target.value)}
+                                    style={{
+                                      width: '100%',
+                                      padding: '8px',
+                                      border: '1px solid #cbd5e1',
+                                      borderRadius: '6px',
+                                      boxSizing: 'border-box',
+                                      fontSize: '13px',
+                                      outline: 'none',
+                                      color: '#334155'
+                                    }}
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>주요 내용</th>
+                                <td>
+                                  <textarea
+                                    value={generatedReport.main_content || ""}
+                                    onChange={(e) => handleReportFieldChange("main_content", e.target.value)}
+                                    style={{
+                                      width: '100%',
+                                      padding: '8px',
+                                      border: '1px solid #cbd5e1',
+                                      borderRadius: '6px',
+                                      boxSizing: 'border-box',
+                                      minHeight: '85px',
+                                      fontFamily: 'inherit',
+                                      resize: 'vertical',
+                                      fontSize: '13px',
+                                      outline: 'none',
+                                      color: '#334155'
+                                    }}
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>특이사항</th>
+                                <td>
+                                  <textarea
+                                    value={generatedReport.special_remarks || ""}
+                                    onChange={(e) => handleReportFieldChange("special_remarks", e.target.value)}
+                                    style={{
+                                      width: '100%',
+                                      padding: '8px',
+                                      border: '1px solid #cbd5e1',
+                                      borderRadius: '6px',
+                                      boxSizing: 'border-box',
+                                      minHeight: '65px',
+                                      fontFamily: 'inherit',
+                                      resize: 'vertical',
+                                      fontSize: '13px',
+                                      outline: 'none',
+                                      color: '#334155'
+                                    }}
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>후속 조치</th>
+                                <td>
+                                  <textarea
+                                    value={generatedReport.follow_up || ""}
+                                    onChange={(e) => handleReportFieldChange("follow_up", e.target.value)}
+                                    style={{
+                                      width: '100%',
+                                      padding: '8px',
+                                      border: '1px solid #cbd5e1',
+                                      borderRadius: '6px',
+                                      boxSizing: 'border-box',
+                                      minHeight: '65px',
+                                      fontFamily: 'inherit',
+                                      resize: 'vertical',
+                                      fontSize: '13px',
+                                      outline: 'none',
+                                      color: '#334155'
+                                    }}
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>요약</th>
+                                <td>
+                                  <textarea
+                                    value={generatedReport.summary || ""}
+                                    onChange={(e) => handleReportFieldChange("summary", e.target.value)}
+                                    style={{
+                                      width: '100%',
+                                      padding: '8px',
+                                      border: '1px solid #cbd5e1',
+                                      borderRadius: '6px',
+                                      boxSizing: 'border-box',
+                                      minHeight: '65px',
+                                      fontFamily: 'inherit',
+                                      resize: 'vertical',
+                                      fontSize: '13px',
+                                      outline: 'none',
+                                      color: '#334155'
+                                    }}
+                                  />
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px', marginTop: '16px' }}>
+                            <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              ⚠️ AI를 통해 생성한 결과물에는 실수가 포함될 수 있습니다.
+                            </div>
+                            <div className="report-actions" style={{ justifyContent: 'flex-end', position: 'relative', width: '100%', margin: 0 }}>
+                              {showSaveToast && (
+                                <div style={{
+                                  position: 'absolute', right: '80px', top: '50%', transform: 'translateY(-50%)',
+                                  display: 'flex', alignItems: 'center', gap: 8,
+                                  background: '#334155', color: 'white',
+                                  padding: '6px 12px', borderRadius: 20,
+                                  fontSize: 12, fontWeight: 500,
+                                  whiteSpace: 'nowrap'
+                                }}>
+                                  <div style={{ width: 16, height: 16, background: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Check size={10} color="white" strokeWidth={3} />
+                                  </div>
+                                  저장완료
+                                </div>
+                              )}
+                              <button
+                                className="report-btn report-btn-primary"
+                                onClick={handleSaveReport}
+                                style={{ fontSize: '12px' }}
+                              >
+                                저장
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Memo Input */
+                        <div className="memo-box" style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                            <div className="memo-box-title" style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>AI 기반 상담 메모 구조화</div>
+                            <div className="consult-date-container">
+                              <span className="consult-date-label">상담 일자</span>
+                              <input
+                                type="date"
+                                className="consult-date-input"
+                                value={consultDate}
+                                onChange={(e) => setConsultDate(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <textarea
+                            className="memo-textarea"
+                            placeholder="상담 내용을 이곳에 메모하세요."
+                            value={memoText}
+                            onChange={(e) => setMemoText(e.target.value)}
+                            style={{ minHeight: '200px', flex: 1, marginBottom: '16px', resize: 'none', fontSize: '13px' }}
+                          />
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
+                            <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '12px' }}>
+                              💡 자유롭게 메모하세요. AI가 구조화된 상담 보고서로 변환합니다.
+                            </div>
+                            <button
+                              className="memo-small-btn"
+                              disabled={isGenerating}
+                              onClick={handleGenerateReport}
+                              style={{
+                                border: '1px solid #0284c7',
+                                color: 'white',
+                                background: '#0284c7',
+                                fontWeight: '600',
+                                whiteSpace: 'nowrap',
+                                cursor: isGenerating ? 'not-allowed' : 'pointer',
+                                opacity: isGenerating ? 0.6 : 1
+                              }}
+                            >
+                              {isGenerating ? "생성 중..." : "AI 보고서 생성"}
                             </button>
                           </div>
                         </div>
-                      </div>
-                    ) : (
-                      /* Memo Input */
-                      <div className="memo-box" style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                          <div className="memo-box-title" style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>AI 기반 상담 메모 구조화</div>
-                          <div className="consult-date-container">
-                            <span className="consult-date-label">상담 일자</span>
-                            <input 
-                              type="date" 
-                              className="consult-date-input"
-                              value={consultDate} 
-                              onChange={(e) => setConsultDate(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                        <textarea 
-                          className="memo-textarea" 
-                          placeholder="상담 내용을 이곳에 메모하세요."
-                          value={memoText}
-                          onChange={(e) => setMemoText(e.target.value)}
-                          style={{ minHeight: '200px', flex: 1, marginBottom: '16px', resize: 'none', fontSize: '13px' }}
-                        />
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
-                          <div className="memo-tip" style={{ margin: 0, width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '12px' }}>
-                            💡 자유롭게 메모하세요. AI가 구조화된 상담 보고서로 변환합니다.
-                          </div>
-                          <button 
-                            className="memo-small-btn" 
-                            disabled={isGenerating}
-                            onClick={handleGenerateReport}
-                            style={{ 
-                              border: '1px solid #0284c7', 
-                              color: 'white', 
-                              background: '#0284c7',
-                              fontWeight: '600',
-                              whiteSpace: 'nowrap',
-                              cursor: isGenerating ? 'not-allowed' : 'pointer',
-                              opacity: isGenerating ? 0.6 : 1
-                            }}
-                          >
-                            {isGenerating ? "생성 중..." : "AI 보고서 생성"}
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* Right Container (Always Timeline): Timeline History */}
-                    <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: '420px' }}>
-                      <div className="memo-box-title" style={{ marginBottom: '20px', fontSize: '15px', fontWeight: 700 }}>이전 상담 타임라인</div>
-                      
-                      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
-                        {timelineList.length === 0 ? (
-                          <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>
-                            이전 상담 타임라인 이력이 없습니다.
-                          </div>
-                        ) : (
-                          timelineList.map((item, index) => {
-                          const isExpanded = expandedTimelineId === item.timelineId;
-                          const isLast = index === timelineList.length - 1;
-                          return (
-                            <div key={item.timelineId} style={{ display: 'flex', gap: '16px', marginBottom: '8px' }}>
-                              {/* 왼쪽 dot + line */}
-                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, width: '32px' }}>
-                                <div style={{
-                                  width: '32px', height: '32px', borderRadius: '50%',
-                                  background: isExpanded ? '#EEEDFE' : 'var(--cust-bg, #f8fafc)',
-                                  border: isExpanded ? '2px solid #7F77DD' : '1.5px solid #e2e8f0',
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                  flexShrink: 0, zIndex: 1, transition: 'all 0.2s'
-                                }}>
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isExpanded ? '#534AB7' : '#94a3b8'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/>
-                                  </svg>
-                                </div>
-                                {!isLast && (
-                                  <div style={{ width: '1px', flex: 1, background: '#e2e8f0', margin: '4px 0', minHeight: '16px' }} />
-                                )}
-                              </div>
+                      {/* Right Container (Always Timeline): Timeline History */}
+                      <div className="memo-box" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: '420px' }}>
+                        <div className="memo-box-title" style={{ marginBottom: '20px', fontSize: '15px', fontWeight: 700 }}>이전 상담 타임라인</div>
 
-                              {/* 오른쪽 카드 */}
-                              <div style={{ flex: 1, marginBottom: '8px' }}>
-                                <div
-                                  onClick={() => handleTimelineClick(item.timelineId)}
-                                  style={{
-                                    background: isExpanded ? '#f8f8fc' : 'white',
-                                    border: isExpanded ? '1px solid #a581fb' : '1px solid #e2e8f0',
-                                    borderRadius: '12px',
-                                    padding: '12px 14px',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s ease'
-                                  }}
-                                >
-                                  {/* 날짜 */}
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                                    </svg>
-                                    {item.date}
+                        <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
+                          {timelineList.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8', fontSize: '14px', fontWeight: '500' }}>
+                              이전 상담 타임라인 이력이 없습니다.
+                            </div>
+                          ) : (
+                            timelineList.map((item, index) => {
+                              const isExpanded = expandedTimelineId === item.timelineId;
+                              const isLast = index === timelineList.length - 1;
+                              return (
+                                <div key={item.timelineId} style={{ display: 'flex', gap: '16px', marginBottom: '8px' }}>
+                                  {/* 왼쪽 dot + line */}
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, width: '32px' }}>
+                                    <div style={{
+                                      width: '32px', height: '32px', borderRadius: '50%',
+                                      background: isExpanded ? '#EEEDFE' : 'var(--cust-bg, #f8fafc)',
+                                      border: isExpanded ? '2px solid #7F77DD' : '1.5px solid #e2e8f0',
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                      flexShrink: 0, zIndex: 1, transition: 'all 0.2s'
+                                    }}>
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isExpanded ? '#534AB7' : '#94a3b8'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14,2 14,8 20,8" />
+                                      </svg>
+                                    </div>
+                                    {!isLast && (
+                                      <div style={{ width: '1px', flex: 1, background: '#e2e8f0', margin: '4px 0', minHeight: '16px' }} />
+                                    )}
                                   </div>
 
-                                  {/* 요약 텍스트 */}
-                                  <div style={{ fontSize: '13px', color: '#080f1a', lineHeight: 1.5, fontWeight: 500 }}>
-                                    {item.content?.summary || item.memo}
-                                  </div>
+                                  {/* 오른쪽 카드 */}
+                                  <div style={{ flex: 1, marginBottom: '8px' }}>
+                                    <div
+                                      onClick={() => handleTimelineClick(item.timelineId)}
+                                      style={{
+                                        background: isExpanded ? '#f8f8fc' : 'white',
+                                        border: isExpanded ? '1px solid #a581fb' : '1px solid #e2e8f0',
+                                        borderRadius: '12px',
+                                        padding: '12px 14px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
+                                      }}
+                                    >
+                                      {/* 날짜 */}
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                          <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+                                        </svg>
+                                        {item.date}
+                                      </div>
 
-                                  {/* 펼쳐진 상세 */}
-                                  {isExpanded && (
-                                    <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #AFA9EC', display: 'flex', flexDirection: 'column', gap: '8px', background: 'white', borderRadius: '8px', padding: '12px 14px', margin: '12px -2px -2px -2px' }}>
+                                      {/* 요약 텍스트 */}
+                                      <div style={{ fontSize: '13px', color: '#080f1a', lineHeight: 1.5, fontWeight: 500 }}>
+                                        {item.content?.summary || item.memo}
+                                      </div>
 
-                                      {timelineDetails[item.timelineId] ? (
-                                        [
-                                          { label: '주요 내용', key: 'main_content' },
-                                          { label: '특이사항', key: 'special_remarks' },
-                                          { label: '후속 조치', key: 'follow_up' },
-                                          { label: '요약', key: 'summary' },
-                                        ].map(({ label, key }) => (
-                                          timelineDetails[item.timelineId].content[key] ? (
-                                            <div key={key} style={{ display: 'flex', gap: '12px'}}>
-                                              <span style={{ fontSize: '12px', color: '#534AB7', fontWeight: 600, minWidth: '56px', paddingTop: '1px' }}>{label}</span>
-                                              <span style={{ fontSize: '13px', color: '#2b1f45', lineHeight: 1.5, flex: 1, whiteSpace: 'pre-wrap' }}>
-                                                {timelineDetails[item.timelineId].content[key]}
-                                              </span>
-                                            </div>
-                                          ) : null
-                                        ))
-                                      ) : (
-                                        <div style={{ fontSize: '13px', color: '#94a3b8' }}>로딩중...</div>
+                                      {/* 펼쳐진 상세 */}
+                                      {isExpanded && (
+                                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #AFA9EC', display: 'flex', flexDirection: 'column', gap: '8px', background: 'white', borderRadius: '8px', padding: '12px 14px', margin: '12px -2px -2px -2px' }}>
+
+                                          {timelineDetails[item.timelineId] ? (
+                                            [
+                                              { label: '주요 내용', key: 'main_content' },
+                                              { label: '특이사항', key: 'special_remarks' },
+                                              { label: '후속 조치', key: 'follow_up' },
+                                              { label: '요약', key: 'summary' },
+                                            ].map(({ label, key }) => (
+                                              timelineDetails[item.timelineId].content[key] ? (
+                                                <div key={key} style={{ display: 'flex', gap: '12px' }}>
+                                                  <span style={{ fontSize: '12px', color: '#534AB7', fontWeight: 600, minWidth: '56px', paddingTop: '1px' }}>{label}</span>
+                                                  <span style={{ fontSize: '13px', color: '#2b1f45', lineHeight: 1.5, flex: 1, whiteSpace: 'pre-wrap' }}>
+                                                    {timelineDetails[item.timelineId].content[key]}
+                                                  </span>
+                                                </div>
+                                              ) : null
+                                            ))
+                                          ) : (
+                                            <div style={{ fontSize: '13px', color: '#94a3b8' }}>로딩중...</div>
+                                          )}
+                                        </div>
                                       )}
                                     </div>
-                                  )}
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                          );
-                        })
-                        )}
+                              );
+                            })
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
                 {/* Section 2: Simulator (Bottom Workspace) */}
                 {activeTab === "simulator" && (
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <div style={{ fontSize: '17px', fontWeight: 800, color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '4px', height: '17px', background: '#8b5cf6', borderRadius: '2px', display: 'inline-block' }}></span>
-                    자산 시뮬레이터 및 AI 질의응답
-                  </div>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', height: '540px', boxSizing: 'border-box' }}>
-                    {/* Left Column (Combined Customer Info & Additional Notes) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minHeight: 0 }}>
-                      
-                      {/* Single Integrated Container */}
-                      <div style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto' }}>
-                        <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', marginBottom: '12px', marginTop: 0 }}>고객 정보 & AI 인사이트</h3>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>고객명(등급)</span>
-                            <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.name}</span>
+                      <span style={{ width: '4px', height: '17px', background: '#8b5cf6', borderRadius: '2px', display: 'inline-block' }}></span>
+                      AI 상담 시뮬레이터
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', height: '540px', boxSizing: 'border-box' }}>
+                      {/* Left Column (Combined Customer Info & Additional Notes) */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minHeight: 0 }}>
+
+                        {/* Single Integrated Container */}
+                        <div style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                          <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', marginBottom: '12px', marginTop: 0 }}>고객 정보 & AI 인사이트</h3>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                              <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>고객명(등급)</span>
+                              <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.name}</span>
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                              <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>생년월일</span>
+                              <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.birthday}</span>
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                              <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>직업</span>
+                              <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.job}</span>
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                              <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>성향</span>
+                              <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.risk}</span>
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
+                              <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>총자산</span>
+                              <span style={{ color: '#0284c7', fontSize: '12px', fontWeight: 700 }}>{selectedSimDetails.assets}</span>
+                            </div>
+
                           </div>
-                          
-                          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>생년월일</span>
-                            <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.birthday}</span>
-                          </div>
-                          
-                          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>직업</span>
-                            <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.job}</span>
-                          </div>
-                          
-                          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>성향</span>
-                            <span style={{ color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>{selectedSimDetails.risk}</span>
-                          </div>
-                          
-                          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                            <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>총자산</span>
-                            <span style={{ color: '#0284c7', fontSize: '12px', fontWeight: 700 }}>{selectedSimDetails.assets}</span>
-                          </div>
-                          
-                          </div>
-                          
+
                           {/* Premium AI Insight Glow Card */}
                           <div className="ai-insight-glow-card" style={{ marginTop: '16px' }}>
                             <div className="ai-insight-header">
                               <span className="ai-badge-gradient" style={{
-                              background: 'linear-gradient(135deg, #8b5cf6 0%, #2e24ea 100%)',
-                              color: 'white',
-                              fontSize: 12,
-                              fontWeight: 800,
-                              padding: '1px 6px',
-                              borderRadius: 8,
-                              letterSpacing: '0.3px',
-                            }}>AI 인사이트</span>
-                              <span style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: 800 }}>금융 라이프스타일 분석</span>
+                                background: 'linear-gradient(135deg, #8b5cf6 0%, #2e24ea 100%)',
+                                color: 'white',
+                                fontSize: 12,
+                                fontWeight: 800,
+                                padding: '1px 6px',
+                                borderRadius: 8,
+                                letterSpacing: '0.3px',
+                              }}>AI 인사이트</span>
+                              <span style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: 800 }}>포트폴리오 진단 분석</span>
                             </div>
                             <div className="ai-insight-body" style={{ fontSize: '12px' }}>
                               {selectedSimDetails.insight}
                             </div>
                           </div>
 
-                        {/* Additional Notes Integrated at the bottom */}
-                        <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px', gap: '8px' }}>
-                          <span style={{ color: '#475569', fontSize: '15px', fontWeight: 700 }}>추가 입력 사항</span>
-                          <textarea
-                            style={{ 
-                              width: '100%', 
-                              border: '1px solid #cbd5e1', 
-                              borderRadius: '8px', 
-                              padding: '10px 12px', 
-                              fontSize: '13px', 
-                              color: '#334155', 
-                              resize: 'none',
-                              outline: 'none',
-                              boxSizing: 'border-box',
-                              minHeight: '80px',
-                              fontFamily: 'inherit'
-                            }}
-                            placeholder={`추가 내용을 자유롭게 입력하세요.\n예) 내년 초 부동산 매도 예정, 자녀 유학 자금 필요...`}
-                            value={additionalNotes[selectedCustomerId] || ""}
-                            onChange={(e) => handleNotesChange(selectedCustomerId, e.target.value)}
-                          />
-                          
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', position: 'relative', marginTop: '4px' }}>
-                            {showNotesSaveToast && (
-                              <div style={{
-                                position: 'absolute', right: '80px', top: '50%', transform: 'translateY(-50%)',
-                                display: 'flex', alignItems: 'center', gap: 8,
-                                background: '#334155', color: 'white',
-                                padding: '6px 12px', borderRadius: 20,
-                                fontSize: 12, fontWeight: 500,
-                                whiteSpace: 'nowrap',
-                                zIndex: 10
-                              }}>
-                                <div style={{ width: 14, height: 14, background: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <Check size={10} color="white" strokeWidth={3} />
+                          {/* Additional Notes Integrated at the bottom */}
+                          <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px', gap: '8px' }}>
+                            <span style={{ color: '#475569', fontSize: '15px', fontWeight: 700 }}>추가 입력 사항</span>
+                            <textarea
+                              style={{
+                                width: '100%',
+                                border: '1px solid #cbd5e1',
+                                borderRadius: '8px',
+                                padding: '10px 12px',
+                                fontSize: '13px',
+                                color: '#334155',
+                                resize: 'none',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                minHeight: '80px',
+                                fontFamily: 'inherit'
+                              }}
+                              placeholder={`상담 전 추가할 내용을 입력하세요. \n예) 내년 초 부동산 매도 예정, 자녀 유학 자금 필요...`}
+                              value={additionalNotes[selectedCustomerId] || ""}
+                              onChange={(e) => handleNotesChange(selectedCustomerId, e.target.value)}
+                            />
+
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', position: 'relative', marginTop: '4px' }}>
+                              {showNotesSaveToast && (
+                                <div style={{
+                                  position: 'absolute', right: '80px', top: '50%', transform: 'translateY(-50%)',
+                                  display: 'flex', alignItems: 'center', gap: 8,
+                                  background: '#334155', color: 'white',
+                                  padding: '6px 12px', borderRadius: 20,
+                                  fontSize: 12, fontWeight: 500,
+                                  whiteSpace: 'nowrap',
+                                  zIndex: 10
+                                }}>
+                                  <div style={{ width: 14, height: 14, background: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Check size={10} color="white" strokeWidth={3} />
+                                  </div>
+                                  저장완료
                                 </div>
-                                저장완료
+                              )}
+                              {simulatorSaved ? (
+                                <span style={{ marginRight: '12px', fontSize: '12px', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
+                                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
+                                  저장됨
+                                </span>
+                              ) : (
+                                <span style={{ marginRight: '12px', fontSize: '12px', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
+                                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></span>
+                                  저장 필요
+                                </span>
+                              )}
+                              <button
+                                onClick={() => handleSaveNotes()}
+                                style={{
+                                  background: '#0284c7',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  padding: '6px 16px',
+                                  fontSize: '12px',
+                                  fontWeight: 600,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                저장
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right Column (Chat simulator) */}
+                      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', minHeight: 0 }}>
+
+                        {/* Messages Panel */}
+                        <div
+                          ref={messagesContainerRef}
+                          style={{
+                            flex: 1,
+                            overflowY: 'auto',
+                            paddingRight: '8px',
+                            paddingBottom: '80px', // Space for bottom input
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '12px',
+                            minHeight: 0
+                          }}
+                        >
+                          {(!chatMessages[selectedCustomerId] || chatMessages[selectedCustomerId].length === 0) ? (
+                            <div style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              height: '100%',
+                              textAlign: 'center',
+                              color: '#64748b',
+                              padding: '24px',
+                              boxSizing: 'border-box'
+                            }}>
+                              <p style={{ fontSize: '14px', fontWeight: 600, color: '#475569', lineHeight: '1.6', marginBottom: '12px' }}>
+                                PB님, 왼쪽에 추가 입력사항을 입력한 후,<br />
+                                '저장' 버튼을 누르고 질문해보세요.
+                              </p>
+                              <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.8' }}>
+                                예) "해당 고객 오늘 상담 어떻게 시작하면 돼?"<br />
+                                "이번 개정세법에서 해당 고객에 대한 절세 포인트 있어?"
+                              </p>
+                            </div>
+                          ) : (
+                            chatMessages[selectedCustomerId].map((msg, idx) => (
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                                  width: '100%'
+                                }}
+                                key={idx}
+                              >
+                                <div style={{
+                                  maxWidth: '85%',
+                                  background: msg.sender === 'user' ? '#0284c7' : '#f1f5f9',
+                                  color: msg.sender === 'user' ? 'white' : '#0f172a',
+                                  padding: '10px 14px',
+                                  borderRadius: msg.sender === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                                  fontSize: '12px',
+                                  lineHeight: '1.5',
+                                  whiteSpace: 'pre-wrap',
+                                  boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+                                }}>
+                                  {msg.text}
+                                </div>
                               </div>
-                            )}
-                            {simulatorSaved ? (
-                              <span style={{ marginRight: '12px', fontSize: '12px', color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
-                                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
-                                저장됨
-                              </span>
-                            ) : (
-                              <span style={{ marginRight: '12px', fontSize: '12px', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
-                                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></span>
-                                저장 필요
-                              </span>
-                            )}
+                            ))
+                          )}
+                          {isTyping && (
+                            <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
+                              <div style={{
+                                background: '#f1f5f9',
+                                color: '#64748b',
+                                padding: '10px 14px',
+                                borderRadius: '12px 12px 12px 2px',
+                                fontSize: '13px',
+                                fontWeight: 500,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px'
+                              }}>
+                                <span className="dot-typing">AI가 시뮬레이션 분석 중입니다...</span>
+                              </div>
+                            </div>
+                          )}
+                          <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Bottom Chat Input */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          background: 'white',
+                          paddingTop: '8px',
+                          paddingBottom: '8px'
+                        }}>
+                          <div style={{
+                            border: '1px solid #cbd5e1',
+                            borderRadius: '24px',
+                            padding: '4px 4px 4px 12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            background: 'white',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                          }}>
+                            <input
+                              type="text"
+                              style={{
+                                flex: 1,
+                                border: 'none',
+                                outline: 'none',
+                                fontSize: '13px',
+                                background: 'transparent'
+                              }}
+                              placeholder="상담 지원용 시뮬레이션 질문을 입력하세요."
+                              value={currentQuestion}
+                              onChange={(e) => setCurrentQuestion(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  handleSendQuestion();
+                                }
+                              }}
+                            />
                             <button
-                              onClick={() => handleSaveNotes()}
-                              style={{ 
-                                background: '#0284c7', 
-                                color: 'white', 
-                                border: 'none', 
-                                borderRadius: '6px', 
-                                padding: '6px 16px', 
-                                fontSize: '12px', 
-                                fontWeight: 600, 
-                                cursor: 'pointer' 
+                              onClick={() => handleSendQuestion()}
+                              style={{
+                                background: '#0284c7',
+                                color: 'white',
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'background 0.2s'
                               }}
                             >
-                              저장
+                              <ArrowUp size={16} />
                             </button>
                           </div>
                         </div>
                       </div>
                     </div>
-
-                    {/* Right Column (Chat simulator) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', minHeight: 0 }}>
-                      
-                      {/* Messages Panel */}
-                      <div 
-                        ref={messagesContainerRef}
-                        style={{ 
-                          flex: 1, 
-                          overflowY: 'auto', 
-                          paddingRight: '8px', 
-                          paddingBottom: '80px', // Space for bottom input
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '12px',
-                          minHeight: 0
-                        }}
-                      >
-                        {(!chatMessages[selectedCustomerId] || chatMessages[selectedCustomerId].length === 0) ? (
-                          <div style={{ 
-                            display: 'flex', 
-                            flexDirection: 'column', 
-                            alignItems: 'center', 
-                            justifyContent: 'center', 
-                            height: '100%', 
-                            textAlign: 'center',
-                            color: '#64748b',
-                            padding: '24px',
-                            boxSizing: 'border-box'
-                          }}>
-                            <p style={{ fontSize: '14px', fontWeight: 600, color: '#475569', lineHeight: '1.6', marginBottom: '12px' }}>
-                              PB님, 위쪽에서 추가 입력 사항을 저장한 후,<br />
-                              상담 지원용 시뮬레이션 질문을 입력해보세요.
-                            </p>
-                            <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.8' }}>
-                              예) "이 고객의 자산 포트폴리오를 기반으로 한 절세 전략 제안해줘"<br />
-                              "추가 유학 자금 2억 마련을 위해 추천하는 상담 화법은?"
-                            </p>
-                          </div>
-                        ) : (
-                          chatMessages[selectedCustomerId].map((msg, idx) => (
-                            <div 
-                              style={{ 
-                                display: 'flex', 
-                                justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                                width: '100%'
-                              }}
-                              key={idx}
-                            >
-                              <div style={{ 
-                                maxWidth: '85%', 
-                                background: msg.sender === 'user' ? '#0284c7' : '#f1f5f9', 
-                                color: msg.sender === 'user' ? 'white' : '#0f172a',
-                                padding: '10px 14px', 
-                                borderRadius: msg.sender === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-                                fontSize: '12px',
-                                lineHeight: '1.5',
-                                whiteSpace: 'pre-wrap',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
-                              }}>
-                                {msg.text}
-                              </div>
-                            </div>
-                          ))
-                        )}
-                        {isTyping && (
-                          <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%' }}>
-                            <div style={{ 
-                              background: '#f1f5f9', 
-                              color: '#64748b',
-                              padding: '10px 14px', 
-                              borderRadius: '12px 12px 12px 2px',
-                              fontSize: '13px',
-                              fontWeight: 500,
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px'
-                            }}>
-                              <span className="dot-typing">AI가 시뮬레이션 분석 중입니다...</span>
-                            </div>
-                          </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                      </div>
-                      
-                      {/* Bottom Chat Input */}
-                      <div style={{ 
-                        position: 'absolute', 
-                        bottom: 0, 
-                        left: 0, 
-                        right: 0, 
-                        background: 'white', 
-                        paddingTop: '8px',
-                        paddingBottom: '8px'
-                      }}>
-                        <div style={{ 
-                          border: '1px solid #cbd5e1', 
-                          borderRadius: '24px', 
-                          padding: '4px 4px 4px 12px', 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          background: 'white',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
-                        }}>
-                          <input 
-                            type="text" 
-                            style={{ 
-                              flex: 1, 
-                              border: 'none', 
-                              outline: 'none', 
-                              fontSize: '13px',
-                              background: 'transparent'
-                            }}
-                            placeholder="상담 지원용 시뮬레이션 질문을 입력하세요."
-                            value={currentQuestion}
-                            onChange={(e) => setCurrentQuestion(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                handleSendQuestion();
-                              }
-                            }}
-                          />
-                          <button 
-                            onClick={() => handleSendQuestion()}
-                            style={{ 
-                              background: '#0284c7', 
-                              color: 'white', 
-                              width: '32px', 
-                              height: '32px', 
-                              borderRadius: '50%', 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              justifyContent: 'center', 
-                              border: 'none', 
-                              cursor: 'pointer',
-                              transition: 'background 0.2s'
-                            }}
-                          >
-                            <ArrowUp size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
                   </div>
-                </div>
-              )}
-                
+                )}
+
               </div>
             </>
           ) : (
@@ -1250,50 +1250,50 @@ export default function CounselingAssistant() {
             </div>
           )}
         </div>
-      <CustomerRegistrationModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSave={async (newData) => {
-          try {
-            const created = await api.customer.create({
-              name: newData.name || "신규 고객",
-              email: newData.email || "new@email.com",
-              phone: newData.phone || "010-0000-0000",
-              address: newData.address || "서울시 강남구",
-              job: newData.job || "회사원",
-              grade: newData.grade || "일반",
-              investment_type: newData.investment_type || "위험중립형",
-              birth: newData.dob ? newData.dob.replace(/\./g, "-") : null,
-              gender: newData.gender || "M",
-            });
+        <CustomerRegistrationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={async (newData) => {
+            try {
+              const created = await api.customer.create({
+                name: newData.name || "신규 고객",
+                email: newData.email || "new@email.com",
+                phone: newData.phone || "010-0000-0000",
+                address: newData.address || "서울시 강남구",
+                job: newData.job || "회사원",
+                grade: newData.grade || "일반",
+                investment_type: newData.investment_type || "위험중립형",
+                birth: newData.dob ? newData.dob.replace(/\./g, "-") : null,
+                gender: newData.gender || "M",
+              });
 
-            pendingSelectedCustomerIdRef.current = created.c_id;
-            setShowTodayOnly(false);
+              pendingSelectedCustomerIdRef.current = created.c_id;
+              setShowTodayOnly(false);
 
-            // Fetch refreshed list to update the client state
-            const response = await api.customer.getList("all");
-            const mapped = response.map((c) => {
-              const char = c.name ? c.name[0] : "고";
-              const avatarColor = c.gender === "F" ? "pink" : "blue";
-              return {
-                id: c.c_id,
-                name: c.name,
-                email: c.email || `${c.c_id}@poom.com`,
-                phone: c.phone || "010-0000-0000",
-                color: avatarColor,
-                gender: c.gender,
-                initial: char,
-              };
-            });
+              // Fetch refreshed list to update the client state
+              const response = await api.customer.getList("all");
+              const mapped = response.map((c) => {
+                const char = c.name ? c.name[0] : "고";
+                const avatarColor = c.gender === "F" ? "pink" : "blue";
+                return {
+                  id: c.c_id,
+                  name: c.name,
+                  email: c.email || `${c.c_id}@poom.com`,
+                  phone: c.phone || "010-0000-0000",
+                  color: avatarColor,
+                  gender: c.gender,
+                  initial: char,
+                };
+              });
 
-            setAllCustomersList(mapped);
-            setSelectedCustomerId(created.c_id);
-            setIsModalOpen(false);
-          } catch (error) {
-            alert("고객 등록 중 오류가 발생했습니다: " + error.message);
-          }
-        }}
-      />
+              setAllCustomersList(mapped);
+              setSelectedCustomerId(created.c_id);
+              setIsModalOpen(false);
+            } catch (error) {
+              alert("고객 등록 중 오류가 발생했습니다: " + error.message);
+            }
+          }}
+        />
       </div>
     </div>
   );
