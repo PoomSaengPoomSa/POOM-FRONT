@@ -1113,8 +1113,8 @@ export default function CounselingAssistant() {
                               boxSizing: 'border-box'
                             }}>
                               <p style={{ fontSize: '14px', fontWeight: 600, color: '#475569', lineHeight: '1.6', marginBottom: '12px' }}>
-                                PB님, 왼쪽에 추가 입력사항을 입력한후,<br />
-                                저장버튼 누르고 질문을 입력해보세요.
+                                PB님, 왼쪽에 추가 입력사항을 입력한 후,<br />
+                                '저장' 버튼을 누르고 질문해보세요.
                               </p>
                               <p style={{ fontSize: '11px', color: '#94a3b8', lineHeight: '1.8' }}>
                                 예) "해당 고객 오늘 상담 어떻게 시작하면 돼?"<br />
