@@ -137,8 +137,9 @@ export default function Sidebar({ type = "cal" }) {
     path.includes('/weekly-calendar') ||
     path.includes('/monthly-calendar');
 
+  // ✅ 수정: /customer-management → /customer-info
   const isCustomerActive =
-    path.includes('/customer-management');
+    path.includes('/customer-info');
 
   const isAssistantActive =
     path.includes('/counseling-assistant');
