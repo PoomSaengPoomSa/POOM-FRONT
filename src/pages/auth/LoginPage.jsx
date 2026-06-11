@@ -11,7 +11,6 @@ export default function LoginPage() {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,10 +26,7 @@ export default function LoginPage() {
       setError("비밀번호를 입력해 주세요.");
       return;
     }
-    if (!agreeTerms) {
-      setError("서비스 이용약관 및 개인정보 처리방침에 동의해 주세요.");
-      return;
-    }
+
 
     setIsSubmitting(true);
     try {
@@ -118,18 +114,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="auth-new-options" style={{ marginTop: "32px" }}>
-              <input
-                type="checkbox"
-                id="agree-terms"
-                className="auth-new-checkbox"
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-              />
-              <label htmlFor="agree-terms" className="auth-new-options-text" style={{ cursor: "pointer", userSelect: "none" }}>
-                By creating an account you agree to the <Link to="#" className="auth-new-link">terms of use</Link> and our <Link to="#" className="auth-new-link">privacy policy.</Link>
-              </label>
-            </div>
+
 
             <button type="submit" className="auth-new-btn" style={{ marginTop: "20px", width: "100%" }} disabled={isSubmitting}>
               {isSubmitting ? "Logging in..." : "Log in"}

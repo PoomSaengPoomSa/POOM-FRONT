@@ -525,7 +525,6 @@ export default function AdminPermissionSettings() {
             {modalStep === 2 && (
               <>
                 <div className="modal-info-box">
-                  <p>{transferEmp.name} PB는 {transferEmp.branch.replace('지점', '')}지점 → {targetBranch.replace(' ', '')} 발령 예정입니다.</p>
                   <p>담당 고객 {transferEmp.clients}을 인수받을 직원을 선택해주세요.</p>
                 </div>
 
@@ -599,9 +598,15 @@ export default function AdminPermissionSettings() {
 
             {modalStep === 4 && (
               <>
-                <div className="modal-info-box" style={{ background: '#f0fdf4', color: '#166534', border: 'none' }}>
-                  <p style={{ color: '#166534', fontWeight: 500 }}>고객 재배정 완료 — {replacementName}에게 {selectedCustomers.size}명 이전됨</p>
-                </div>
+                {parseInt(transferEmp.clients) > 0 ? (
+                  <div className="modal-info-box" style={{ background: '#f0fdf4', color: '#166534', border: 'none' }}>
+                    <p style={{ color: '#166534', fontWeight: 500 }}>고객 재배정 완료 — {replacementName}에게 {selectedCustomers.size}명 이전됨</p>
+                  </div>
+                ) : (
+                  <div className="modal-info-box">
+                    <p>{transferEmp.name} PB는 담당 고객이 없습니다. 발령할 지점을 선택해주세요.</p>
+                  </div>
+                )}
 
                 <div className="modal-subtitle" style={{ color: '#9ca3af' }}>발령 지점을 선택해주세요</div>
 
@@ -632,7 +637,7 @@ export default function AdminPermissionSettings() {
               )}
 
               {modalStep < 4 ? (
-                <button className="btn-next" disabled={modalStep === 2 && availableReplacements.length === 0} onClick={handleNextStep}>다음</button>
+                <button className="btn-next" disabled={modalStep === 2 && parseInt(transferEmp.clients) > 0 && availableReplacements.length === 0} onClick={handleNextStep}>다음</button>
               ) : (
                 <button className="btn-next" onClick={handleComplete}>완료</button>
               )}
