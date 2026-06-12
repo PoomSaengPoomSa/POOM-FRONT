@@ -188,7 +188,7 @@ export default function App() {
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
   const [selectedBriefing, setSelectedBriefing] = useState(null);
   const [modalSize, setModalSize] = useState({ width: 850, height: 650 });
-  const prevCountRef = useRef(null);
+  const prevMaxIdRef = useRef(null);
   const pollIntervalRef = useRef(null);
 
   const handleResizeStart = (e) => {
@@ -222,70 +222,77 @@ export default function App() {
   };
 
   useEffect(() => {
-    // 15초마다 알림 개수 조회하여 감시
+    // 15초마다 알림 리스트 조회하여 감시
     const checkNotifications = async () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        prevCountRef.current = null;
+        prevMaxIdRef.current = null;
         return;
       }
       try {
-        const countData = await api.notification.getTodayCount();
-        if (countData && typeof countData.today_count === "number") {
-          const currentCount = countData.today_count;
+        const list = await api.notification.getList("today");
+        if (list && list.length > 0) {
+          const currentMaxId = Math.max(...list.map(n => n.id));
           
-          if (prevCountRef.current !== null && currentCount > prevCountRef.current) {
-            const list = await api.notification.getList("today");
-            if (list && list.length > 0) {
-              const latestBriefing = list.find(n => n.isBriefing);
-              if (latestBriefing) {
-                // 방문 시간 파싱 (예: "홍길동 고객 — 17:00 방문 예정")
-                const timeMatch = latestBriefing.content.match(/(\d{2}):(\d{2})/);
-                let shouldPopup = true;
+          if (prevMaxIdRef.current !== null && currentMaxId > prevMaxIdRef.current) {
+            // 새로 생성된 알림들 중에서 isBriefing 인 것 필터링
+            const newBriefings = list.filter(n => n.isBriefing && n.id > prevMaxIdRef.current);
+            if (newBriefings.length > 0) {
+              // 새로 들어온 브리핑 알림 중 가장 최신 것(ID가 가장 큰 것) 선택
+              const latestBriefing = newBriefings.reduce((prev, curr) => (prev.id > curr.id) ? prev : curr);
+              
+              // 방문 시간 파싱 (예: "홍길동 고객 — 17:00 방문 예정")
+              const timeMatch = latestBriefing.content.match(/(\d{2}):(\d{2})/);
+              let shouldPopup = true;
+              
+              if (timeMatch) {
+                const visitHours = parseInt(timeMatch[1], 10);
+                const visitMinutes = parseInt(timeMatch[2], 10);
                 
-                if (timeMatch) {
-                  const visitHours = parseInt(timeMatch[1], 10);
-                  const visitMinutes = parseInt(timeMatch[2], 10);
-                  
-                  const now = new Date();
-                  const visitTime = new Date(now);
-                  visitTime.setHours(visitHours, visitMinutes, 0, 0);
-                  
-                  // 현재 시간이 방문 시간보다 10분 이상 지났다면 실시간 팝업을 띄우지 않습니다.
-                  const tenMinutes = 10 * 60 * 1000;
-                  if (now.getTime() - visitTime.getTime() > tenMinutes) {
-                    shouldPopup = false;
-                  }
-                }
+                const now = new Date();
+                const visitTime = new Date(now);
+                visitTime.setHours(visitHours, visitMinutes, 0, 0);
                 
-                if (shouldPopup) {
-                  setActiveAlert(latestBriefing);
-                  
-                  const audio = new Audio("/ding.mp3");
-                  audio.play().catch(e => console.log("실시간 알림 효과음 재생 실패:", e));
+                // 현재 시간이 방문 시간보다 10분 이상 지났다면 실시간 팝업을 띄우지 않습니다.
+                const tenMinutes = 10 * 60 * 1000;
+                if (now.getTime() - visitTime.getTime() > tenMinutes) {
+                  shouldPopup = false;
                 }
+              }
+              
+              if (shouldPopup) {
+                setActiveAlert(latestBriefing);
+                
+                const audio = new Audio("/ding.mp3");
+                audio.play().catch(e => console.log("실시간 알림 효과음 재생 실패:", e));
               }
             }
           }
-          prevCountRef.current = currentCount;
+          prevMaxIdRef.current = currentMaxId;
+        } else {
+          prevMaxIdRef.current = 0;
         }
       } catch (err) {
         console.error("실시간 알림 폴링 실패:", err);
       }
     };
 
-    const initCount = async () => {
+    const initMaxId = async () => {
       const token = localStorage.getItem("accessToken");
       if (token) {
         try {
-          const countData = await api.notification.getTodayCount();
-          if (countData) {
-            prevCountRef.current = countData.today_count;
+          const list = await api.notification.getList("today");
+          if (list && list.length > 0) {
+            prevMaxIdRef.current = Math.max(...list.map(n => n.id));
+          } else {
+            prevMaxIdRef.current = 0;
           }
-        } catch (e) {}
+        } catch (e) {
+          prevMaxIdRef.current = 0;
+        }
       }
     };
-    initCount();
+    initMaxId();
 
     pollIntervalRef.current = setInterval(checkNotifications, 15000);
 
