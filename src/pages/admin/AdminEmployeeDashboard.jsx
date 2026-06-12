@@ -214,11 +214,14 @@ export default function AdminEmployeeDashboard() {
         if (branchData && branchData.stats) {
           setDeptData(branchData.stats.map(s => ({
             name: s.branch_name,
-            value: s.access_rate
+            value: Math.min(s.access_rate || 0, 100)
           })));
         }
         if (weeklyData && weeklyData.trends) {
-          setTrendData(weeklyData.trends);
+          setTrendData(weeklyData.trends.map(t => ({
+            ...t,
+            value: Math.min(t.value || 0, 100)
+          })));
         }
         if (usageData) {
           if (usageData.usage) {
@@ -484,7 +487,7 @@ export default function AdminEmployeeDashboard() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={deptData} barSize={48}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6b7280' }} interval={0} />
                     <YAxis axisLine={false} tickLine={false} domain={[0, 100]} ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={(val) => `${val}%`} tick={{ fontSize: 12, fill: '#6b7280' }} />
                     <Tooltip 
                       cursor={{fill: 'rgba(243, 244, 246, 0.3)'}}
@@ -519,7 +522,7 @@ export default function AdminEmployeeDashboard() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={trendData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} interval={0} />
                     <YAxis axisLine={false} tickLine={false} domain={[0, 100]} ticks={[0, 20, 40, 60, 80, 100]} tickFormatter={(val) => `${val}%`} tick={{ fontSize: 12, fill: '#6b7280' }} />
                     <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: 12 }} />
                     <Line 
